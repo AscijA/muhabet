@@ -1,0 +1,118 @@
+import styles from './SignComponent.module.css';
+// Import the functions you need from the SDKs you need
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+
+import { useState, } from "react";
+import {auth, db} from '../../Firebase/firebase';
+import LoginForm from './LoginForm/LoginForm';
+
+
+function SignComponent() {
+  let [credentials, setCredentials] = useState({ email: "", password: "", });
+  let [isSignIn, setIsSignIn] = useState(true);
+
+  function handleChangeEmail(event) {
+    setCredentials(oldState => {
+      return { ...oldState, email: event.target.value };
+    });
+  }
+  function handleChangePassword(event) {
+    setCredentials(oldState => {
+      return { ...oldState, password: event.target.value };
+    });
+  }
+  function handleSignUp(event) {
+    event.preventDefault();
+    if (credentials.email && credentials.password) {
+      createUserWithEmailAndPassword(auth, credentials.email, credentials.password)
+        .then(async (userCredential) => {
+          const userInfo = userCredential.user;
+          const user = {
+            email: userInfo.email,
+            displayName: userInfo.displayName,
+            emailVerified: userInfo.emailVerified,
+            createdAt: userInfo.metadata.creationTime,
+            uid: userInfo.uid,
+          };
+          const docRef = await addDoc(collection(db, "users"), user);
+          console.log(docRef);
+        })
+        .catch((error) => {
+          // const errorCode = error.code;
+          // const errorMessage = error.message;
+        });
+    }
+  }
+  function handleSignIn(event) {
+    event.preventDefault();
+    if (credentials.email && credentials.password) {
+      signInWithEmailAndPassword(auth, credentials.email, credentials.password)
+        .then((userCredential) => {
+          const userInfo = userCredential.user;
+          const user = {
+            email: userInfo.email,
+            displayName: userInfo.displayName,
+            emailVerified: userInfo.emailVerified,
+            createdAt: userInfo.metadata.creationTime,
+            uid: userInfo.uid,
+
+          };
+          console.log(user);
+        })
+        .catch((error) => {
+          // const errorCode = error.code;
+          // const errorMessage = error.message;
+        });
+    }
+  }
+  function handleResetPassword(event) {
+    event.preventDefault();
+    if (credentials.email) {
+      sendPasswordResetEmail(auth, credentials.email)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          // const errorCode = error.code;
+          // const errorMessage = error.message;
+        });
+    }
+  }
+  function handleChangeFormType() {
+    setIsSignIn(oldState => !oldState);
+  }
+
+  return (
+    <div className={ styles.container }>
+      <div className={ styles.sign }>
+        <div className={ styles.innerContainer }>
+          <LoginForm
+            handleChangeEmail={ handleChangeEmail }
+            handleChangePassword={ handleChangePassword }
+            handleResetPassword={ handleResetPassword }
+            handleChangeFormType={ handleChangeFormType }
+            email={ credentials.email }
+            password={ credentials.password }
+            handleSubmit={ isSignIn ? handleSignIn : handleSignUp }
+            buttonText={ isSignIn ? "Sign in" : "Sign up" }
+            formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
+          />
+          {/* <LoginForm
+            handleChangeEmail={ handleChangeEmail }
+            handleChangePassword={ handleChangePassword }
+            handleSubmit={ handleSignIn }
+            email={ credentials.email }
+            password={ credentials.password }
+            buttonText="Sign In" /> */}
+        </div>
+      </div>
+      <div>
+
+      </div>
+    </div>
+  );
+}
+
+export default SignComponent;

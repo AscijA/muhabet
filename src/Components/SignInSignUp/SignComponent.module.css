@@ -1,0 +1,23 @@
+.container {
+  width: inherit;
+  height: inherit;
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+  /* background-color: aqua; */
+  /* flex-direction: row; */
+}
+
+.sign {
+  width: 30%;
+  height: inherit;
+  box-shadow: 5px 0px 10px gray;
+  display: flex;
+  flex-direction: column;
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+
+}
