@@ -1,23 +1,28 @@
 .container {
   width: inherit;
-  height: inherit;
+  height: 100vh;
   display: flex;
   /* justify-content: center; */
   /* align-items: center; */
   /* background-color: aqua; */
-  /* flex-direction: row; */
+
 }
 
 .sign {
-  width: 30%;
+  width: 30vw;
   height: inherit;
-  box-shadow: 5px 0px 10px gray;
+  box-shadow: 5px 0px 10px #4b43e8;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  color: white;
+  background-color: #4b43e8;
 }
 
 .innerContainer {
   display: flex;
   flex-direction: column;
+  margin: 2.5vh;
 
 }

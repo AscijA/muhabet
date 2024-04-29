@@ -3,23 +3,22 @@ import styles from './LoginForm.module.css';
 
 function LoginForm(props) {
   return (
-    <form >
+    <form className={styles.signForm}>
       <div className={ styles.formInput }>
         <label >Email address</label>
         <input type="text" value={ props.email } onChange={ props.handleChangeEmail } />
-        <div >We'll never share your email with anyone else.</div>
       </div>
       <div className={ styles.formInput }>
         <label >Password</label>
         <input type="password" value={ props.password } onChange={ props.handleChangePassword } />
       </div>
-      <div>
+      <div className={styles.buttonContainer}>
         <button onClick={ props.handleSubmit }>{ props.buttonText }</button>
       </div>
-      <div>
+      <div className={styles.helpLinks}>
         <div onClick={ props.handleChangeFormType }>{ props.formType }</div>
+        <div onClick={ props.handleResetPassword }>Reset password</div>
       </div>
-      <div onClick={ props.handleResetPassword }>Reset password</div>
     </form>
   );
 }
