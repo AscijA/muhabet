@@ -1,0 +1,29 @@
+.formInput {
+  display: flex;
+  flex-direction: column;
+  font-size: 32px;
+  width: 100%;
+}
+
+.formInput label {
+  margin: 8px 0px;
+}
+
+.formInput input {
+  border: 1px solid #4b43e8;
+  border-radius: 10px;
+  margin: 8px 0px;
+  height: 3.5vh;
+  box-sizing: border-box;
+  font-size: 2vh;
+  color: #4b43e8;
+  padding: 1vh;
+}
+
+.formInput input:focus {
+  margin: 8px 0px;
+  box-sizing: border-box;
+  outline: 2px solid #fff;
+  outline-offset: 0;
+  border: 2px solid #4b43e8;
+}

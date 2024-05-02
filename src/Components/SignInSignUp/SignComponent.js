@@ -4,13 +4,15 @@ import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmail
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 import { useState, } from "react";
-import {auth, db} from '../../Firebase/firebase';
+import { auth, db } from '../../Firebase/firebase';
 import LoginForm from './LoginForm/LoginForm';
-
+import BasicModal from '../Common/BasicModal/BasicModal';
+import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
 
 function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
+  let [showResetModal, setShowResetModal] = useState(false);
 
   function handleChangeEmail(event) {
     setCredentials(oldState => {
@@ -75,13 +77,15 @@ function SignComponent() {
           console.log(user);
         })
         .catch((error) => {
-          // const errorCode = error.code;
-          // const errorMessage = error.message;
         });
     }
   }
   function handleChangeFormType() {
     setIsSignIn(oldState => !oldState);
+  }
+
+  function handleResetPasswordToggle() {
+    setShowResetModal(oldState => !oldState);
   }
 
   return (
@@ -91,7 +95,7 @@ function SignComponent() {
           <LoginForm
             handleChangeEmail={ handleChangeEmail }
             handleChangePassword={ handleChangePassword }
-            handleResetPassword={ handleResetPassword }
+            handleResetPasswordToggle={ handleResetPasswordToggle }
             handleChangeFormType={ handleChangeFormType }
             email={ credentials.email }
             password={ credentials.password }
@@ -99,13 +103,11 @@ function SignComponent() {
             buttonText={ isSignIn ? "Sign in" : "Sign up" }
             formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
           />
-          {/* <LoginForm
-            handleChangeEmail={ handleChangeEmail }
-            handleChangePassword={ handleChangePassword }
-            handleSubmit={ handleSignIn }
-            email={ credentials.email }
-            password={ credentials.password }
-            buttonText="Sign In" /> */}
+          { showResetModal && <BasicModal
+            handleResetPasswordToggle={ handleResetPasswordToggle }
+          >
+            <ResetPasswordModal handleResetPassword={handleResetPassword}/>
+          </BasicModal> }
         </div>
       </div>
       <div>

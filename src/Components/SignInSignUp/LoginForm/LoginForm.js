@@ -1,23 +1,28 @@
 import React from 'react';
 import styles from './LoginForm.module.css';
+import CustomInput from '../../Common/CustomInput/CustomInput';
 
 function LoginForm(props) {
   return (
-    <form className={styles.signForm}>
-      <div className={ styles.formInput }>
-        <label >Email address</label>
-        <input type="text" value={ props.email } onChange={ props.handleChangeEmail } />
-      </div>
-      <div className={ styles.formInput }>
-        <label >Password</label>
-        <input type="password" value={ props.password } onChange={ props.handleChangePassword } />
-      </div>
-      <div className={styles.buttonContainer}>
+    <form className={ styles.signForm }>
+      <CustomInput
+        label="Email address"
+        inputType="text"
+        stateElement={ props.email }
+        stateElementChangeHandler={ props.handleChangeEmail }
+      />
+      <CustomInput
+        label="Password"
+        inputType="password"
+        stateElement={ props.password }
+        stateElementChangeHandler={ props.handleChangePassword }
+      />
+      <div className={ styles.buttonContainer }>
         <button onClick={ props.handleSubmit }>{ props.buttonText }</button>
       </div>
-      <div className={styles.helpLinks}>
+      <div className={ styles.helpLinks }>
         <div onClick={ props.handleChangeFormType }>{ props.formType }</div>
-        <div onClick={ props.handleResetPassword }>Reset password</div>
+        <div onClick={ props.handleResetPasswordToggle }>Reset password</div>
       </div>
     </form>
   );
