@@ -1,0 +1,44 @@
+.outerContainer {
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.modalContainer {
+  background-color: #4b43e8;
+  width: 40vh;
+  border: 2px solid #4b43e8;
+  box-shadow: 0px 0px 30px #4b43e8;
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.closeBar {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+
+}
+
+.closeButton {
+  color: #fff;
+  font-size: 32px;
+}
+
+.closeButton:hover{
+  text-shadow: 0 0 10px #fff;
+  cursor: pointer;
+}
+
+.childContainer{
+  display:flex;
+  width: 100%;
+}
