@@ -3,6 +3,7 @@
   flex-direction: column;
   font-size: 32px;
   width: 100%;
+  font-weight: bold;
 }
 
 .formInput label {
@@ -26,4 +27,13 @@
   outline: 2px solid #fff;
   outline-offset: 0;
   border: 2px solid #4b43e8;
+  animation-name: blinking;
+  animation-duration: 1.5s;
+  animation-iteration-count: 100;
+}
+
+@keyframes blinking {
+  50% {
+    outline-color: #4b43e8;
+  }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './LoginForm.module.css';
 import CustomInput from '../../Common/CustomInput/CustomInput';
+import CustomButton from '../../Common/Buttons/CustomButton';
 
 function LoginForm(props) {
   return (
@@ -17,9 +18,11 @@ function LoginForm(props) {
         stateElement={ props.password }
         stateElementChangeHandler={ props.handleChangePassword }
       />
-      <div className={ styles.buttonContainer }>
-        <button onClick={ props.handleSubmit }>{ props.buttonText }</button>
-      </div>
+      <CustomButton
+        buttonType="filled"
+        buttonText={ props.buttonText }
+        handleSubmit={ props.handleSubmit }
+      />
       <div className={ styles.helpLinks }>
         <div onClick={ props.handleChangeFormType }>{ props.formType }</div>
         <div onClick={ props.handleResetPasswordToggle }>Reset password</div>

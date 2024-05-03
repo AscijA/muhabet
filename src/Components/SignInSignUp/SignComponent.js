@@ -106,7 +106,12 @@ function SignComponent() {
           { showResetModal && <BasicModal
             handleResetPasswordToggle={ handleResetPasswordToggle }
           >
-            <ResetPasswordModal handleResetPassword={handleResetPassword}/>
+            <ResetPasswordModal 
+            handleResetPassword={handleResetPassword}
+            stateElement={credentials.email}
+            stateElementChangeHandler={ handleChangeEmail }
+
+            />
           </BasicModal> }
         </div>
       </div>

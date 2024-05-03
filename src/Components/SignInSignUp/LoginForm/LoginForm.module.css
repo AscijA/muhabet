@@ -14,30 +14,3 @@
 }
 
 
-.buttonContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: end;
-  margin: 8px 0;
-}
-
-.signForm button:hover {
-  background-color: #4b43e8;
-  border: 5px solid #fff;
-  color: #fff;
-  outline: 1px solid #fff;
-  outline-offset: -2px;
-  cursor: pointer;
-}
-
-.signForm button {
-  background-color: #fff;
-  border: 5px solid #4b43e8;
-  color: #4b43e8;
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-  font-weight: 600;
-  font-size: 24px;
-  border-radius: 10px;
-  padding: 12px 24px;
-}
