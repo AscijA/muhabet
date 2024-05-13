@@ -8,6 +8,7 @@ import { auth, db } from '../../Firebase/firebase';
 import LoginForm from './LoginForm/LoginForm';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
+import logo from "../../assets/logo_white.svg";
 
 function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
@@ -92,6 +93,9 @@ function SignComponent() {
     <div className={ styles.container }>
       <div className={ styles.sign }>
         <div className={ styles.innerContainer }>
+          <div className={ styles.logoContainer } >
+            <img src={ logo } alt="Logo" className={ styles.logo }  />
+          </div>
           <LoginForm
             handleChangeEmail={ handleChangeEmail }
             handleChangePassword={ handleChangePassword }
@@ -106,10 +110,10 @@ function SignComponent() {
           { showResetModal && <BasicModal
             handleResetPasswordToggle={ handleResetPasswordToggle }
           >
-            <ResetPasswordModal 
-            handleResetPassword={handleResetPassword}
-            stateElement={credentials.email}
-            stateElementChangeHandler={ handleChangeEmail }
+            <ResetPasswordModal
+              handleResetPassword={ handleResetPassword }
+              stateElement={ credentials.email }
+              stateElementChangeHandler={ handleChangeEmail }
 
             />
           </BasicModal> }
