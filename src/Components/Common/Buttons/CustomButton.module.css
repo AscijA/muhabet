@@ -12,6 +12,8 @@
   border-radius: 10px;
   padding: 12px 24px;
   outline: 2px solid #fff;
+  min-width: 7.5vw;
+
 }
 
 .filled:hover {

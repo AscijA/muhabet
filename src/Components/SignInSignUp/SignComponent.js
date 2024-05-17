@@ -9,6 +9,7 @@ import LoginForm from './LoginForm/LoginForm';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
 import logo from "../../assets/logo_white.svg";
+import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
 
 function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
