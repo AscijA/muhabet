@@ -1,7 +1,7 @@
 //App.js
 import { Route, Routes } from 'react-router-dom';
 import SignComponent from './Components/SignInSignUp/SignComponent';
-import ChatContent from './Components/Chat/ChatContent/ChatContent';
+import Chat from './Components/Chat/Chat';
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <div>
         <Routes>
           <Route path='/' element={ <SignComponent /> } />
-          <Route path='/chat' element={ <ChatContent /> } />
+          <Route path='/chat' element={ <Chat /> } />
         </Routes>
       </div>
     </div>

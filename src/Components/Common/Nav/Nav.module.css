@@ -1,0 +1,33 @@
+.main {
+  position: absolute;
+  display: flex;
+  height: 60px;
+  background-color: #4b43e8;
+  width: 100vw;
+  border-bottom: #fff solid 2px;
+
+}
+
+.side {
+  width: 20vw;
+  border-right: #fff solid 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.userName{
+  width: 75%;
+  margin-left:  32px;
+}
+
+.settingsButton{
+  width: 25%;
+  margin-right:  32px;
+  text-align: end;
+}
+
+
+.chatContent {
+  padding: 5px;
+}

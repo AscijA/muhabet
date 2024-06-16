@@ -1,6 +1,6 @@
 .container {
   width: inherit;
-  height: 100vh;
+  /* height: 100%; */
   display: flex;
 }
 
@@ -20,4 +20,8 @@
   display: flex;
   flex-direction: column;
   margin: 2.5vh;
+}
+
+.chatWidth {
+  width: 20vw;
 }

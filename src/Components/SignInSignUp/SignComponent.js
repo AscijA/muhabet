@@ -92,32 +92,37 @@ function SignComponent() {
   }
 
   return (
-    <SideBar>
-      <div className={ styles.logoContainer } >
-        <img src={ logo } alt="Logo" className={ styles.logo } />
-      </div>
-      <LoginForm
-        handleChangeEmail={ handleChangeEmail }
-        handleChangePassword={ handleChangePassword }
-        handleResetPasswordToggle={ handleResetPasswordToggle }
-        handleChangeFormType={ handleChangeFormType }
-        email={ credentials.email }
-        password={ credentials.password }
-        handleSubmit={ isSignIn ? handleSignIn : handleSignUp }
-        buttonText={ isSignIn ? "Sign in" : "Sign up" }
-        formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
-      />
-      { showResetModal && <BasicModal
-        handleResetPasswordToggle={ handleResetPasswordToggle }
-      >
-        <ResetPasswordModal
-          handleResetPassword={ handleResetPassword }
-          stateElement={ credentials.email }
-          stateElementChangeHandler={ handleChangeEmail }
-
+    <div className={ styles.main }>
+      <SideBar isChat={ false }>
+        <div className={ styles.logoContainer } >
+          <img src={ logo } alt="Logo" className={ styles.logo } />
+        </div>
+        <LoginForm
+          handleChangeEmail={ handleChangeEmail }
+          handleChangePassword={ handleChangePassword }
+          handleResetPasswordToggle={ handleResetPasswordToggle }
+          handleChangeFormType={ handleChangeFormType }
+          email={ credentials.email }
+          password={ credentials.password }
+          handleSubmit={ isSignIn ? handleSignIn : handleSignUp }
+          buttonText={ isSignIn ? "Sign in" : "Sign up" }
+          formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
         />
-      </BasicModal> }
-    </SideBar>
+        { showResetModal && <BasicModal
+          handleResetPasswordToggle={ handleResetPasswordToggle }
+        >
+          <ResetPasswordModal
+            handleResetPassword={ handleResetPassword }
+            stateElement={ credentials.email }
+            stateElementChangeHandler={ handleChangeEmail }
+
+          />
+        </BasicModal> }
+      </SideBar>
+      <div>
+        Slika
+      </div>
+    </div>
   );
 }
 
