@@ -2,20 +2,30 @@ import styles from './SignComponent.module.css';
 // Import the functions you need from the SDKs you need
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
-
-import { useState, } from "react";
 import { auth, db } from '../../Firebase/firebase';
+
 import LoginForm from './LoginForm/LoginForm';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
 import logo from "../../assets/logo_white.svg";
 import SideBar from '../Common/SideBar/SideBar';
+
+import { useNavigate } from 'react-router-dom';
+
+import { useState, } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
+
+
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
 
 function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
+  // const user = useSelector((state) => state.user.value);
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
 
   function handleChangeEmail(event) {
     setCredentials(oldState => {
@@ -63,7 +73,9 @@ function SignComponent() {
             uid: userInfo.uid,
 
           };
-          console.log(user);
+          // console.log(userInfo);
+          dispatch(setUser({ ...user }));
+          navigate("/chat");
         })
         .catch((error) => {
           // const errorCode = error.code;
