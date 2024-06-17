@@ -1,7 +1,7 @@
 import styles from './SignComponent.module.css';
 // Import the functions you need from the SDKs you need
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from '../../Firebase/firebase';
 
 import LoginForm from './LoginForm/LoginForm';
@@ -13,7 +13,7 @@ import SideBar from '../Common/SideBar/SideBar';
 import { useNavigate } from 'react-router-dom';
 
 import { useState, } from "react";
-import { useSelector, useDispatch } from 'react-redux';
+import {  useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 
 
@@ -23,7 +23,6 @@ function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
-  // const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
   let navigate = useNavigate();
 

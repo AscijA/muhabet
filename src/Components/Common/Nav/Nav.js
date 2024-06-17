@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './Nav.module.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { setUser } from '../../../store/userSlice';
+import { useSelector } from 'react-redux';
 
 
 function Nav() {
@@ -10,7 +9,6 @@ function Nav() {
     return state.user;
   });
 
-  const dispatch = useDispatch();
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
