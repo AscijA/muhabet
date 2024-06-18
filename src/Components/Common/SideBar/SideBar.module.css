@@ -6,6 +6,7 @@
 
 .sign {
   width: 30vw;
+  min-width: 500px;
   height: inherit;
   box-shadow: 5px 0px 10px #4b43e8;
   display: flex;

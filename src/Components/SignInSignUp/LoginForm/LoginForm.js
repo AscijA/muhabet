@@ -8,7 +8,7 @@ function LoginForm(props) {
     <form className={ styles.signForm }>
       <CustomInput
         label="Email address"
-        inputType="text"
+        inputType="email"
         stateElement={ props.email }
         stateElementChangeHandler={ props.handleChangeEmail }
       />
@@ -18,6 +18,7 @@ function LoginForm(props) {
         stateElement={ props.password }
         stateElementChangeHandler={ props.handleChangePassword }
       />
+      {props.showError && <div className={styles.errorMessage}>{props.errorMessage}</div>}
       <CustomButton
         buttonType="filled"
         buttonText={ props.buttonText }

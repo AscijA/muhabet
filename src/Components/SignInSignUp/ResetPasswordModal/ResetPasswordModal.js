@@ -7,20 +7,21 @@ export default function ResetPasswordModal(props) {
 
   return (
     <div className={ styles.outerContainer }>
-      <div>After submitting you will recieve an email with password reset link</div>
+      <div>After submitting, if a user exists, You will recieve an email with password reset link</div>
       <form className={ styles.signForm }>
         <CustomInput
           label="Email address"
-          inputType="text"
-          stateElement={ props.email }
-          stateElementChangeHandler={ props.handleChangeEmail }
+          inputType="email"
+          stateElement={ props.stateElement }
+          stateElementChangeHandler={ props.stateElementChangeHandler }
         />
+        { props.showError && <div> { props.errorMessage }</div> }
         <CustomButton
           buttonType="outlined"
           buttonText="Reset password"
           handleSubmit={ props.handleResetPassword }
         />
-      </form>
-    </div>
+      </form >
+    </div >
   );
 }
