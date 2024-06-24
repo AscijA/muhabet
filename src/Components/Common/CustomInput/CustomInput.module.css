@@ -11,13 +11,13 @@
 }
 
 .formInput input {
-  border: 1px solid #4b43e8;
+  border: 1px solid #002b36;
   border-radius: 10px;
   margin: 8px 0px;
   height: 3.5vh;
   box-sizing: border-box;
   font-size: 2vh;
-  color: #4b43e8;
+  color: #002b36;
   padding: 1vh;
 }
 
@@ -26,7 +26,7 @@
   box-sizing: border-box;
   outline: 2px solid #fff;
   outline-offset: 0;
-  border: 2px solid #4b43e8;
+  border: 2px solid #002b36;
   animation-name: blinking;
   animation-duration: 1.5s;
   animation-iteration-count: 100;
@@ -34,6 +34,6 @@
 
 @keyframes blinking {
   50% {
-    outline-color: #4b43e8;
+    outline-color: #002b36;
   }
 }

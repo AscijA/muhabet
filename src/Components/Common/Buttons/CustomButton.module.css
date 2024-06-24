@@ -17,7 +17,7 @@
 }
 
 .filled:hover {
-  background-color: #4b43e8;
+  background-color: #002b36;
   border: 5px solid #fff;
   color: #fff;
   cursor: pointer;
@@ -25,19 +25,19 @@
 
 .filled {
   background-color: #fff;
-  border: 5px solid #4b43e8;
-  color: #4b43e8;
+  border: 5px solid #002b36;
+  color: #002b36;
 }
 
 .outlined:hover {
   background-color: #fff;
-  border: 5px solid #4b43e8;
-  color: #4b43e8;
+  border: 5px solid #002b36;
+  color: #002b36;
   cursor: pointer;
 }
 
 .outlined {
-  background-color: #4b43e8;
+  background-color: #002b36;
   border: 5px solid #fff;
   color: #fff;
 }

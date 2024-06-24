@@ -13,10 +13,10 @@
 }
 
 .modalContainer {
-  background-color: #4b43e8;
+  background-color: #002b36;
   width: 40vh;
-  border: 2px solid #4b43e8;
-  box-shadow: 0px 0px 30px #4b43e8;
+  border: 2px solid #002b36;
+  box-shadow: 0px 0px 30px #002b36;
   border-radius: 20px;
   padding: 16px;
 }
