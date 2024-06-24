@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './LoginForm.module.css';
+import styles from './LoginForm.module.scss';
 import CustomInput from '../../Common/CustomInput/CustomInput';
 import CustomButton from '../../Common/Buttons/CustomButton';
 

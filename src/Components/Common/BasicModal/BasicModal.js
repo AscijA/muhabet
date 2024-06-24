@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "./BasicModal.module.css";
+import styles from "./BasicModal.module.scss";
 
 export default function BasicModal(props) {
   

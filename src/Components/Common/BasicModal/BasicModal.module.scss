@@ -1,8 +1,10 @@
+@import '../../../styles/styles';
+
 .outerContainer {
   width: 100vw;
   height: 100vh;
   z-index: 9999;
-  background-color: #fff;
+  background-color: $secondary-color;
   position: absolute;
   top: 0;
   left: 0;
@@ -13,10 +15,10 @@
 }
 
 .modalContainer {
-  background-color: #002b36;
+  background-color: $primary-color;
   width: 40vh;
-  border: 2px solid #002b36;
-  box-shadow: 0px 0px 30px #002b36;
+  border: 2px solid $primary-color;
+  box-shadow: 0px 0px 30px $primary-color;
   border-radius: 20px;
   padding: 16px;
 }
@@ -29,14 +31,19 @@
 }
 
 .closeButton {
-  color: #fff;
+  color: $secondary-color;
   font-size: 32px;
+
+  &:hover {
+    text-shadow: 0 0 10px $secondary-color;
+    cursor: pointer;
+  }
 }
 
-.closeButton:hover{
-  text-shadow: 0 0 10px #fff;
-  cursor: pointer;
-}
+// .closeButton:hover{
+//   text-shadow: 0 0 10px $secondary-color;
+//   cursor: pointer;
+// }
 
 .childContainer{
   display:flex;

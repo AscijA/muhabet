@@ -1,4 +1,4 @@
-import styles from './SignComponent.module.css';
+import styles from './SignComponent.module.scss';
 // Import the functions you need from the SDKs you need
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";

@@ -1,16 +1,18 @@
+@import "../../../styles/styles";
+
 .main {
   position: absolute;
   display: flex;
   height: 60px;
-  background-color: #002b36;
+  background-color: $primary-color;
   width: 100vw;
-  border-bottom: #fff solid 2px;
+  border-bottom: $secondary-color solid 2px;
 
 }
 
 .side {
   width: 20vw;
-  border-right: #fff solid 2px;
+  border-right: $secondary-color solid 2px;
   display: flex;
   align-items: center;
   justify-content: space-between;

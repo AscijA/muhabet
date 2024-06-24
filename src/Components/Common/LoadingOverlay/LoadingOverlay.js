@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "./LoadingOverlay.module.css";
+import styles from "./LoadingOverlay.module.scss";
 import { ThreeCircles } from 'react-loader-spinner';
 export const LoadingOverlay = (props) => {
   return (

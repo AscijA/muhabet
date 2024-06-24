@@ -1,8 +1,10 @@
+@import "../../../styles/styles";
+
 .outerContainer {
   width: 100vw;
   height: 100vh;
   z-index: 9999;
-  background-color: #fff;
+  background-color: $secondary-color;
   position: absolute;
   top: 0;
   left: 0;

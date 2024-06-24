@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "./ResetPasswordModal.module.css";
+import styles from "./ResetPasswordModal.module.scss";
 import CustomInput from '../../Common/CustomInput/CustomInput';
 import CustomButton from '../../Common/Buttons/CustomButton';
 

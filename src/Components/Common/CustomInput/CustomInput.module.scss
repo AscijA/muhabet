@@ -1,0 +1,42 @@
+@import "../../../styles/styles";
+
+
+.formInput {
+  display: flex;
+  flex-direction: column;
+  font-size: 3vh;
+  width: 100%;
+  font-weight: bold;
+
+  label {
+    margin: 8px 0px;
+  }
+
+  input {
+    border: 1px solid $primary-color;
+    border-radius: 10px;
+    margin: 8px 0px;
+    height: 3.5vh;
+    box-sizing: border-box;
+    font-size: 2vh;
+    color: $primary-color;
+    padding: 1vh;
+
+    &:focus {
+      margin: 8px 0px;
+      box-sizing: border-box;
+      outline: 2px solid $secondary-color;
+      outline-offset: 0;
+      border: 2px solid $primary-color;
+      animation-name: blinking;
+      animation-duration: 1.5s;
+      animation-iteration-count: infinite;
+    }
+  }
+}
+
+@keyframes blinking {
+  50% {
+    outline-color: $primary-color;
+  }
+}

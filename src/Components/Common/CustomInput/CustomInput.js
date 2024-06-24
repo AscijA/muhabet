@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "./CustomInput.module.css";
+import styles from "./CustomInput.module.scss";
 export default function CustomInput(props) {
   return (
     <div className={ styles.formInput }>
