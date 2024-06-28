@@ -12,6 +12,7 @@
 
 .side {
   width: 20vw;
+  min-width: 500px;
   border-right: $secondary-color solid 2px;
   display: flex;
   align-items: center;

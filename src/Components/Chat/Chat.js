@@ -4,6 +4,8 @@ import Nav from "../Common/Nav/Nav";
 import ChatSidebar from './ChatSidebar/ChatSidebar';
 import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
+import BasicModal from '../Common/BasicModal/BasicModal';
+
 function Chat() {
   return (
     <div  className={ styles.main }>
@@ -11,7 +13,9 @@ function Chat() {
       <div  className={ styles.content }>
         <SideBar isChat={ true }>
           <ChatSidebar />
+          
         </SideBar>
+        
         <ChatContent />
       </div>
     </div>

@@ -169,7 +169,7 @@ function SignComponent() {
           showError={ showError }
         />
         { showResetModal && <BasicModal
-          handleResetPasswordToggle={ handleResetPasswordToggle }
+          handleToggleModal={ handleResetPasswordToggle }
         >
           <ResetPasswordModal
             handleResetPassword={ handleResetPassword }
