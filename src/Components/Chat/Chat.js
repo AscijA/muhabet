@@ -1,10 +1,10 @@
 import React from 'react';
 import SideBar from "../Common/SideBar/SideBar";
-import Nav from "../Common/Nav/Nav";
+import Nav from "../Nav/Nav";
 import ChatSidebar from './ChatSidebar/ChatSidebar';
 import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
-import BasicModal from '../Common/BasicModal/BasicModal';
+// import BasicModal from '../Common/BasicModal/BasicModal';
 
 function Chat() {
   return (

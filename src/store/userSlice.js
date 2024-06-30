@@ -9,6 +9,8 @@ const userSlice = createSlice({
       emailVerified: "",
       createdAt: "",
       uid: "",
+      settings: null,
+      contacts: [],
     }
   },
   reducers: {

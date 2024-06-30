@@ -170,6 +170,7 @@ function SignComponent() {
         />
         { showResetModal && <BasicModal
           handleToggleModal={ handleResetPasswordToggle }
+          fullscreen={ true }
         >
           <ResetPasswordModal
             handleResetPassword={ handleResetPassword }

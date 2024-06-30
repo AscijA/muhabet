@@ -9,19 +9,24 @@
 .fullscreenContainer {
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
+  z-index: 9998;
   background-color: $secondary-color;
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.containedContainer{
+.containedContainer {
   width: 80%;
   height: 80%;
 }
 
+.transparentContainer {
+  background-color: rgba($color: #000000, $alpha: 0.9);
+}
+
 .modalContainer {
+  z-index: 9999;
   background-color: $primary-color;
   width: 40vh;
   border: 2px solid $secondary-color;
@@ -34,12 +39,19 @@
   display: flex;
   align-items: center;
   justify-content: end;
-
+  margin-bottom: 16px;
 }
 
 .closeButton {
   color: $secondary-color;
-  font-size: 32px;
+  font-size: 52px;
+
+  &:before {
+    display: block;
+    height: 52px;
+    content: "\00d7";
+    margin-top: -26px;
+  }
 
   &:hover {
     text-shadow: 0 0 10px $secondary-color;

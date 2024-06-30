@@ -1,4 +1,4 @@
-@import "../../../styles/styles";
+@import "../../styles/styles";
 
 .main {
   position: absolute;
@@ -19,16 +19,22 @@
   justify-content: space-between;
 }
 
-.userName{
+.userName {
   width: 75%;
-  margin-left:  32px;
-  
+  margin-left: 32px;
+
 }
 
-.settingsButton{
+.settingsButton {
   width: 25%;
-  margin-right:  32px;
+  margin-right: 32px;
   text-align: end;
+
+  span {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }
 
 
