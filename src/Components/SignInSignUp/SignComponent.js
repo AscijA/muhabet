@@ -1,6 +1,6 @@
 import styles from './SignComponent.module.scss';
 // Import the functions you need from the SDKs you need
-import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from '../../Firebase/firebase';
 import { AuthErrorCodes } from "firebase/auth";
@@ -13,9 +13,9 @@ import SideBar from '../Common/SideBar/SideBar';
 
 import { useNavigate } from 'react-router-dom';
 
-import { useState, } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/userSlice';
+import { userSetUp } from '../../Helpers/DataLoading';
 
 
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
@@ -30,6 +30,18 @@ function SignComponent() {
 
   const dispatch = useDispatch();
   let navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userSetUp(user, dispatch);
+        navigate("/chat");
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [dispatch, navigate]);
 
   function handleChangeEmail(event) {
     setCredentials(oldState => {
@@ -88,25 +100,18 @@ function SignComponent() {
   function handleSignIn(event) {
     event.preventDefault();
     if (credentials.email && credentials.password) {
-      signInWithEmailAndPassword(auth, credentials.email, credentials.password)
-        .then((userCredential) => {
-          const userInfo = userCredential.user;
-          const user = {
-            email: userInfo.email,
-            displayName: userInfo.displayName,
-            emailVerified: userInfo.emailVerified,
-            createdAt: userInfo.metadata.creationTime,
-            uid: userInfo.uid,
+      setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          signInWithEmailAndPassword(auth, credentials.email, credentials.password)
+            .then((userCredential) => {
+              userSetUp(auth.currentUser, dispatch);
+              navigate("/chat");
 
-          };
-          // console.log(userInfo);
-          dispatch(setUser({ ...user }));
-          navigate("/chat");
-
-        })
-        .catch((error) => {
-          setShowError(true);
-          setErrorMessage("Invalid Credentials");
+            })
+            .catch((error) => {
+              setShowError(true);
+              setErrorMessage("Invalid Credentials");
+            });
         });
     }
     else {
@@ -189,3 +194,4 @@ function SignComponent() {
 }
 
 export default SignComponent;
+
