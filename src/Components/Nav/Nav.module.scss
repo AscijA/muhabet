@@ -21,7 +21,7 @@
 
 .userName {
   width: 75%;
-  margin-left: 32px;
+  // margin-left: 32px;
 
 }
 
@@ -39,5 +39,37 @@
 
 
 .chatContent {
-  padding: 5px;
+  // padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+
+.contactNav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.contactPic {
+  height: 32px;
+  width: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  background-color: white;
+  border-radius: 50%;
+  margin: 0 16px;
+}
+
+.contactPicImg {
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+  margin: 0 16px;
+
 }
