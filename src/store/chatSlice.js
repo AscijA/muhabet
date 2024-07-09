@@ -2,16 +2,17 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   uid: "",
+  showChatInfo: false,
   currentChat: {
     chatId: "",
     lastSeen: "",
     contact: {
-      profilePic: null,
-      email: "",
+      profilePic: "",
+      email: "mascija111@gmail.com",
     },
     messages: [
       {
-        
+
       }
     ]
   },
@@ -19,7 +20,7 @@ const initialState = {
 };
 
 const chatSlice = createSlice({
-  name: 'chats',
+  name: 'chat',
   initialState: initialState,
   reducers: {
     // Set the entire state
@@ -45,6 +46,13 @@ const chatSlice = createSlice({
     },
 
 
+    toggleShowChatInfo: (state, action) => {
+      return {
+        ...state,
+        showChatInfo: !state.showChatInfo
+      };
+    },
+
     // Set the currentChat
     setCurrentChat: (state, action) => {
       return {
@@ -61,7 +69,7 @@ const chatSlice = createSlice({
         ...state,
         currentChat: {
           ...state.value.currentChat,
-          key: value
+          [key]: value
 
         }
       };
@@ -82,8 +90,21 @@ const chatSlice = createSlice({
         allChats: [...state.allChats, action.payload]
       };
     },
+
+    updateContact: (state, action) => {
+      return {
+        ...state,
+        currentChat: {
+          ...state.currentChat,
+          contact: {
+            ...state.currentChat.contact,
+            ...action.payload
+          }
+        }
+      };
+    }
   },
 });
 
-export const { setState, updateState, setUid, updateUid, setCurrentChat, updateCurrentChat, setAllChats, updateAllChats } = chatSlice.actions;
+export const { toggleShowChatInfo, updateContact, setState, updateState, setUid, updateUid, setCurrentChat, updateCurrentChat, setAllChats, updateAllChats } = chatSlice.actions;
 export default chatSlice.reducer;
