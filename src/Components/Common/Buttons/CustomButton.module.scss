@@ -17,6 +17,8 @@
     min-width: 7.5vw;
   }
 
+
+
   .filled {
     background-color: $secondary-color;
     border: 5px solid $primary-color;
@@ -41,5 +43,14 @@
       color: $primary-color;
       cursor: pointer;
     }
+  }
+
+  .smallButton {
+    font-size: 16px;
+    outline-offset: -2px;
+    padding: 6px 12px;
+    outline: 1px solid $secondary-color;
+    min-width: 7.5vw;
+    border: 5px solid $primary-color;
   }
 }

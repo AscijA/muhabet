@@ -4,6 +4,7 @@ import styles from "./CustomButton.module.scss";
 
 export default function CustomButton(props) {
   let buttonStyle = props.buttonType === "filled" ? styles.filled : styles.outlined;
+  buttonStyle = buttonStyle + (props.buttonSize === "sm" ? " " + styles.smallButton : "");
   return (
     <div className={ styles.buttonContainer }>
       <button
