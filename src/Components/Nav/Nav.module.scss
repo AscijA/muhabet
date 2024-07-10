@@ -1,5 +1,7 @@
 @import "../../styles/styles";
 
+
+
 .main {
   position: absolute;
   display: flex;
@@ -57,19 +59,18 @@
 }
 
 .contactPic {
-  height: 32px;
-  width: 32px;
-  max-width: 32px;
-  max-height: 32px;
-  background-color: white;
-  border-radius: 50%;
-  margin: 0 16px;
+  @include profilePics;
 }
 
 .contactPicImg {
   border-radius: 50%;
-  height: 32px;
-  width: 32px;
+  @include dimensionsMaxDimensions;
+ 
+
+}
+
+.contactPicBG {
+  @include dimensionsMaxDimensions;
   margin: 0 16px;
 
 }

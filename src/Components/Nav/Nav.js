@@ -5,8 +5,11 @@ import { useSelector } from 'react-redux';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import { useDispatch } from 'react-redux';
 import { toggleShowChatInfo, updateContact } from '../../store/chatSlice';
-import { storage, bucket } from "../../Firebase/firebase";
+import { storage, auth } from "../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
+import { updateUser } from '../../store/userSlice';
+import { onAuthStateChanged } from 'firebase/auth';
+import { userSetUp } from '../../Helpers/DataLoading';
 
 function Nav() {
   let user = useSelector((state) => state.user);
@@ -15,12 +18,25 @@ function Nav() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const gsRef = ref(storage, `gs://${bucket}/profile-pics/kindpng_6534564.png`);
-    getDownloadURL(gsRef).then((url) => {
-      dispatch(updateContact({ profilePic: url }));
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userSetUp(user, dispatch);
+        const contactRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+        getDownloadURL(contactRef).then((url) => {
+          dispatch(updateContact({ profilePic: url }));
+        });
+
+        const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+        getDownloadURL(gsRef).then((url) => {
+          dispatch(updateUser({ profilePic: url }));
+        });
+      }
     });
 
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [dispatch]);
+
 
   function handleShowSettingsToggle() {
     setShowSettings(oldState => !oldState);
@@ -33,7 +49,9 @@ function Nav() {
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
-          <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" />
+          <div className={ user.profilePic === "" ? styles.contactPic : styles.contactPicBG }>
+            <img className={ styles.contactPicImg } src={ user.profilePic } alt="" />
+          </div>
           <div className={ styles.userName } >{ user.email }</div>
         </div>
         <div className={ styles.settingsButton } onClick={ handleShowSettingsToggle }><span>Settings</span></div>
@@ -41,7 +59,7 @@ function Nav() {
       <div className={ styles.chatContent }>
 
         <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
-          <div className={ chat.currentChat.contact.profilePic === "" ? styles.contactPic : "" }>
+          <div className={ chat.currentChat.contact.profilePic === "" ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
