@@ -53,7 +53,7 @@ function Nav() {
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
           <div className={ userPicturePresent ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ user.profilePic } alt="" />
+            { userPicturePresent && <img className={ styles.contactPicImg } src={ user.profilePic } alt="" /> }
           </div>
           <div className={ styles.userName } >{ user.email }</div>
         </div>
@@ -63,7 +63,7 @@ function Nav() {
 
         <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
           <div className={ currentChatUserImagePresent ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" />
+            { currentChatUserImagePresent && <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" /> }
           </div>
           <div >{ chat.currentChat.contact.email }</div>
         </div>
