@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from "./UserSettingsModal.module.scss";
 import CustomButton from '../Common/Buttons/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,11 +7,12 @@ import { auth, storage } from '../../Firebase/firebase';
 import { resetUser, updateUser } from '../../store/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
+import userIcon from "../../assets/user.svg";
 
 export const UserSettingsModal = (props) => {
   let user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
-
+  const [showUser, setShowUser] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export const UserSettingsModal = (props) => {
     const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
     getDownloadURL(gsRef).then((url) => {
       dispatch(updateUser({ profilePic: url }));
+      setShowUser(true);
     });
 
   }, [dispatch]);
@@ -55,7 +57,7 @@ export const UserSettingsModal = (props) => {
   };
   return (
     <div className={ styles.outerContainer }>
-      <div className={ styles.profileContainer + (user.profilePic === "" ? " " + styles.noProfileBG : "") }>
+      <div className={ styles.profileContainer + (showUser ? " " + styles.noProfileBG : "") }>
         <input
           type="file"
           accept="image/*"
@@ -63,7 +65,7 @@ export const UserSettingsModal = (props) => {
           ref={ fileInputRef }
           style={ { display: 'none' } }
         />
-        <img src={ user.profilePic } alt="" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+        <img src={ showUser ? user.profilePic : userIcon } alt="" className={ styles.profilePic } onClick={ handleChooseFileClick } />
       </div>
       <div className={ styles.email }>
         { user.email }

@@ -10,12 +10,16 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { updateUser } from '../../store/userSlice';
 import { onAuthStateChanged } from 'firebase/auth';
 import { userSetUp } from '../../Helpers/DataLoading';
+import userIcon from "../../assets/user.svg";
+
 
 function Nav() {
   let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
   const [showSettings, setShowSettings] = useState(false);
   const dispatch = useDispatch();
+  const [showUser, setShowUser] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -25,11 +29,13 @@ function Nav() {
         const contactRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(contactRef).then((url) => {
           dispatch(updateContact({ profilePic: url }));
+          setShowContact(true);
         });
 
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef).then((url) => {
           dispatch(updateUser({ profilePic: url }));
+          setShowUser(true);
         });
       }
     });
@@ -46,14 +52,12 @@ function Nav() {
   const handleShowContactInfoToggle = () => {
     dispatch(toggleShowChatInfo());
   };
-  const userPicturePresent = user.profilePic === "";
-  const currentChatUserImagePresent = chat.currentChat.contact.profilePic === "";
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
-          <div className={ userPicturePresent ? styles.contactPic : styles.contactPicBG }>
-            { userPicturePresent && <img className={ styles.contactPicImg } src={ user.profilePic } alt="" /> }
+          <div className={ showUser ? styles.contactPic : styles.contactPicBG }>
+            <img className={ styles.contactPicImg } src={ showUser ? user.profilePic : userIcon } alt="" />
           </div>
           <div className={ styles.userName } >{ user.email }</div>
         </div>
@@ -62,8 +66,8 @@ function Nav() {
       <div className={ styles.chatContent }>
 
         <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
-          <div className={ currentChatUserImagePresent ? styles.contactPic : styles.contactPicBG }>
-            { currentChatUserImagePresent && <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" /> }
+          <div className={ showContact ? styles.contactPic : styles.contactPicBG }>
+            <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
         </div>

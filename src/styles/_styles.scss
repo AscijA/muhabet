@@ -27,5 +27,6 @@ $secondary-color: #fff;
 .contactPicBG {
   @include dimensionsMaxDimensions(32px);
   margin: 0 16px;
+  border-radius: 50%;
 
 }
