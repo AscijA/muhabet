@@ -2,6 +2,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  align-content: center;
   justify-content: center;
   margin-bottom: 3vh;
 }
@@ -13,4 +14,8 @@
 .main {
   display: flex;
   height: 100vh;
+}
+
+.formContainer {
+  margin: 0 24px;
 }

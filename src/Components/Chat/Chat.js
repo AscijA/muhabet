@@ -5,7 +5,6 @@ import ChatSidebar from './ChatSidebar/ChatSidebar';
 import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { userSetUp } from '../../Helpers/DataLoading';
 import { auth } from '../../Firebase/firebase';
@@ -14,19 +13,17 @@ import { auth } from '../../Firebase/firebase';
 function Chat() {
 
   const dispatch = useDispatch();
-  let navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
-        navigate("/chat");
       }
     });
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [dispatch, navigate]);
+  }, [dispatch]);
   return (
     <div className={ styles.main }>
       <Nav />

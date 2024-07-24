@@ -1,0 +1,58 @@
+@import "../../../../styles/styles";
+
+
+.chatItemContainer {
+  font-size: 24px;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .chatInfo {
+    width: 100%;
+  }
+
+  .chatItemProfile {
+    margin: 12px 24px;
+    margin-left: 0;
+    display: flex;
+  }
+
+  .contactPicBG {
+    @include dimensionsMaxDimensions(64px);
+
+    margin: 12px 24px;
+  }
+
+  .contactPic {
+    margin: 12px 24px;
+    @include dimensionsMaxDimensions(64px);
+  }
+
+  .contactPicImg {
+    @include dimensionsMaxDimensions(64px);
+  }
+
+  .chatItemMostRecentMessageSeen {
+    margin: 12px 24px;
+    margin-left: 0px;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+
+  }
+
+  &:hover {
+    background-color: rgba(#fff, 0.1);
+  }
+
+  .chatTitle {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .statusAndTime {
+    display: flex;
+  }
+}

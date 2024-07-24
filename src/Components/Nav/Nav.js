@@ -21,6 +21,7 @@ function Nav() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
+        // Update with chat user icon
         const contactRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(contactRef).then((url) => {
           dispatch(updateContact({ profilePic: url }));
@@ -45,11 +46,13 @@ function Nav() {
   const handleShowContactInfoToggle = () => {
     dispatch(toggleShowChatInfo());
   };
+  const userPicturePresent = user.profilePic === "";
+  const currentChatUserImagePresent = chat.currentChat.contact.profilePic === "";
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
-          <div className={ user.profilePic === "" ? styles.contactPic : styles.contactPicBG }>
+          <div className={ userPicturePresent ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ user.profilePic } alt="" />
           </div>
           <div className={ styles.userName } >{ user.email }</div>
@@ -59,7 +62,7 @@ function Nav() {
       <div className={ styles.chatContent }>
 
         <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
-          <div className={ chat.currentChat.contact.profilePic === "" ? styles.contactPic : styles.contactPicBG }>
+          <div className={ currentChatUserImagePresent ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ chat.currentChat.contact.profilePic } alt="" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>

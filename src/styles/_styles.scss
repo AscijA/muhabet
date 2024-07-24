@@ -2,15 +2,30 @@ $primary-color: #002b36;
 $secondary-color: #fff;
 
 @mixin profilePics {
-  @include dimensionsMaxDimensions;
+  @include dimensionsMaxDimensions(32px);
   background-color: white;
   border-radius: 50%;
   margin: 0 16px;
 }
 
-@mixin dimensionsMaxDimensions {
-  height: 32px;
-  width: 32px;
-  max-width: 32px;
-  max-height: 32px;
+@mixin dimensionsMaxDimensions($n) {
+  height: $n;
+  width: $n;
+  max-width: $n;
+  max-height: $n;
+}
+
+.contactPic {
+  @include profilePics;
+}
+
+.contactPicImg {
+  border-radius: 50%;
+  @include dimensionsMaxDimensions(32px);
+}
+
+.contactPicBG {
+  @include dimensionsMaxDimensions(32px);
+  margin: 0 16px;
+
 }

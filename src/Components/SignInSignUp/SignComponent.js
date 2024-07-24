@@ -160,19 +160,21 @@ function SignComponent() {
         <div className={ styles.logoContainer } >
           <img src={ logo } alt="Logo" className={ styles.logo } />
         </div>
-        <LoginForm
-          handleChangeEmail={ handleChangeEmail }
-          handleChangePassword={ handleChangePassword }
-          handleResetPasswordToggle={ handleResetPasswordToggle }
-          handleChangeFormType={ handleChangeFormType }
-          email={ credentials.email }
-          password={ credentials.password }
-          handleSubmit={ isSignIn ? handleSignIn : handleSignUp }
-          buttonText={ isSignIn ? "Sign in" : "Sign up" }
-          formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
-          errorMessage={ errorMessage }
-          showError={ showError }
-        />
+        <div className={ styles.formContainer }>
+          <LoginForm
+            handleChangeEmail={ handleChangeEmail }
+            handleChangePassword={ handleChangePassword }
+            handleResetPasswordToggle={ handleResetPasswordToggle }
+            handleChangeFormType={ handleChangeFormType }
+            email={ credentials.email }
+            password={ credentials.password }
+            handleSubmit={ isSignIn ? handleSignIn : handleSignUp }
+            buttonText={ isSignIn ? "Sign in" : "Sign up" }
+            formType={ isSignIn ? "Account needed? Sign up" : "Already a user? Sign in" }
+            errorMessage={ errorMessage }
+            showError={ showError }
+          />
+        </div>
         { showResetModal && <BasicModal
           handleToggleModal={ handleResetPasswordToggle }
           fullscreen={ true }

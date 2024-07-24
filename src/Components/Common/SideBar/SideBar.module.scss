@@ -22,9 +22,10 @@
 .innerContainer {
   display: flex;
   flex-direction: column;
-  margin: 2.5vh;
+  // margin: 2.5vh;
 }
 
 .chatWidth {
   width: 20vw;
+  justify-content: start;
 }
