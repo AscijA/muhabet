@@ -8,6 +8,11 @@
   align-items: center;
   width: 100%;
 
+  .icons{
+    img{
+      fill: red;
+    }
+  }
   .chatInfo {
     width: 100%;
   }
@@ -54,5 +59,20 @@
 
   .statusAndTime {
     display: flex;
+  }
+
+  .chatItemNumberOfUnreadMessages {
+    background-color: $secondary-color;
+    color: $primary-color;
+    height: 100%;
+    min-width: 16px;
+    padding: 0 6px;
+    text-align: center;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    div{
+      margin-bottom: 2px;
+    }
   }
 }

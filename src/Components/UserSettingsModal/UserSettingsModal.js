@@ -65,7 +65,7 @@ export const UserSettingsModal = (props) => {
           ref={ fileInputRef }
           style={ { display: 'none' } }
         />
-        <img src={ showUser ? user.profilePic : userIcon } alt="" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+        <img src={ showUser ? user.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
       </div>
       <div className={ styles.email }>
         { user.email }
