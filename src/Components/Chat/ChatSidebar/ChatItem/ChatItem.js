@@ -8,7 +8,15 @@ import seen from "../../../../assets/seen.svg";
 
 // import delivered from "../../../../assets/delivered.svg";
 // import sent from "../../../../assets/sent.svg";
+// import seen from "../../../../assets/seen.svg";
 
+/**
+ * ChatItem component is a re-usable component for chat items in the chat sidebar.
+ * @param {string} email - Contact email
+ * @param {string} lastMessage - The most recent message in the chat item.
+ * @param {number} numberOfUnreadMessages - The number of unread messages in the chat item.
+ * @param {boolean} showUser - Whether to show the user profile picture or not.
+ */
 function ChatItem(props) {
   const [showUser, setShowUser] = useState(false);
 

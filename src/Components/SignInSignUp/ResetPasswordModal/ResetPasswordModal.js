@@ -3,6 +3,15 @@ import styles from "./ResetPasswordModal.module.scss";
 import CustomInput from '../../Common/CustomInput/CustomInput';
 import CustomButton from '../../Common/Buttons/CustomButton';
 
+
+/**
+ * ResetPasswordModal component component for the password reset form. Used inside a BaseModal
+ * @param {string} stateElement - The email address that is entered by the user.
+ * @param {function} stateElementChangeHandler - The function to be called when the email address input field value changes.
+ * @param {boolean} showError - A boolean to determine if an error message should be shown or not.
+ * @param {string} errorMessage - The error message to be shown.
+ * @param {function} handleResetPassword - The function to be called when the user clicks the "Reset password" button.
+ */
 export default function ResetPasswordModal(props) {
 
   return (

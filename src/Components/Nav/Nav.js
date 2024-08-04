@@ -12,7 +12,9 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
 
-
+/**
+ * Navbar
+ */
 function Nav() {
   let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);

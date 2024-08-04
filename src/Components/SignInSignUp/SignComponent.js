@@ -20,6 +20,9 @@ import { userSetUp } from '../../Helpers/DataLoading';
 
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
 
+/**
+ * SignComponent is the main component for the sign in and sign up page.
+ */
 function SignComponent() {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);

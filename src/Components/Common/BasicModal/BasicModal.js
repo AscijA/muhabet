@@ -1,6 +1,12 @@
 import React from 'react';
 import styles from "./BasicModal.module.scss";
 
+/**
+ * BasicModal component is a re-usable component for modals with different styles and sizes.
+ * @param {boolean} fullscreen - Whether the modal should be fullscreen or not.
+ * @param {boolean} transparent - Whether the modal should be transparent or not.
+ * @param {function} handleToggleModal - The function to be called when the modal is closed.
+ */
 export default function BasicModal(props) {
   let modalTypeStyles = styles.baseContainer + (props.fullscreen ? " " + styles.fullscreenContainer : " " + styles.containedContainer);
   modalTypeStyles = modalTypeStyles + (props.transparent ? " " + styles.transparentContainer : "")

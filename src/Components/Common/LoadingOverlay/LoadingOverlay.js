@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from "./LoadingOverlay.module.scss";
 import { ThreeCircles } from 'react-loader-spinner';
+
+/**
+ * LoadingOverlay component is a re-usable component for loading spinners.
+ */
 export const LoadingOverlay = (props) => {
   return (
     <div className={ styles.outerContainer }>

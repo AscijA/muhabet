@@ -9,6 +9,10 @@ import { useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
 import userIcon from "../../assets/user.svg";
 
+/**
+ * UserSettingsModal component that displays the user profile picture and email address.
+ * Also allows the user to log out, delete their account or change profile picture. 
+ */
 export const UserSettingsModal = (props) => {
   let user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
