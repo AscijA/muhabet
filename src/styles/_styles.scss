@@ -6,6 +6,7 @@ $secondary-color: #fff;
   background-color: white;
   border-radius: 50%;
   margin: 0 16px;
+  object-fit: cover;
 }
 
 @mixin dimensionsMaxDimensions($n) {
@@ -21,7 +22,8 @@ $secondary-color: #fff;
 
 .contactPicImg {
   border-radius: 50%;
-  @include dimensionsMaxDimensions(32px);
+  object-fit: cover;
+    @include dimensionsMaxDimensions(32px);
 }
 
 .contactPicBG {
