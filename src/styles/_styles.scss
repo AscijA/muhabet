@@ -1,6 +1,13 @@
 $primary-color: #002b36;
 $secondary-color: #fff;
 
+$own-message-bg: #073642;    /* Base02 */
+$other-message-bg: #586e75;  /* Base01 */
+$text-color: #839496;        /* Base0 */
+$border-color: #586e75;      /* Base01 */
+$timestamp-color: #93a1a1;   /* Base1 */
+$highlight-color: #268bd2;
+
 @mixin profilePics {
   @include dimensionsMaxDimensions(32px);
   background-color: white;

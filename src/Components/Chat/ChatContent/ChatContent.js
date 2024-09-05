@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import styles from "./ChatContent.module.scss";
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 // import BasicModal from '../../Common/BasicModal/BasicModal';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 import CustomButton from '../../Common/Buttons/CustomButton';
-import {addMessageToCurrentChat} from "../../../store/chatSlice";
-import {MESSAGE_STATUS} from "../../../Helpers/Constants";
+import { addMessageToCurrentChat } from "../../../store/chatSlice";
+import { MESSAGE_STATUS } from "../../../Helpers/Constants";
+import MessageItem from '../MessageItem/MessageItem';
 
 const initialMessage = {
     "messageText": "",
@@ -18,23 +19,23 @@ function ChatContent() {
     const dispatch = useDispatch();
     let chat = useSelector((state) => state.chat);
     let currentUser = useSelector((state) => state.user);
-    const allChats = useSelector((state) => state.chat)
+    const allChats = useSelector((state) => state.chat);
     const [message, setMessage] = useState(initialMessage);
 
     let handleChangeMessage = (event) => {
         setMessage(state => {
-                return {
-                    ...state,
-                    messageText: event.target.value,
-                }
-            }
+            return {
+                ...state,
+                messageText: event.target.value,
+            };
+        }
         );
-    }
+    };
 
     const handleEnter = event => {
         if (event.key === "Enter") {
             event.preventDefault();
-            handleSendMessage()
+            handleSendMessage();
         }
     };
     const handleSendMessage = () => {
@@ -46,16 +47,16 @@ function ChatContent() {
             // send message to the subscriber
             // console.log("preupdate");
             setMessage((oldState) => {
-                    let newMessage = {
-                        ...oldState,
-                        sender: currentUser.uid,
-                        status: MESSAGE_STATUS.MESSAGE_SENT,
-                        timestamp: Date.now(),
-                    }
-                    dispatch(addMessageToCurrentChat(newMessage));
-                    return newMessage;
+                let newMessage = {
+                    ...oldState,
+                    sender: currentUser.uid,
+                    status: MESSAGE_STATUS.MESSAGE_SENT,
+                    timestamp: Date.now(),
+                };
+                dispatch(addMessageToCurrentChat(newMessage));
+                return newMessage;
 
-                }
+            }
             );
             // console.log(message)
             // dispatch(addMessageToCurrentChat(message))
@@ -64,19 +65,19 @@ function ChatContent() {
     };
     return (
         // Chat window content with message box and message input, no header
-        <div className={styles.mainChatContainer}>
-            <div className={styles.chatContent}>
+        <div className={ styles.mainChatContainer }>
+            <div className={ styles.chatContent }>
 
-                
+                <MessageItem text="Test" timestamp="00:04" isOwnMessage={ true } />
             </div>
-            <div className={styles.messageBoxContainer}>
-                <div className={styles.inputContainer}>
-                    <textarea placeholder="Type a message" value={message.messageText} onChange={handleChangeMessage}
-                              onKeyDown={handleEnter}/>
+            <div className={ styles.messageBoxContainer }>
+                <div className={ styles.inputContainer }>
+                    <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
+                        onKeyDown={ handleEnter } />
                 </div>
-                <div className={styles.buttonContainer}>
+                <div className={ styles.buttonContainer }>
                     <CustomButton buttonText="Send" buttonSize="sm" buttonType="filled"
-                                  handleSubmit={handleSendMessage}/>
+                        handleSubmit={ handleSendMessage } />
                 </div>
 
             </div>

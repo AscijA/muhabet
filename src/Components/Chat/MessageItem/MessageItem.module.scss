@@ -1,0 +1,34 @@
+@import "../../../styles/styles";
+/* Variables for colors */
+
+
+/* Common styles for both own and other messages */
+.message {
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px;
+  max-width: 60%;
+  position: relative;
+
+  .messageContent {
+    font-size: 16px;
+    color: $text-color;
+  }
+
+  .messageTimestamp {
+    font-size: 12px;
+    margin-top: 5px;
+    color: $timestamp-color;
+  }
+
+  &.ownMessage {
+    align-self: flex-end;
+    background-color: $own-message-bg;
+  }
+
+  &.otherMessage {
+    align-self: flex-start;
+    background-color: $other-message-bg;
+    border: 1px solid $border-color;
+  }
+}
