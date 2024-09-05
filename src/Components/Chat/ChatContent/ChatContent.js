@@ -66,6 +66,8 @@ function ChatContent() {
         // Chat window content with message box and message input, no header
         <div className={styles.mainChatContainer}>
             <div className={styles.chatContent}>
+
+                
             </div>
             <div className={styles.messageBoxContainer}>
                 <div className={styles.inputContainer}>
