@@ -4,12 +4,19 @@
 
 /* Common styles for both own and other messages */
 .message {
+  display: flex;
   border-radius: 10px;
   padding: 10px;
   margin: 5px;
   max-width: 60%;
   position: relative;
 
+  .dotMenu{
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: bold;
+    color: $timestamp-color;
+  }
   .messageContent {
     font-size: 16px;
     color: $text-color;
@@ -23,12 +30,31 @@
 
   &.ownMessage {
     align-self: flex-end;
-    background-color: $own-message-bg;
+    background-color: $primary-color;
   }
 
   &.otherMessage {
     align-self: flex-start;
     background-color: $other-message-bg;
     border: 1px solid $border-color;
+ }
+
+ .customMenu {
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  background-color: $menu-bg-color;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+
+  .menuItem {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    &:hover {
+      background-color: $menu-hover-bg;
+    }
   }
+}
 }

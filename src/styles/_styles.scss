@@ -1,12 +1,13 @@
 $primary-color: #002b36;
 $secondary-color: #fff;
 
-$own-message-bg: #073642;    /* Base02 */
-$other-message-bg: #586e75;  /* Base01 */
-$text-color: #839496;        /* Base0 */
-$border-color: #586e75;      /* Base01 */
-$timestamp-color: #93a1a1;   /* Base1 */
+$other-message-bg: #02487a;
+$text-color: #fff;
+$border-color: #586e75;
+$timestamp-color: #93a1a1;
 $highlight-color: #268bd2;
+$menu-bg-color: #073642;
+$menu-hover-bg: #19414b;
 
 @mixin profilePics {
   @include dimensionsMaxDimensions(32px);
@@ -30,12 +31,11 @@ $highlight-color: #268bd2;
 .contactPicImg {
   border-radius: 50%;
   object-fit: cover;
-    @include dimensionsMaxDimensions(32px);
+  @include dimensionsMaxDimensions(32px);
 }
 
 .contactPicBG {
   @include dimensionsMaxDimensions(32px);
   margin: 0 16px;
   border-radius: 50%;
-
 }

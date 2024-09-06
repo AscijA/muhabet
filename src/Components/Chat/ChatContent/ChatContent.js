@@ -68,7 +68,9 @@ function ChatContent() {
         <div className={ styles.mainChatContainer }>
             <div className={ styles.chatContent }>
 
-                <MessageItem text="Test" timestamp="00:04" isOwnMessage={ true } />
+                <MessageItem text="TestChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp="00:04" isOwnMessage={ true } />
+                <MessageItem text="TestChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp="00:04" isOwnMessage={ false } />
+
             </div>
             <div className={ styles.messageBoxContainer }>
                 <div className={ styles.inputContainer }>
