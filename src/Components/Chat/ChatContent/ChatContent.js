@@ -21,6 +21,7 @@ function ChatContent() {
     let currentUser = useSelector((state) => state.user);
     const allChats = useSelector((state) => state.chat);
     const [message, setMessage] = useState(initialMessage);
+    const [buttonAction, setButtonAction] = useState("Send");
 
     let handleChangeMessage = (event) => {
         setMessage(state => {
@@ -46,30 +47,31 @@ function ChatContent() {
             // update firebase with message
             // send message to the subscriber
             // console.log("preupdate");
-            setMessage((oldState) => {
-                let newMessage = {
-                    ...oldState,
-                    sender: currentUser.uid,
-                    status: MESSAGE_STATUS.SENT,
-                    timestamp: Date.now(),
-                };
-                dispatch(addMessageToCurrentChat(newMessage));
-                return newMessage;
+            let newMessage = {
+                ...message,
+                sender: currentUser.uid,
+                status: MESSAGE_STATUS.SENT,
+                timestamp: Date.now(),
+            };
+            setMessage(initialMessage); // ✅ First update local state
 
-            }
-            );
+            setTimeout(() => {
+                dispatch(addMessageToCurrentChat(newMessage)); // ✅ Dispatch after render cycle
+            }, 0);
             // console.log(message)
             // dispatch(addMessageToCurrentChat(message))
             // setMessage(initialMessage);
         }
     };
+
+
     return (
         // Chat window content with message box and message input, no header
         <div className={ styles.mainChatContainer }>
             <div className={ styles.chatContent }>
 
-                <MessageItem text="TestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestCha TestChatTestChatTestChat TestChatt window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerTestChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerTestChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp="00:04" isOwnMessage={ false } />
-                <MessageItem text="TestChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp="00:04" isOwnMessage={ true } />
+                <MessageItem text="TestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestChatTestCha TestChatTestChatTestChat TestChatt window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerTestChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerTestChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp={new Date()} isOwnMessage={ false } />
+                <MessageItem text="TestChat window content with message box and message input, no headerChat window content with message box and message input, no header" timestamp={new Date()} isOwnMessage={ true } deliveryStatus={ MESSAGE_STATUS.SEEN } />
 
             </div>
             <div className={ styles.messageBoxContainer }>
@@ -78,7 +80,7 @@ function ChatContent() {
                         onKeyDown={ handleEnter } />
                 </div>
                 <div className={ styles.buttonContainer }>
-                    <CustomButton buttonText="Send" buttonSize="sm" buttonType="filled"
+                    <CustomButton buttonText={buttonAction} buttonSize="sm" buttonType="filled"
                         handleSubmit={ handleSendMessage } />
                 </div>
 

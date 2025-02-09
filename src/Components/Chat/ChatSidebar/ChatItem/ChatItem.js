@@ -16,7 +16,7 @@ import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
  * @param {boolean} showUser - Whether to show the user profile picture or not.
  */
 function ChatItem(props) {
-  const [showUser, setShowUser] = useState(false);
+  const [showUser, setShowUser] = useState(false); // ??
 
   return (
     <div className={ styles.chatItemContainer }>

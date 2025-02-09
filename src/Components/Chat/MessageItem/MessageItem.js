@@ -1,8 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from "./MessageItem.module.scss";
+import { MESSAGE_STATUS } from 'src/Helpers/Constants';
+import sentIcon from "../../../assets/checkmark.svg";
+import delivered from "../../../assets/delivered.svg";
+import seen from "../../../assets/seen.svg";
+
+
 
 // Single Message Component for both own and other messages
-const MessageItem = ({ text, timestamp, isOwnMessage }) => {
+const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [renderUpwards, setRenderUpwards] = useState(false); // State to track if menu should render upwards
   const menuRef = useRef(null);
@@ -44,24 +50,42 @@ const MessageItem = ({ text, timestamp, isOwnMessage }) => {
     };
   }, [showMessageMenu]);
 
+  
   return (
-    <div ref={messageRef} className={messageType} onContextMenu={toggleMenu}>
+    <div ref={ messageRef } className={ messageType } onContextMenu={ toggleMenu }>
       <div>
-        <div className={styles.messageContent}>{text}</div>
-        <div className={styles.messageTimestamp}>{timestamp}</div>
+        <div className={ styles.messageContent }>{ text }</div>
+        <div className={ styles.messageTimestamp }>{ (timestamp.Date === new Date().Date && timestamp.Month !== new Date().Date) ? timestamp.toTimeString().slice(0,5) : timestamp.toLocaleString("de").slice(0,-3) }
+          <div className={ styles.icons }>
+            { deliveryStatus === MESSAGE_STATUS.SENT && (
+              <img className={ "" } src={ sentIcon } alt="Delivery Status: Sent" />
+            ) }
+
+            { deliveryStatus === MESSAGE_STATUS.DELIVERED && (
+              <img className={ "" } src={ delivered } alt="Delivery Status: Delivered" />
+            ) }
+
+            { deliveryStatus === MESSAGE_STATUS.SEEN && (
+              <img className={ "" } src={ seen } alt="Delivery Status: Seen" />
+            ) }
+
+
+          </div>
+
+        </div>
       </div>
-      <div className={styles.dotMenu} onClick={toggleMenu}>
+      <div className={ styles.dotMenu } onClick={ toggleMenu }>
         &#8942;
       </div>
-      {showMessageMenu && (
+      { showMessageMenu && (
         <div
-          ref={menuRef}
-          className={`${styles.customMenu} ${renderUpwards ? styles.upwards : ''}`}
+          ref={ menuRef }
+          className={ `${styles.customMenu} ${renderUpwards ? styles.upwards : ''}` }
         >
-          <div className={styles.menuItem}>Edit</div>
-          <div className={styles.menuItem}>Delete</div>
+          <div className={ styles.menuItem }>Edit</div>
+          <div className={ styles.menuItem }>Delete</div>
         </div>
-      )}
+      ) }
     </div>
   );
 };
