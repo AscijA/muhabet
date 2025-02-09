@@ -50,7 +50,7 @@ function ChatContent() {
                 let newMessage = {
                     ...oldState,
                     sender: currentUser.uid,
-                    status: MESSAGE_STATUS.MESSAGE_SENT,
+                    status: MESSAGE_STATUS.SENT,
                     timestamp: Date.now(),
                 };
                 dispatch(addMessageToCurrentChat(newMessage));

@@ -5,10 +5,8 @@ import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
 
+import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 
-// import delivered from "../../../../assets/delivered.svg";
-// import sent from "../../../../assets/sent.svg";
-// import seen from "../../../../assets/seen.svg";
 
 /**
  * ChatItem component is a re-usable component for chat items in the chat sidebar.
@@ -33,10 +31,19 @@ function ChatItem(props) {
               ascija111@gmail.com
             </div>
             <div className={ styles.statusAndTime }>
-              <div className={styles.icons}>
-                <img className={ "" } src={ sentIcon } alt="Delivery Status" />
-                <img className={ "" } src={ delivered } alt="Delivery Status" />
-                <img className={ "" } src={ seen } alt="Delivery Status" />
+              <div className={ styles.icons }>
+                { props.deliveryStatus === MESSAGE_STATUS.SENT && (
+                  <img className={ "" } src={ sentIcon } alt="Delivery Status: Sent" />
+                ) }
+
+                { props.deliveryStatus === MESSAGE_STATUS.DELIVERED && (
+                  <img className={ "" } src={ delivered } alt="Delivery Status: Delivered" />
+                ) }
+
+                { props.deliveryStatus === MESSAGE_STATUS.SEEN && (
+                  <img className={ "" } src={ seen } alt="Delivery Status: Seen" />
+                ) }
+
 
               </div>
               <div>

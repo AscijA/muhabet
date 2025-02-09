@@ -1,5 +1,5 @@
 export const MESSAGE_STATUS ={
-    MESSAGE_SENT: "0",
-    MESSAGE_DELIVERED: "1",
-    MESSAGE_READ: "2",
+    SENT: "0",
+    DELIVERED: "1",
+    SEEN: "2",
 }
