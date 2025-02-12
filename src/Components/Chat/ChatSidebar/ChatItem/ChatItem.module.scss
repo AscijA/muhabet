@@ -9,7 +9,11 @@
   width: 100%;
 
   .icons{
+    display: flex;
+    margin-right: 10px;
+    align-items: center;
     img{
+      height: 20px;
       fill: red;
     }
   }
@@ -47,20 +51,21 @@
 
   }
 
+  
   &:hover {
     background-color: rgba(#fff, 0.1);
   }
-
+  
   .chatTitle {
     display: flex;
     width: 100%;
     justify-content: space-between;
   }
-
+  
   .statusAndTime {
     display: flex;
   }
-
+  
   .chatItemNumberOfUnreadMessages {
     background-color: $secondary-color;
     color: $primary-color;
@@ -75,4 +80,8 @@
       margin-bottom: 2px;
     }
   }
+}
+.currentChat
+{
+  background-color: rgba(#fff, 0.1);
 }
