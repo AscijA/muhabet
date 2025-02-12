@@ -6,6 +6,7 @@ import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
 
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
+import { useSelector } from 'react-redux';
 
 
 /**
@@ -17,9 +18,12 @@ import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
  */
 function ChatItem(props) {
   const [showUser, setShowUser] = useState(false); // ??
+  let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
+
+  let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
 
   return (
-    <div className={ styles.chatItemContainer }>
+    <div className={ containerStyle }>
       <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
         <img className={ styles.contactPicImg } src={ showUser ? "" : userIcon } alt="Profile" />
 
@@ -28,7 +32,7 @@ function ChatItem(props) {
         <div className={ styles.chatItemProfile }>
           <div className={ styles.chatTitle } >
             <div>
-              ascija111@gmail.com
+              { props.email }
             </div>
             <div className={ styles.statusAndTime }>
               <div className={ styles.icons }>
