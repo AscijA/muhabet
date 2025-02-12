@@ -1,7 +1,7 @@
 import styles from './SignComponent.module.scss';
 // Import the functions you need from the SDKs you need
 import { onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc} from "firebase/firestore";
 import { auth, db } from '../../Firebase/firebase';
 import { AuthErrorCodes } from "firebase/auth";
 
@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from "react";
 import { useDispatch } from 'react-redux';
-import { userSetUp } from '../../Helpers/DataLoading';
+import { userSetUp, fetchChats } from '../../Helpers/DataLoading';
 
 
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
@@ -35,9 +35,12 @@ function SignComponent() {
   let navigate = useNavigate();
 
   useEffect(() => {
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
+        fetchChats(user.uid);
+
         navigate("/chat");
       }
     });
@@ -45,6 +48,10 @@ function SignComponent() {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [dispatch, navigate]);
+
+
+
+
 
   function handleChangeEmail(event) {
     setCredentials(oldState => {

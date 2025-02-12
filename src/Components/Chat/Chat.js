@@ -6,7 +6,7 @@ import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
 import { useDispatch } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
-import { userSetUp } from '../../Helpers/DataLoading';
+import { fetchChats, userSetUp } from '../../Helpers/DataLoading';
 import { auth } from '../../Firebase/firebase';
 // import BasicModal from '../Common/BasicModal/BasicModal';
 
@@ -18,12 +18,15 @@ function Chat() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
+        fetchChats(user.uid);
+
       }
     });
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [dispatch]);
+
   return (
     <div className={ styles.main }>
       <Nav />
