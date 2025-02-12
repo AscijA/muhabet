@@ -46,21 +46,19 @@ function ChatContent() {
             // dispatch(sendMessage(messageText));
             // update firebase with message
             // send message to the subscriber
-            // console.log("preupdate");
+ 
             let newMessage = {
                 ...message,
                 sender: currentUser.uid,
                 status: MESSAGE_STATUS.SENT,
                 timestamp: Date.now(),
             };
-            setMessage(initialMessage); // ✅ First update local state
+            setMessage(initialMessage); 
 
             setTimeout(() => {
-                dispatch(addMessageToCurrentChat(newMessage)); // ✅ Dispatch after render cycle
+                dispatch(addMessageToCurrentChat(newMessage));
             }, 0);
-            // console.log(message)
-            // dispatch(addMessageToCurrentChat(message))
-            // setMessage(initialMessage);
+
         }
     };
 
