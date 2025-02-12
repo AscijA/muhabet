@@ -18,7 +18,7 @@ function Chat() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
-        fetchChats(user.uid);
+        fetchChats(user.uid, dispatch);
 
       }
     });

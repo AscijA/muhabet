@@ -1,6 +1,7 @@
 import { setUser } from '../store/userSlice';
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy, Timestamp } from "firebase/firestore";
 import { db } from '../Firebase/firebase';
+import { setAllChats } from 'src/store/chatSlice';
 
 /**
  * Set up user object
@@ -45,20 +46,34 @@ export async function fetchChats(userID, dispatch) {
 
     let chatsMap = new Map();
 
-    // Add results from first query
+    // Helper function to convert Firestore timestamps
+    const convertTimestamps = (docData) => {
+      if (docData.lastModified instanceof Timestamp) {
+        docData.lastModified = docData.lastModified.toDate().toISOString(); // Convert to ISO string
+      }
+
+      if (docData.messages) {
+        docData.messages = docData.messages.map(msg => ({
+          ...msg,
+          timestamp: msg.timestamp instanceof Timestamp ? msg.timestamp.toDate().toISOString() : msg.timestamp
+        }));
+      }
+
+      return docData;
+    };
+
+    // Process first query
     snapshot1.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...doc.data() });
+      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
     });
 
-    // Add results from second query (avoiding duplicates)
+    // Process second query
     snapshot2.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...doc.data() });
+      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
     });
 
-    // Convert Map to array
     const chats = Array.from(chatsMap.values());
-
-    dispatch({ type: "setAllChats", payload: chats });
+    dispatch(setAllChats(chats));
 
   } catch (error) {
     console.error("Error fetching chats:", error);

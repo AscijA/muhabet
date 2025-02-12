@@ -14,7 +14,7 @@ const initialState = {
             {}
         ]
     },
-    allChats: [{chatId: 0, messages: []}],
+    allChats: [],
 };
 
 const chatSlice = createSlice({
