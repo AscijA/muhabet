@@ -1,18 +1,27 @@
 import React from 'react';
 import styles from "./ChatSidebar.module.scss";
 import ChatItem from './ChatItem/ChatItem';
-import { MESSAGE_STATUS } from 'src/Helpers/Constants';
-import { useSelector, useDispatch  } from 'react-redux';
-
-
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ChatSidebar() {
-  const dispatch = useDispatch();
-  const allChats = useSelector((state) => state.chat);
+
+  //const dispatch = useDispatch();
+  const allChats = useSelector((state) => state.chat.allChats);
+  let currentUser = useSelector((state) => state.user);
 
   return (
     <div className={ styles.main }>
-      <ChatItem deliveryStatus={ MESSAGE_STATUS.SENT } email="mascija111@gmail.com" />
+      { allChats.map(chat => {
+        var chatOwner = currentUser.uid === chat.user1ID ? chat.user2Email : chat.user1Email;
+        var deliveryStatus = currentUser.uid === chat.lastMessageStatus.userID ? chat.lastMessageStatus.status : "";
+        return <ChatItem
+          deliveryStatus={ deliveryStatus }
+          email={ chatOwner }
+          timestamp={ chat.lastModified }
+          chat={ chat }
+          key={ chat.id } />;
+
+      }) }
     </div>
   );
 }
