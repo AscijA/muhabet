@@ -4,9 +4,10 @@ import userIcon from "../../../../assets/user.svg";
 import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
+import { setCurrentChat } from "../../../../store/chatSlice";
 
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 
 /**
@@ -17,13 +18,43 @@ import { useSelector } from 'react-redux';
  * @param {boolean} showUser - Whether to show the user profile picture or not.
  */
 function ChatItem(props) {
+  const dispatch = useDispatch();
   const [showUser, setShowUser] = useState(false); // ??
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
-
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
 
+  const handleChatItemOnClick = () => {
+    let currentChat = {
+      chatId: props.chat.id,
+      lastSeen: "",
+      contact: {
+        profilePic: "",
+        email: props.email,
+        uid: props.contactUID,
+      },
+      messages: props.chat.messages,
+    };
+    console.log(currentChat);
+
+    dispatch(setCurrentChat(currentChat));
+  };
+
+  const getUnreadMessagesCount = (arr) => {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (arr[i].status === MESSAGE_STATUS.SEEN) {
+        return arr.length - i;
+      }
+    }
+    return 0;
+  };
+
+  const convertTimestamp = (timestamp) => {
+    var ts = new Date(timestamp);
+    return (ts.Date === new Date().Date && ts.Month !== new Date().Date) ? ts.toTimeString().slice(0, 5) : ts.toLocaleString("de").slice(0, -10);
+  };
+
   return (
-    <div className={ containerStyle }>
+    <div className={ containerStyle } onClick={ handleChatItemOnClick } >
       <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
         <img className={ styles.contactPicImg } src={ showUser ? "" : userIcon } alt="Profile" />
 
@@ -48,10 +79,9 @@ function ChatItem(props) {
                   <img className={ "" } src={ seen } alt="Delivery Status: Seen" />
                 ) }
 
-
               </div>
               <div>
-                20:15
+                { convertTimestamp(props.timestamp) }
               </div>
             </div>
           </div>
@@ -59,11 +89,11 @@ function ChatItem(props) {
         </div>
         <div className={ styles.chatItemMostRecentMessageSeen }>
           <div>
-            Message text
+            { props.chat.messages.at(-1).content }
           </div>
           <div className={ styles.chatItemNumberOfUnreadMessages }>
             <div>
-              5
+              { getUnreadMessagesCount(props.chat.messages) }
             </div>
           </div>
         </div>

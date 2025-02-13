@@ -45,7 +45,7 @@
   .chatItemMostRecentMessageSeen {
     margin: 12px 24px;
     margin-left: 0px;
-    font-size: 20px;
+    font-size: 16px;
     display: flex;
     justify-content: space-between;
 
@@ -64,6 +64,9 @@
   
   .statusAndTime {
     display: flex;
+    color: $timestamp-color;
+    font-size: 16px;
+    align-items: center;
   }
   
   .chatItemNumberOfUnreadMessages {

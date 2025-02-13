@@ -28,11 +28,12 @@ function Nav() {
       if (user) {
         userSetUp(user, dispatch);
         // Update with chat user icon
-        const contactRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+        if(chat.currentChat.contact.uid !== undefined) 
+        {const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
         getDownloadURL(contactRef).then((url) => {
           dispatch(updateContact({ profilePic: url }));
           setShowContact(true);
-        });
+        });}
 
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef).then((url) => {
@@ -44,7 +45,7 @@ function Nav() {
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [dispatch]);
+  }, [chat.currentChat.contact.uid, dispatch]);
 
 
   function handleShowSettingsToggle() {
@@ -67,13 +68,13 @@ function Nav() {
       </div>
       <div className={ styles.chatContent }>
 
-        <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
+       { chat.currentChat.contact.uid !== undefined && ( <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
           <div className={ showContact ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="Profile" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
-        </div>
-
+        </div>)
+}
       </div>
 
       { showSettings && <BasicModal
