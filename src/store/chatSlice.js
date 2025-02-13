@@ -8,7 +8,7 @@ const initialState = {
         lastSeen: "",
         contact: {
             profilePic: "",
-            email: "mascija111@gmail.com",
+            email: "",
         },
         messages: [
             {}
