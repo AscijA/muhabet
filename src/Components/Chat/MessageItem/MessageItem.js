@@ -16,8 +16,10 @@ const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
   const messageType = `${styles.message} ${isOwnMessage ? styles.ownMessage : styles.otherMessage}`;
 
   const toggleMenu = (event) => {
-    event.preventDefault();
-    setShowMessageMenu((prev) => !prev);
+    if (isOwnMessage) {
+      event.preventDefault();
+      setShowMessageMenu((prev) => !prev);
+    }
   };
 
   const closeMenu = (event) => {
