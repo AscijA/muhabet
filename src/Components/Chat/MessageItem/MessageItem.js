@@ -50,12 +50,12 @@ const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
     };
   }, [showMessageMenu]);
 
-  
+
   return (
     <div ref={ messageRef } className={ messageType } onContextMenu={ toggleMenu }>
       <div>
         <div className={ styles.messageContent }>{ text }</div>
-        <div className={ styles.messageTimestamp }>{ (timestamp.Date === new Date().Date && timestamp.Month !== new Date().Date) ? timestamp.toTimeString().slice(0,5) : timestamp.toLocaleString("de").slice(0,-3) }
+        <div className={ styles.messageTimestamp }>{ (timestamp.Date === new Date().Date && timestamp.Month !== new Date().Date) ? timestamp.toTimeString().slice(0, 5) : timestamp.toLocaleString("de").slice(0, -3) }
           <div className={ styles.icons }>
             { deliveryStatus === MESSAGE_STATUS.SENT && (
               <img className={ "" } src={ sentIcon } alt="Delivery Status: Sent" />
@@ -74,9 +74,9 @@ const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
 
         </div>
       </div>
-      <div className={ styles.dotMenu } onClick={ toggleMenu }>
+      { isOwnMessage && (<div className={ styles.dotMenu } onClick={ toggleMenu }>
         &#8942;
-      </div>
+      </div>) }
       { showMessageMenu && (
         <div
           ref={ menuRef }
