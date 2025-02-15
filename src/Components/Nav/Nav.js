@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Nav.module.scss';
-import { UserSettingsModal } from '../UserSettingsModal/UserSettingsModal';
+
 import { useSelector } from 'react-redux';
-import BasicModal from '../Common/BasicModal/BasicModal';
 import { useDispatch } from 'react-redux';
-import { toggleShowChatInfo, updateContact } from '../../store/chatSlice';
+import { useNavigate } from 'react-router-dom';
+
+import { UserSettingsModal } from '../UserSettingsModal/UserSettingsModal';
+import BasicModal from '../Common/BasicModal/BasicModal';
+
 import { storage, auth } from "../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
-import { updateUser } from '../../store/userSlice';
 import { onAuthStateChanged } from 'firebase/auth';
+
+import { updateUser } from '../../store/userSlice';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
+
 import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
-import { useNavigate } from 'react-router-dom';
 
 /**
  * Navbar
@@ -21,7 +26,7 @@ function Nav() {
   let chat = useSelector((state) => state.chat);
   const [showSettings, setShowSettings] = useState(false);
   const dispatch = useDispatch();
-  const [showUser, setShowUser] = useState(false);
+  const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
   const [showContact, setShowContact] = useState(false);
   let navigate = useNavigate();
 
@@ -35,13 +40,15 @@ function Nav() {
           getDownloadURL(contactRef).then((url) => {
             dispatch(updateContact({ profilePic: url }));
             setShowContact(true);
+          }).catch((error) => {
+            setShowContact(false);
           });
         }
 
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef).then((url) => {
           dispatch(updateUser({ profilePic: url }));
-          setShowUser(true);
+          dispatch(setShowDefaultImage(false));
         }).catch((error) => {
 
         });
@@ -69,8 +76,8 @@ function Nav() {
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
-          <div className={ showUser ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ showUser ? user.profilePic : userIcon } alt="Profile" />
+          <div className={ !showDefaultImage ? styles.contactPic : styles.contactPicBG }>
+            <img className={ styles.contactPicImg } src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" />
           </div>
           <div className={ styles.userName } >{ user.email }</div>
         </div>
