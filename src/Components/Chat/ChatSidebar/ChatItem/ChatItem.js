@@ -14,19 +14,12 @@ import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 import { useSelector, useDispatch } from 'react-redux';
 
 
-/**
- * ChatItem component is a re-usable component for chat items in the chat sidebar.
- * @param {string} email - Contact email
- * @param {string} lastMessage - The most recent message in the chat item.
- * @param {number} numberOfUnreadMessages - The number of unread messages in the chat item.
- * @param {boolean} showUser - Whether to show the user profile picture or not.
- */
 function ChatItem(props) {
   const dispatch = useDispatch();
-  const [showUser, setShowUser] = useState(false); // ??
+  const [showUser, setShowUser] = useState(false);
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
-  const [numberUnread, setNumberUnread] = useState(0); // ??
+  const [numberUnread, setNumberUnread] = useState(0);
 
   let chat = useSelector((state) => state.chat);
   const [profilePic, setProfilePic] = useState("");
@@ -35,7 +28,6 @@ function ChatItem(props) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
 
-        // Update with chat user icon
         if (props.contactUID !== undefined) {
 
           const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
@@ -51,15 +43,16 @@ function ChatItem(props) {
       }
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [props.contactUID, dispatch, props.chat.messages]);
+
 
   const handleChatItemOnClick = () => {
     let currentChat = {
       chatId: props.chat.id,
       lastSeen: "",
       contact: {
+        profilePic: profilePic,
         email: props.email,
         uid: props.contactUID,
       },
@@ -67,13 +60,26 @@ function ChatItem(props) {
     };
 
     dispatch(setCurrentChat(currentChat));
-    if (chat.currentChat.contact.uid !== undefined) {
-      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-      getDownloadURL(contactRef).then((url) => {
-        dispatch(updateContact({ profilePic: url }));
-      }).catch((error) => { });
-    }
   };
+
+  useEffect(() => {
+    console.log(1);
+  
+    if (chat.currentChat?.contact?.uid && !chat.currentChat.contact.profilePic) {
+      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
+  
+      getDownloadURL(contactRef)
+        .then((url) => {
+          if (chat.currentChat.contact.profilePic !== url) {  
+            dispatch(updateContact({ profilePic: url }));
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching profile pic:", error);
+        });
+    }
+  }, [chat.currentChat.contact.profilePic, chat.currentChat.contact.uid, dispatch]); 
+  
 
   const getUnreadMessagesCount = (arr) => {
     for (let i = arr.length - 1; i >= 0; i--) {

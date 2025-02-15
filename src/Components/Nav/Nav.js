@@ -34,35 +34,43 @@ function Nav() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
-        // Update with chat user icon
-        if (chat.currentChat.contact.uid !== undefined) {
-          const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-          getDownloadURL(contactRef).then((url) => {
-            dispatch(updateContact({ profilePic: url }));
-            setShowContact(true);
-          }).catch((error) => {
-            setShowContact(false);
-          });
-        }
-
+  
+        // Fetch logged-in user's profile picture
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-        getDownloadURL(gsRef).then((url) => {
-          dispatch(updateUser({ profilePic: url }));
-          dispatch(setShowDefaultImage(false));
-        }).catch((error) => {
-
-        });
-
-      }
-      else {
+        getDownloadURL(gsRef)
+          .then((url) => {
+            dispatch(updateUser({ profilePic: url }));
+            dispatch(setShowDefaultImage(false));
+          })
+          .catch((error) => {
+            console.error("Error fetching user profile pic:", error);
+          });
+      } else {
         navigate("/");
-
       }
     });
-
-    // Cleanup subscription on unmount
+  
     return () => unsubscribe();
-  }, [chat.currentChat.contact.uid, dispatch, navigate]);
+  }, [dispatch, navigate]); 
+  
+  
+  
+  useEffect(() => {
+    if (chat.currentChat?.contact?.uid) {
+      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
+  
+      getDownloadURL(contactRef)
+        .then((url) => {
+          dispatch(updateContact({ profilePic: url }));
+          setShowContact(true);
+        })
+        .catch((error) => {
+          setShowContact(false);
+          console.error("Error fetching contact profile pic:", error);
+        });
+    }
+  }, [chat.currentChat?.contact?.uid, dispatch]); 
+  
 
 
   function handleShowSettingsToggle() {
