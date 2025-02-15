@@ -3,6 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
     uid: "",
     showChatInfo: false,
+    showDefaultImage: true,
     currentChat: {
         chatId: 0,
         lastSeen: "",
@@ -48,6 +49,13 @@ const chatSlice = createSlice({
             return {
                 ...state,
                 showChatInfo: !state.showChatInfo
+            };
+        },
+
+        setShowDefaultImage: (state, action) => {
+            return {
+                ...state,
+                showDefaultImage: action.payload
             };
         },
 
@@ -131,6 +139,7 @@ export const {
     updateCurrentChat,
     setAllChats,
     updateAllChats,
-    addMessageToCurrentChat
+    addMessageToCurrentChat,
+    setShowDefaultImage
 } = chatSlice.actions;
 export default chatSlice.reducer;

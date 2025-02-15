@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from "./ChatItem.module.scss";
 import userIcon from "../../../../assets/user.svg";
 import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
-import { setCurrentChat } from "../../../../store/chatSlice";
+import { updateContact, setCurrentChat } from "../../../../store/chatSlice";
+import { storage, auth } from "../../../../Firebase/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
+
+import { onAuthStateChanged } from 'firebase/auth';
 
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,30 +26,62 @@ function ChatItem(props) {
   const [showUser, setShowUser] = useState(false); // ??
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
+  const [numberUnread, setNumberUnread] = useState(0); // ??
+
+  let chat = useSelector((state) => state.chat);
+  const [profilePic, setProfilePic] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+
+        // Update with chat user icon
+        if (props.contactUID !== undefined) {
+
+          const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
+          getDownloadURL(contactRef).then((url) => {
+            setProfilePic(url);
+            setShowUser(true);
+          }).catch((error) => {
+          });
+
+
+        }
+        getUnreadMessagesCount(props.chat.messages);
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [props.contactUID, dispatch, props.chat.messages]);
 
   const handleChatItemOnClick = () => {
     let currentChat = {
       chatId: props.chat.id,
       lastSeen: "",
       contact: {
-        profilePic: "",
         email: props.email,
         uid: props.contactUID,
       },
       messages: props.chat.messages,
     };
-    console.log(currentChat);
 
     dispatch(setCurrentChat(currentChat));
+    if (chat.currentChat.contact.uid !== undefined) {
+      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
+      getDownloadURL(contactRef).then((url) => {
+        dispatch(updateContact({ profilePic: url }));
+      }).catch((error) => { });
+    }
   };
 
   const getUnreadMessagesCount = (arr) => {
     for (let i = arr.length - 1; i >= 0; i--) {
       if (arr[i].status === MESSAGE_STATUS.SEEN) {
-        return arr.length - i;
+        setNumberUnread(arr.length - i);
       }
     }
-    return 0;
+    setNumberUnread(0);
   };
 
   const convertTimestamp = (timestamp) => {
@@ -56,7 +92,7 @@ function ChatItem(props) {
   return (
     <div className={ containerStyle } onClick={ handleChatItemOnClick } >
       <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
-        <img className={ styles.contactPicImg } src={ showUser ? "" : userIcon } alt="Profile" />
+        <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />
 
       </div>
       <div className={ styles.chatInfo }>
@@ -92,9 +128,9 @@ function ChatItem(props) {
             { props.chat.messages.at(-1).content }
           </div>
           <div className={ styles.chatItemNumberOfUnreadMessages }>
-            <div>
-              { getUnreadMessagesCount(props.chat.messages) }
-            </div>
+            { numberUnread !== 0 && (<div>
+              { numberUnread }
+            </div>) }
           </div>
         </div>
       </div>
