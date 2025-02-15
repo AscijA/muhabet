@@ -63,7 +63,6 @@ function ChatItem(props) {
   };
 
   useEffect(() => {
-    console.log(1);
   
     if (chat.currentChat?.contact?.uid && !chat.currentChat.contact.profilePic) {
       const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
