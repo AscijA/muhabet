@@ -26,7 +26,7 @@ export const UserSettingsModal = (props) => {
     getDownloadURL(gsRef).then((url) => {
       dispatch(updateUser({ profilePic: url }));
       setShowUser(true);
-    });
+    }).catch((error) => { });
 
   }, [dispatch]);
 
@@ -53,7 +53,6 @@ export const UserSettingsModal = (props) => {
     const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
 
     uploadBytes(storageRef, file).then((snapshot) => {
-      console.log('Uploaded a blob or file!');
       getDownloadURL(storageRef).then((url) => {
         dispatch(updateUser({ profilePic: url }));
       });
@@ -61,7 +60,7 @@ export const UserSettingsModal = (props) => {
   };
   return (
     <div className={ styles.outerContainer }>
-      <div className={ styles.profileContainer + (showUser ? " " + styles.noProfileBG : "") }>
+      <div className={ styles.profileContainer + (!showUser ? " " + styles.noProfileBG : "") }>
         <input
           type="file"
           accept="image/*"
