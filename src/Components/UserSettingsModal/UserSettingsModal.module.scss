@@ -3,11 +3,12 @@
 .buttonsContainer {
   width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   margin-top: 24px;
-  > *{
-    margin: 0 8px;
+
+  div:not(:last-child) {
+    border-bottom: 1px solid $border-color;
   }
 }
 

@@ -9,6 +9,7 @@ import { setShowDefaultImage } from '../../store/chatSlice';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
 import userIcon from "../../assets/user.svg";
+import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
 /**
  * UserSettingsModal component that displays the user profile picture and email address.
@@ -87,9 +88,13 @@ export const UserSettingsModal = (props) => {
         { user.email }
       </div>
       <div className={ styles.buttonsContainer }>
-        <CustomButton handleSubmit={ handleSignOut } buttonText="Log Out" buttonSize="sm" />
+        <SettingsItem title="Log Out" onClick={ handleSignOut } />
+        <SettingsItem title="Remove Profile Image" onClick={ handleDeleteProfileImage } />
+        <SettingsItem title="Delete Account" onClick={ handleDeleteUser } />
+
+        {/* <CustomButton handleSubmit={ handleSignOut } buttonText="Log Out" buttonSize="sm" />
         <CustomButton handleSubmit={ handleDeleteProfileImage } buttonText="Remove Profile Image" buttonSize="sm" />
-        <CustomButton handleSubmit={ handleDeleteUser } buttonText="Delete Account" buttonSize="sm" />
+        <CustomButton handleSubmit={ handleDeleteUser } buttonText="Delete Account" buttonSize="sm" /> */}
 
       </div>
 

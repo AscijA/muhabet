@@ -17,6 +17,7 @@ import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../st
 
 import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
+import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
 /**
  * Navbar
@@ -34,7 +35,7 @@ function Nav() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
-  
+
         // Fetch logged-in user's profile picture
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef)
@@ -49,16 +50,16 @@ function Nav() {
         navigate("/");
       }
     });
-  
+
     return () => unsubscribe();
-  }, [dispatch, navigate]); 
-  
-  
-  
+  }, [dispatch, navigate]);
+
+
+
   useEffect(() => {
     if (chat.currentChat?.contact?.uid) {
       const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-  
+
       getDownloadURL(contactRef)
         .then((url) => {
           dispatch(updateContact({ profilePic: url }));
@@ -69,9 +70,13 @@ function Nav() {
           console.error("Error fetching contact profile pic:", error);
         });
     }
-  }, [chat.currentChat?.contact?.uid, dispatch]); 
-  
+  }, [chat.currentChat?.contact?.uid, dispatch]);
 
+  const handleBlockUser = () => {
+  };
+
+  const handleDeleteChat = () => {
+  };
 
   function handleShowSettingsToggle() {
     setShowSettings(oldState => !oldState);
@@ -116,6 +121,10 @@ function Nav() {
         fullscreen={ true }
         transparent={ true }
       >
+        <div className={ styles.contactInfo }>
+          <SettingsItem title="Delete Chat" onClick={ handleDeleteChat } />
+          <SettingsItem title="Block User" onClick={ handleBlockUser } />
+        </div>
 
       </BasicModal> }
     </div>
