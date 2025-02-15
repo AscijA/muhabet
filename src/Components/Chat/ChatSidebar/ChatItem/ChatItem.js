@@ -21,6 +21,9 @@ function ChatItem(props) {
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
   const [numberUnread, setNumberUnread] = useState(0);
 
+  
+  let chatStatus = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
+
   let chat = useSelector((state) => state.chat);
   const [profilePic, setProfilePic] = useState("");
 
@@ -57,6 +60,7 @@ function ChatItem(props) {
         uid: props.contactUID,
       },
       messages: props.chat.messages,
+      chatStatus: props.chat.chatStatus
     };
 
     dispatch(setCurrentChat(currentChat));
@@ -94,7 +98,7 @@ function ChatItem(props) {
     return (ts.Date === new Date().Date && ts.Month !== new Date().Date) ? ts.toTimeString().slice(0, 5) : ts.toLocaleString("de").slice(0, -10);
   };
 
-  return (
+  return !chatStatus && (
     <div className={ containerStyle } onClick={ handleChatItemOnClick } >
       <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
         <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import styles from "./UserSettingsModal.module.scss";
-import CustomButton from '../Common/Buttons/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import { auth, storage } from '../../Firebase/firebase';
@@ -90,7 +89,7 @@ export const UserSettingsModal = (props) => {
       <div className={ styles.buttonsContainer }>
         <SettingsItem title="Log Out" onClick={ handleSignOut } />
         <SettingsItem title="Remove Profile Image" onClick={ handleDeleteProfileImage } />
-        <SettingsItem title="Delete Account" onClick={ handleDeleteUser } />
+        <SettingsItem title="Delete Account" onClick={ handleDeleteUser } color="red"/>
 
         {/* <CustomButton handleSubmit={ handleSignOut } buttonText="Log Out" buttonSize="sm" />
         <CustomButton handleSubmit={ handleDeleteProfileImage } buttonText="Remove Profile Image" buttonSize="sm" />

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./ChatSidebar.module.scss";
 import ChatItem from './ChatItem/ChatItem';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 export default function ChatSidebar() {
 
