@@ -4,7 +4,7 @@ import Nav from "../Nav/Nav";
 import ChatSidebar from './ChatSidebar/ChatSidebar';
 import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
 import { fetchChats, userSetUp } from '../../Helpers/DataLoading';
 import { auth } from '../../Firebase/firebase';
@@ -13,6 +13,7 @@ import { auth } from '../../Firebase/firebase';
 function Chat() {
 
   const dispatch = useDispatch();
+  const currentChat = useSelector((state) => state.chat.currentChat);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,7 +37,7 @@ function Chat() {
 
         </SideBar>
 
-        <ChatContent />
+        {currentChat.contact.email && (<ChatContent />)}
       </div>
     </div>
   );
