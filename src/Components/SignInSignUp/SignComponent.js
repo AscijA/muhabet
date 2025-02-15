@@ -86,7 +86,6 @@ function SignComponent() {
             uid: userInfo.uid,
           };
           const docRef = await addDoc(collection(db, "users"), user);
-          console.log(docRef);
         })
         .catch((error) => {
           switch (error.code) {
