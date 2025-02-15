@@ -11,6 +11,7 @@ import { updateUser } from '../../store/userSlice';
 import { onAuthStateChanged } from 'firebase/auth';
 import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Navbar
@@ -22,30 +23,39 @@ function Nav() {
   const dispatch = useDispatch();
   const [showUser, setShowUser] = useState(false);
   const [showContact, setShowContact] = useState(false);
+  let navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
         // Update with chat user icon
-        if(chat.currentChat.contact.uid !== undefined) 
-        {const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-        getDownloadURL(contactRef).then((url) => {
-          dispatch(updateContact({ profilePic: url }));
-          setShowContact(true);
-        });}
+        if (chat.currentChat.contact.uid !== undefined) {
+          const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
+          getDownloadURL(contactRef).then((url) => {
+            dispatch(updateContact({ profilePic: url }));
+            setShowContact(true);
+          });
+        }
 
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef).then((url) => {
           dispatch(updateUser({ profilePic: url }));
           setShowUser(true);
+        }).catch((error) => {
+
         });
+
+      }
+      else {
+        navigate("/");
+
       }
     });
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [chat.currentChat.contact.uid, dispatch]);
+  }, [chat.currentChat.contact.uid, dispatch, navigate]);
 
 
   function handleShowSettingsToggle() {
@@ -68,13 +78,13 @@ function Nav() {
       </div>
       <div className={ styles.chatContent }>
 
-       { chat.currentChat.contact.uid !== undefined && ( <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
+        { chat.currentChat.contact.uid !== undefined && (<div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
           <div className={ showContact ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="Profile" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
         </div>)
-}
+        }
       </div>
 
       { showSettings && <BasicModal
