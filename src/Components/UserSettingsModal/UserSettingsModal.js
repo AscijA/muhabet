@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from "./UserSettingsModal.module.scss";
 import CustomButton from '../Common/Buttons/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
