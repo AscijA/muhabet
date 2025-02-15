@@ -17,9 +17,9 @@ const initialMessage = {
 
 function ChatContent() {
     const dispatch = useDispatch();
-    let chat = useSelector((state) => state.chat);
     let currentUser = useSelector((state) => state.user);
-    const allChats = useSelector((state) => state.chat);
+    // const currentChat = useSelector((state) => state.chat.currentChat);
+    const currentMessages = useSelector((state) => state.chat.currentChat.messages);
     const [message, setMessage] = useState(initialMessage);
     const [buttonAction, setButtonAction] = useState("Send");
 
@@ -91,8 +91,9 @@ function ChatContent() {
         <div className={ styles.mainChatContainer }>
             <div className={ styles.chatContent }>
 
-                <MessageItem text="TestChat" timestamp={ new Date() } isOwnMessage={ false } />
-                <MessageItem text="TestChat window content with message box and " handleEdit={ () => setButtonAction("Update") } timestamp={ new Date() } isOwnMessage={ true } deliveryStatus={ MESSAGE_STATUS.SEEN } />
+                { currentMessages.map((message) => {
+                    return <MessageItem key={ message.id } text={ message.content } timestamp={new Date( message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
+                }) }
 
             </div>
             <div className={ styles.messageBoxContainer }>

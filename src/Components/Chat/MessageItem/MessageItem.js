@@ -58,7 +58,7 @@ const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
       <div>
         <div className={ styles.messageContent }>{ text }</div>
         <div className={ styles.messageTimestamp }>{ (timestamp.Date === new Date().Date && timestamp.Month !== new Date().Date) ? timestamp.toTimeString().slice(0, 5) : timestamp.toLocaleString("de").slice(0, -3) }
-          <div className={ styles.icons }>
+          { isOwnMessage && (<div className={ styles.icons }>
             { deliveryStatus === MESSAGE_STATUS.SENT && (
               <img className={ "" } src={ sentIcon } alt="Delivery Status: Sent" />
             ) }
@@ -70,10 +70,8 @@ const MessageItem = ({ text, timestamp, isOwnMessage, deliveryStatus }) => {
             { deliveryStatus === MESSAGE_STATUS.SEEN && (
               <img className={ "" } src={ seen } alt="Delivery Status: Seen" />
             ) }
-
-
           </div>
-
+          ) }
         </div>
       </div>
       { isOwnMessage && (<div className={ styles.dotMenu } onClick={ toggleMenu }>
