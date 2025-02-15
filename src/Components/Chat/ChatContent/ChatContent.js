@@ -92,7 +92,7 @@ function ChatContent() {
             <div className={ styles.chatContent }>
 
                 { currentMessages.map((message) => {
-                    return <MessageItem key={ message.id } text={ message.content } timestamp={new Date( message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
+                    return <MessageItem key={ message.messageID } text={ message.content } timestamp={new Date( message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
                 }) }
 
             </div>
