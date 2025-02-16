@@ -19,14 +19,12 @@ import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
-
 function ContactInfo(props) {
   return (<div className={ styles.contactInfo }>
     <SettingsItem title="Delete Chat" onClick={ props.handleDeleteChat } />
     <SettingsItem title="Block User" onClick={ props.handleBlockUser } />
   </div>);
 }
-
 
 /**
  * Navbar
@@ -63,8 +61,6 @@ function Nav() {
     return () => unsubscribe();
   }, [dispatch, navigate]);
 
-
-
   useEffect(() => {
     if (chat.currentChat?.contact?.uid) {
       const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
@@ -87,7 +83,7 @@ function Nav() {
   const handleDeleteChat = () => {
   };
 
-  function handleShowSettingsToggle() {
+  const handleShowSettingsToggle = () => {
     setShowSettings(oldState => !oldState);
   }
 
