@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from "./UserSettingsModal.module.scss";
 import { useDispatch, useSelector } from 'react-redux';
 import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
+import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow';
 
 /**
  * UserSettingsModal component that displays the user profile picture and email address.
@@ -18,6 +19,9 @@ export const UserSettingsModal = (props) => {
   let user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
+  const [showConfirmWindowLogOut, setDisplayConfirmLogOut] = useState(false);
+  const [showConfirmWindowDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
+  const [showConfirmWindowDeleteAcc, setDisplayConfirmDeleteAcc] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -71,28 +75,69 @@ export const UserSettingsModal = (props) => {
       });
     });
   };
+
+  const handleShowConfirmationWindowLogOut = () => {
+    setDisplayConfirmLogOut(oldState => !oldState);
+  };
+
+  const handleShowConfirmationWindowDeleteImage = () => {
+    setDisplayConfirmDeleteImage(oldState => !oldState);
+  };
+  const handleShowConfirmationWindowDeleteUser = () => {
+    setDisplayConfirmDeleteAcc(oldState => !oldState);
+  };
   return (
-    <div className={ styles.outerContainer }>
-      <div className={ styles.profileContainer + (showDefaultImage ? " " + styles.noProfileBG : "") }>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={ handleFileChange }
-          ref={ fileInputRef }
-          style={ { display: 'none' } }
-        />
-        <img src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+    <>
+      <div className={ styles.outerContainer }>
+        <div className={ styles.profileContainer + (showDefaultImage ? " " + styles.noProfileBG : "") }>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={ handleFileChange }
+            ref={ fileInputRef }
+            style={ { display: 'none' } }
+          />
+          <img src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+        </div>
+        <div className={ styles.email }>
+          { user.email }
+        </div>
+        <div className={ styles.buttonsContainer }>
+          <SettingsItem title="Log Out" onClick={ handleShowConfirmationWindowLogOut } />
+          <SettingsItem title="Remove Profile Image" onClick={ handleShowConfirmationWindowDeleteImage } />
+          <SettingsItem title="Delete Account" onClick={ handleShowConfirmationWindowDeleteUser } color="red" />
+        </div>
       </div>
-      <div className={ styles.email }>
-        { user.email }
-      </div>
-      <div className={ styles.buttonsContainer }>
-        <SettingsItem title="Log Out" onClick={ handleSignOut } />
-        <SettingsItem title="Remove Profile Image" onClick={ handleDeleteProfileImage } />
-        <SettingsItem title="Delete Account" onClick={ handleDeleteUser } color="red"/>
 
-      </div>
+      { showConfirmWindowLogOut &&
+        (<ConfirmationWindow
+          text="Are you sure you want to Log Out?"
+          buttons={ [
+            { text: "Yes", onClick: handleSignOut },
+            { text: "No", onClick: handleShowConfirmationWindowLogOut }
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowLogOut }
+        />) }
 
-    </div>
+      { showConfirmWindowDeleteImage &&
+        (<ConfirmationWindow
+          text="Are you sure you want to remove Your profile picture?"
+          buttons={ [
+            { text: "Yes", onClick: handleDeleteProfileImage },
+            { text: "No", onClick: handleShowConfirmationWindowDeleteImage }
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowDeleteImage }
+        />) }
+
+      { showConfirmWindowDeleteAcc &&
+        (<ConfirmationWindow
+          text="Are you sure you want to Delete Your Account? This action cannot be undone."
+          buttons={ [
+            { text: "Yes", onClick: handleDeleteUser },
+            { text: "No", onClick: handleShowConfirmationWindowDeleteUser }
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowDeleteUser }
+        />) }
+    </>
   );
 };
