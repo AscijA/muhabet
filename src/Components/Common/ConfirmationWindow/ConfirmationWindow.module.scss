@@ -1,0 +1,15 @@
+@import "../../../styles/_styles.scss";
+
+.confirmationWindow {
+  width: 100%;
+  h4 {
+    margin: 0;
+    margin-bottom: 16px;
+  }
+}
+
+.buttonContainer {
+
+  display: flex;
+  justify-content: space-between;
+}
