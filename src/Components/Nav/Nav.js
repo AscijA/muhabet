@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { UserSettingsModal } from '../UserSettingsModal/UserSettingsModal';
+import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
 import BasicModal from '../Common/BasicModal/BasicModal';
 
 import { storage, auth } from "../../Firebase/firebase";
@@ -24,7 +24,7 @@ const ContactInfo = (props) => {
     <SettingsItem title="Delete Chat" onClick={ props.handleDeleteChat } />
     <SettingsItem title="Block User" onClick={ props.handleBlockUser } />
   </div>);
-}
+};
 
 /**
  * Navbar
@@ -85,7 +85,7 @@ const Nav = () => {
 
   const handleShowSettingsToggle = () => {
     setShowSettings(oldState => !oldState);
-  }
+  };
 
   const handleShowContactInfoToggle = () => {
     dispatch(toggleShowChatInfo());
@@ -131,6 +131,6 @@ const Nav = () => {
       </BasicModal> }
     </div>
   );
-}
+};
 
 export default Nav;
