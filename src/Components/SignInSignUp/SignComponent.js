@@ -1,7 +1,7 @@
 import styles from './SignComponent.module.scss';
 // Import the functions you need from the SDKs you need
 import { onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { collection, addDoc} from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from '../../Firebase/firebase';
 import { AuthErrorCodes } from "firebase/auth";
 
@@ -23,7 +23,7 @@ import { userSetUp, fetchChats } from '../../Helpers/DataLoading';
 /**
  * SignComponent is the main component for the sign in and sign up page.
  */
-function SignComponent() {
+const SignComponent = () => {
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
@@ -35,7 +35,7 @@ function SignComponent() {
   let navigate = useNavigate();
 
   useEffect(() => {
-    
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
@@ -49,30 +49,26 @@ function SignComponent() {
     return () => unsubscribe();
   }, [dispatch, navigate]);
 
-
-
-
-
-  function handleChangeEmail(event) {
+  const handleChangeEmail = (event) => {
     setCredentials(oldState => {
       return { ...oldState, email: event.target.value };
     });
     setShowError(false);
-  }
+  };
 
-  function handleChangePassword(event) {
+  const handleChangePassword = (event) => {
     setCredentials(oldState => {
       return { ...oldState, password: event.target.value };
     });
     setShowError(false);
-  }
+  };
 
-  function handleChangeResetEmail(event) {
+  const handleChangeResetEmail = (event) => {
     setResetEmail(event.target.value);
     setShowError(false);
-  }
+  };
 
-  function handleSignUp(event) {
+  const handleSignUp = (event) => {
     event.preventDefault();
     if (credentials.email && credentials.password) {
       createUserWithEmailAndPassword(auth, credentials.email, credentials.password)
@@ -105,8 +101,8 @@ function SignComponent() {
           setShowError(true);
         });
     }
-  }
-  function handleSignIn(event) {
+  };
+  const handleSignIn = (event) => {
     event.preventDefault();
     if (credentials.email && credentials.password) {
       setPersistence(auth, browserLocalPersistence)
@@ -127,9 +123,9 @@ function SignComponent() {
       setShowError(true);
       setErrorMessage("Email and/or password cannot be empty");
     }
-  }
+  };
 
-  function handleResetPassword(event) {
+  const handleResetPassword = (event) => {
     event.preventDefault();
     if (resetEmail) {
       console.log(resetEmail);
@@ -154,12 +150,12 @@ function SignComponent() {
           setShowError(true);
         });
     }
-  }
-  function handleChangeFormType() {
+  };
+  const handleChangeFormType = () => {
     setIsSignIn(oldState => !oldState);
   }
 
-  function handleResetPasswordToggle() {
+  const handleResetPasswordToggle = () => {
     setShowResetModal(oldState => !oldState);
   }
 
@@ -202,7 +198,7 @@ function SignComponent() {
       </div>
     </div>
   );
-}
+};
 
 export default SignComponent;
 

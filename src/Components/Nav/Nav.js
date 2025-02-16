@@ -19,7 +19,7 @@ import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
-function ContactInfo(props) {
+const ContactInfo = (props) => {
   return (<div className={ styles.contactInfo }>
     <SettingsItem title="Delete Chat" onClick={ props.handleDeleteChat } />
     <SettingsItem title="Block User" onClick={ props.handleBlockUser } />
@@ -29,7 +29,7 @@ function ContactInfo(props) {
 /**
  * Navbar
  */
-function Nav() {
+const Nav = () => {
   let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
   const [showSettings, setShowSettings] = useState(false);

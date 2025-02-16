@@ -17,7 +17,7 @@ import CustomButton from '../../Common/Buttons/CustomButton';
  * @param {function} handleChangeFormType - The function to be called when the form type is changed.
  * @param {function} handleResetPasswordToggle - The function to be called when the reset password link is clicked.
  */
-function LoginForm(props) {
+const LoginForm = (props) => {
   return (
     <form className={ styles.signForm }>
       <CustomInput

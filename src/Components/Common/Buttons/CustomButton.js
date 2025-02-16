@@ -8,7 +8,7 @@ import styles from "./CustomButton.module.scss";
  * @param {string} buttonSize - The size of the button, can be "sm" or "lg".
  * @param {function} handleSubmit - The function to be called when the button is clicked.
  */
-export default function CustomButton(props) {
+const CustomButton = (props) => {
   let buttonStyle = props.buttonType === "filled" ? styles.filled : styles.outlined;
   buttonStyle = buttonStyle + (props.buttonSize === "sm" ? " " + styles.smallButton : "");
   return (
@@ -18,9 +18,8 @@ export default function CustomButton(props) {
         onClick={ props.handleSubmit }>
         { props.buttonText }
       </button>
-
-
     </div>
   );
+};
 
-}
+export default CustomButton;

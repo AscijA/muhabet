@@ -8,7 +8,7 @@ import styles from "./CustomInput.module.scss";
  * @param {string} stateElement - The state element that holds the value of the input field.
  * @param {function} stateElementChangeHandler - The function to be called when the input field value changes.
  */
-export default function CustomInput(props) {
+const CustomInput = (props) => {
   return (
     <div className={ styles.formInput }>
       <label >{ props.label }</label>
@@ -17,5 +17,6 @@ export default function CustomInput(props) {
         onChange={ props.stateElementChangeHandler } />
     </div>
   );
-
 }
+
+export default CustomInput;

@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './SettingsItem.module.scss';
+
 const SettingsItem = ({ title, onClick, color }) => {
   return (
     <div className={ styles.settingsItemContainer } onClick={ onClick }>

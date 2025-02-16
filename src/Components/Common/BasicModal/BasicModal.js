@@ -7,9 +7,9 @@ import styles from "./BasicModal.module.scss";
  * @param {boolean} transparent - Whether the modal should be transparent or not.
  * @param {function} handleToggleModal - The function to be called when the modal is closed.
  */
-export default function BasicModal(props) {
+const BasicModal = (props) => {
   let modalTypeStyles = styles.baseContainer + (props.fullscreen ? " " + styles.fullscreenContainer : " " + styles.containedContainer);
-  modalTypeStyles = modalTypeStyles + (props.transparent ? " " + styles.transparentContainer : "")
+  modalTypeStyles = modalTypeStyles + (props.transparent ? " " + styles.transparentContainer : "");
   const handleBackroundClick = (event) => {
     if (event.target === event.currentTarget) {
       props.handleToggleModal();
@@ -28,4 +28,5 @@ export default function BasicModal(props) {
       </div>
     </div>
   );
-}
+};
+export default BasicModal;

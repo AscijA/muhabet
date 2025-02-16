@@ -15,7 +15,7 @@ const initialMessage = {
     "status": "",
 };
 
-function ChatContent() {
+const ChatContent = () => {
     const dispatch = useDispatch();
     let currentUser = useSelector((state) => state.user);
     // const currentChat = useSelector((state) => state.chat.currentChat);
@@ -83,8 +83,6 @@ function ChatContent() {
 
         }
     };
-
-
 
     return (
         // Chat window content with message box and message input, no header

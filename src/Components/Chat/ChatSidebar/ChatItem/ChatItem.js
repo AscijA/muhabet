@@ -14,13 +14,13 @@ import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 import { useSelector, useDispatch } from 'react-redux';
 
 
-function ChatItem(props) {
+const ChatItem = (props) => {
   const dispatch = useDispatch();
   const [showUser, setShowUser] = useState(false);
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
   const [numberUnread, setNumberUnread] = useState(0);
-  
+
   let chatStatus = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
 
   let chat = useSelector((state) => state.chat);
@@ -66,13 +66,13 @@ function ChatItem(props) {
   };
 
   useEffect(() => {
-  
+
     if (chat.currentChat?.contact?.uid && !chat.currentChat.contact.profilePic) {
       const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-  
+
       getDownloadURL(contactRef)
         .then((url) => {
-          if (chat.currentChat.contact.profilePic !== url) {  
+          if (chat.currentChat.contact.profilePic !== url) {
             dispatch(updateContact({ profilePic: url }));
           }
         })
@@ -80,8 +80,8 @@ function ChatItem(props) {
           console.error("Error fetching profile pic:", error);
         });
     }
-  }, [chat.currentChat.contact.profilePic, chat.currentChat.contact.uid, dispatch]); 
-  
+  }, [chat.currentChat.contact.profilePic, chat.currentChat.contact.uid, dispatch]);
+
 
   const getUnreadMessagesCount = (arr) => {
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -145,6 +145,6 @@ function ChatItem(props) {
 
     </div>
   );
-}
+};
 
 export default ChatItem;

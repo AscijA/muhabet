@@ -10,7 +10,7 @@ import { fetchChats, userSetUp } from '../../Helpers/DataLoading';
 import { auth } from '../../Firebase/firebase';
 // import BasicModal from '../Common/BasicModal/BasicModal';
 
-function Chat() {
+const Chat = () => {
 
   const dispatch = useDispatch();
   const currentChat = useSelector((state) => state.chat.currentChat);
@@ -20,11 +20,9 @@ function Chat() {
       if (user) {
         userSetUp(user, dispatch);
         fetchChats(user.uid, dispatch);
-
       }
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [dispatch]);
 

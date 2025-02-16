@@ -3,7 +3,7 @@ import styles from "./ChatSidebar.module.scss";
 import ChatItem from './ChatItem/ChatItem';
 import { useSelector } from 'react-redux';
 
-export default function ChatSidebar() {
+ const ChatSidebar = () => {
 
   //const dispatch = useDispatch();
   const allChats = useSelector((state) => state.chat.allChats);
@@ -28,3 +28,4 @@ export default function ChatSidebar() {
     </div>
   );
 }
+export default ChatSidebar;

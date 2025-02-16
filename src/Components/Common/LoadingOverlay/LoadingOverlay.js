@@ -5,7 +5,7 @@ import { ThreeCircles } from 'react-loader-spinner';
 /**
  * LoadingOverlay component is a re-usable component for loading spinners.
  */
-export const LoadingOverlay = (props) => {
+const LoadingOverlay = (props) => {
   return (
     <div className={ styles.outerContainer }>
 
@@ -21,3 +21,5 @@ export const LoadingOverlay = (props) => {
     </div>
   );
 };
+
+export default LoadingOverlay;

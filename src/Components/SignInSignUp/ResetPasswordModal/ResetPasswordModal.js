@@ -12,7 +12,7 @@ import CustomButton from '../../Common/Buttons/CustomButton';
  * @param {string} errorMessage - The error message to be shown.
  * @param {function} handleResetPassword - The function to be called when the user clicks the "Reset password" button.
  */
-export default function ResetPasswordModal(props) {
+const ResetPasswordModal = (props) => {
 
   return (
     <div className={ styles.outerContainer }>
@@ -34,3 +34,5 @@ export default function ResetPasswordModal(props) {
     </div >
   );
 }
+
+export default ResetPasswordModal;
