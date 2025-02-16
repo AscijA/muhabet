@@ -81,7 +81,7 @@ const SignComponent = () => {
             createdAt: userInfo.metadata.creationTime,
             uid: userInfo.uid,
           };
-          const docRef = await addDoc(collection(db, "users"), user);
+          await addDoc(collection(db, "users"), user);
         })
         .catch((error) => {
           switch (error.code) {
@@ -153,11 +153,11 @@ const SignComponent = () => {
   };
   const handleChangeFormType = () => {
     setIsSignIn(oldState => !oldState);
-  }
+  };
 
   const handleResetPasswordToggle = () => {
     setShowResetModal(oldState => !oldState);
-  }
+  };
 
   return (
     <div className={ styles.main }>

@@ -18,12 +18,48 @@ import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../st
 import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
+import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow';
 
 const ContactInfo = (props) => {
-  return (<div className={ styles.contactInfo }>
-    <SettingsItem title="Delete Chat" onClick={ props.handleDeleteChat } />
-    <SettingsItem title="Block User" onClick={ props.handleBlockUser } />
-  </div>);
+  const [showConfirmWindowDeleteChat, setDisplayConfirmDeleteChat] = useState(false);
+  const [showConfirmWindowBlockUser, setDisplayConfirmBlockUser] = useState(false);
+
+  const handleShowConfirmationWindowDeleteChat = () => {
+    setDisplayConfirmDeleteChat(oldState => !oldState);
+  };
+  const handleShowConfirmationWindowBlockUser = () => {
+    setDisplayConfirmBlockUser(oldState => !oldState);
+  };
+
+  return (
+    <>
+      <div className={ styles.contactInfo }>
+        <SettingsItem title="Delete Chat" onClick={ handleShowConfirmationWindowDeleteChat } />
+        <SettingsItem title="Block User" onClick={ handleShowConfirmationWindowBlockUser } />
+      </div>
+
+
+      { showConfirmWindowDeleteChat &&
+        (<ConfirmationWindow
+          text="Are you sure you want to delete this chat? This action cannot be undone."
+          buttons={ [
+            { text: "Yes", onClick: props.handleDeleteChat },
+            { text: "No", onClick: handleShowConfirmationWindowDeleteChat }
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowDeleteChat }
+        />) }
+
+      { showConfirmWindowBlockUser &&
+        (<ConfirmationWindow
+          text="Are you sure you want to block this user?"
+          buttons={ [
+            { text: "Yes", onClick: props.handleBlockUser },
+            { text: "No", onClick: handleShowConfirmationWindowBlockUser }
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowBlockUser }
+        />) }
+    </>
+  );
 };
 
 /**
@@ -77,11 +113,6 @@ const Nav = () => {
     }
   }, [chat.currentChat?.contact?.uid, dispatch]);
 
-  const handleBlockUser = () => {
-  };
-
-  const handleDeleteChat = () => {
-  };
 
   const handleShowSettingsToggle = () => {
     setShowSettings(oldState => !oldState);
@@ -90,6 +121,11 @@ const Nav = () => {
   const handleShowContactInfoToggle = () => {
     dispatch(toggleShowChatInfo());
   };
+
+  const handleDeleteChat = () => { };
+
+  const handleBlockUser = () => { };
+
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
