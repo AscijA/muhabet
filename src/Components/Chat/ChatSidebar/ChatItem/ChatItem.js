@@ -20,7 +20,6 @@ function ChatItem(props) {
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
   const [numberUnread, setNumberUnread] = useState(0);
-
   
   let chatStatus = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
 

@@ -19,6 +19,15 @@ import { userSetUp } from '../../Helpers/DataLoading';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
+
+function ContactInfo(props) {
+  return (<div className={ styles.contactInfo }>
+    <SettingsItem title="Delete Chat" onClick={ props.handleDeleteChat } />
+    <SettingsItem title="Block User" onClick={ props.handleBlockUser } />
+  </div>);
+}
+
+
 /**
  * Navbar
  */
@@ -121,10 +130,7 @@ function Nav() {
         fullscreen={ true }
         transparent={ true }
       >
-        <div className={ styles.contactInfo }>
-          <SettingsItem title="Delete Chat" onClick={ handleDeleteChat } />
-          <SettingsItem title="Block User" onClick={ handleBlockUser } />
-        </div>
+        <ContactInfo handleBlockUser={ handleBlockUser } handleDeleteChat={ handleDeleteChat } />
 
       </BasicModal> }
     </div>

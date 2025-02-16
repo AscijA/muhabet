@@ -91,10 +91,6 @@ export const UserSettingsModal = (props) => {
         <SettingsItem title="Remove Profile Image" onClick={ handleDeleteProfileImage } />
         <SettingsItem title="Delete Account" onClick={ handleDeleteUser } color="red"/>
 
-        {/* <CustomButton handleSubmit={ handleSignOut } buttonText="Log Out" buttonSize="sm" />
-        <CustomButton handleSubmit={ handleDeleteProfileImage } buttonText="Remove Profile Image" buttonSize="sm" />
-        <CustomButton handleSubmit={ handleDeleteUser } buttonText="Delete Account" buttonSize="sm" /> */}
-
       </div>
 
     </div>
