@@ -19,3 +19,10 @@
 .formContainer {
   margin: 0 24px;
 }
+.imageContainer {
+  width: 70vw;
+  height: 100vh;
+  // background-color: aqua;
+  background-image: url("../../assets/temp.png");
+  background-position: center;
+}

@@ -193,8 +193,7 @@ const SignComponent = () => {
           />
         </BasicModal> }
       </SideBar>
-      <div>
-        Slika
+      <div className={ styles.imageContainer }> 
       </div>
     </div>
   );
