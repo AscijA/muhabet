@@ -6,7 +6,7 @@ import styles from "./Chat.module.scss";
 import ChatContent from './ChatContent/ChatContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
-import { fetchChats, userSetUp } from '../../Helpers/DataLoading';
+import { fetchChats, userSetUp } from '../../Helpers/DataHandling';
 import { auth } from '../../Firebase/firebase';
 // import BasicModal from '../Common/BasicModal/BasicModal';
 

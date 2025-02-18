@@ -15,7 +15,7 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
  * UserSettingsModal component that displays the user profile picture and email address.
  * Also allows the user to log out, delete their account or change profile picture. 
  */
- const UserSettingsModal = (props) => {
+ const UserSettingsModal = () => {
   let user = useSelector((state) => state.user);
   const fileInputRef = useRef(null);
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);

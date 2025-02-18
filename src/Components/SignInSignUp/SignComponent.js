@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from "react";
 import { useDispatch } from 'react-redux';
-import { userSetUp, fetchChats } from '../../Helpers/DataLoading';
+import { userSetUp, fetchChats } from '../../Helpers/DataHandling';
 
 
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';

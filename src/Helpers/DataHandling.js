@@ -8,7 +8,7 @@ import { setAllChats } from 'src/store/chatSlice';
  * @param {Object} authUser - Firebase auth user object
  * @param {Object} dispatch - Redux dispatch
  */
-export function userSetUp(authUser, dispatch) {
+const userSetUp = (authUser, dispatch) => {
   const user = {
     email: authUser.email,
     displayName: authUser.displayName,
@@ -17,9 +17,9 @@ export function userSetUp(authUser, dispatch) {
     uid: authUser.uid,
   };
   dispatch(setUser({ ...user }));
-}
+};
 
-export async function fetchChats(userID, dispatch) {
+const fetchChats = async (userID, dispatch) => {
   try {
     // Firestore query to get chats where currentUserID is one of the participants
     const chatsRef = collection(db, "chats");
@@ -80,3 +80,9 @@ export async function fetchChats(userID, dispatch) {
   }
 
 };
+
+
+const updateChat = async () => {
+
+};
+export { userSetUp, fetchChats, updateChat };
