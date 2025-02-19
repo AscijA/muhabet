@@ -13,14 +13,22 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { updateUser } from '../../store/userSlice';
-import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage, updateChatStatus, updateChatByID } from '../../store/chatSlice';
 
-import { userSetUp } from '../../Helpers/DataLoading';
+import { updateChat, userSetUp } from '../../Helpers/DataHandling';
 import userIcon from "../../assets/user.svg";
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
 import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow';
 
 const ContactInfo = (props) => {
+
+  let user = useSelector((state) => state.user);
+  let chat = useSelector((state) => state.chat);
+
+  let chatStatusBlock = user.uid === chat.currentChat.user1ID ? chat.currentChat.chatStatus.user2Block : chat.currentChat.chatStatus.user1Block;
+
+  let text = chatStatusBlock ? "Unblock User" : "Block User";
+  let confirmTextTitle = chatStatusBlock ? "Are you sure you want to unblock this user?" : "Are you sure you want to block this user?";
   const [showConfirmWindowDeleteChat, setDisplayConfirmDeleteChat] = useState(false);
   const [showConfirmWindowBlockUser, setDisplayConfirmBlockUser] = useState(false);
 
@@ -35,7 +43,7 @@ const ContactInfo = (props) => {
     <>
       <div className={ styles.contactInfo }>
         <SettingsItem title="Delete Chat" onClick={ handleShowConfirmationWindowDeleteChat } />
-        <SettingsItem title="Block User" onClick={ handleShowConfirmationWindowBlockUser } />
+        <SettingsItem title={ text } onClick={ handleShowConfirmationWindowBlockUser } />
       </div>
 
 
@@ -43,7 +51,13 @@ const ContactInfo = (props) => {
         (<ConfirmationWindow
           text="Are you sure you want to delete this chat? This action cannot be undone."
           buttons={ [
-            { text: "Yes", onClick: props.handleDeleteChat },
+            {
+              text: "Yes", onClick: () => {
+                props.handleDeleteChat();
+                handleShowConfirmationWindowDeleteChat();
+
+              }
+            },
             { text: "No", onClick: handleShowConfirmationWindowDeleteChat }
           ] }
           handleToggleModal={ handleShowConfirmationWindowDeleteChat }
@@ -51,9 +65,14 @@ const ContactInfo = (props) => {
 
       { showConfirmWindowBlockUser &&
         (<ConfirmationWindow
-          text="Are you sure you want to block this user?"
+          text={ confirmTextTitle }
           buttons={ [
-            { text: "Yes", onClick: props.handleBlockUser },
+            {
+              text: "Yes", onClick: () => {
+                props.handleBlockUser();
+                handleShowConfirmationWindowBlockUser();
+              }
+            },
             { text: "No", onClick: handleShowConfirmationWindowBlockUser }
           ] }
           handleToggleModal={ handleShowConfirmationWindowBlockUser }
@@ -66,20 +85,21 @@ const ContactInfo = (props) => {
  * Navbar
  */
 const Nav = () => {
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
+
   let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
-  const [showSettings, setShowSettings] = useState(false);
-  const dispatch = useDispatch();
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
+
+  const [showSettings, setShowSettings] = useState(false);
   const [showContact, setShowContact] = useState(false);
-  let navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
 
-        // Fetch logged-in user's profile picture
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         getDownloadURL(gsRef)
           .then((url) => {
@@ -122,9 +142,77 @@ const Nav = () => {
     dispatch(toggleShowChatInfo());
   };
 
-  const handleDeleteChat = () => { };
+  const handleDeleteChat = () => {
+    let currentChat = chat.currentChat;
+    let allChats = chat.allChats;
+    let chatStatus = chat.currentChat.chatStatus;
+    let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
+    let currentUserUid = user.uid;
 
-  const handleBlockUser = () => { };
+    if (currentUserUid === currentChatFull.user1ID) {
+
+      chatStatus = {
+        ...chatStatus,
+        user1Del: true
+      };
+    }
+    else {
+      chatStatus = {
+        ...chatStatus,
+        user2Del: true
+      };
+
+    }
+
+    currentChatFull = {
+      ...currentChatFull,
+      chatStatus: chatStatus
+    };
+
+    updateChat("chatStatus", chatStatus, currentChat.chatId)
+      .then(() => {
+        dispatch(updateChatByID(currentChatFull));
+        dispatch(updateChatStatus(chatStatus));
+        handleShowContactInfoToggle();
+      }).catch((error) => {
+        console.error("Error blocking user:", error);
+      });
+  };
+
+  const handleBlockUser = () => {
+    let currentChat = chat.currentChat;
+    let allChats = chat.allChats;
+    let chatStatus = chat.currentChat.chatStatus;
+    let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
+    let currentUserUid = user.uid;
+
+    if (currentUserUid === currentChatFull.user1ID) {
+
+      chatStatus = {
+        ...chatStatus,
+        user1Block: !chatStatus.user1Block,
+      };
+    }
+    else {
+      chatStatus = {
+        ...chatStatus,
+        user2Block: !chatStatus.user2Block,
+      };
+    }
+
+    currentChatFull = {
+      ...currentChatFull,
+      chatStatus: chatStatus
+    };
+    updateChat("chatStatus", chatStatus, currentChat.chatId)
+      .then(() => {
+        dispatch(updateChatByID(currentChatFull));
+        dispatch(updateChatStatus(chatStatus));
+        handleShowContactInfoToggle();
+      }).catch((error) => {
+        console.error("Error blocking user:", error);
+      });
+  };
 
   return (
     <div className={ styles.main }>
@@ -139,7 +227,7 @@ const Nav = () => {
       </div>
       <div className={ styles.chatContent }>
 
-        { chat.currentChat.contact.uid !== undefined && (<div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
+        { chat.currentChat.contact.uid && (<div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
           <div className={ showContact ? styles.contactPic : styles.contactPicBG }>
             <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="Profile" />
           </div>

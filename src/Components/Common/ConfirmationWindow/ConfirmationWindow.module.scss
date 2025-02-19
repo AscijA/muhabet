@@ -2,9 +2,12 @@
 
 .confirmationWindow {
   width: 100%;
+  display: flex;
+  flex-direction: column;
   h4 {
     margin: 0;
     margin-bottom: 16px;
+    text-align: center;
   }
 }
 

@@ -1,5 +1,5 @@
 import { setUser } from '../store/userSlice';
-import { collection, getDocs, query, where, orderBy, Timestamp } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy, Timestamp, doc, updateDoc } from "firebase/firestore";
 import { db } from '../Firebase/firebase';
 import { setAllChats } from 'src/store/chatSlice';
 
@@ -82,7 +82,12 @@ const fetchChats = async (userID, dispatch) => {
 };
 
 
-const updateChat = async () => {
+const updateChat = async (key, value, chatID) => {
+  const chatRef = doc(db, "chats", chatID);
+
+  await updateDoc(chatRef, {
+    [key]: value,
+  });
 
 };
 export { userSetUp, fetchChats, updateChat };

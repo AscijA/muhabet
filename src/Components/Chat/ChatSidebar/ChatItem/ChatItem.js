@@ -18,11 +18,11 @@ const ChatItem = (props) => {
   const dispatch = useDispatch();
   const [showUser, setShowUser] = useState(false);
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
-  let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : " ");
   const [numberUnread, setNumberUnread] = useState(0);
-
-  let chatStatus = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
-
+  
+  let chatStatusDel = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
+  let chatStatusBlock = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Block : props.chat.chatStatus.user1Block;
+  let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : "") + " " + (chatStatusBlock ? styles.blocked : "");
   let chat = useSelector((state) => state.chat);
   const [profilePic, setProfilePic] = useState("");
 
@@ -30,7 +30,7 @@ const ChatItem = (props) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
 
-        if (props.contactUID !== undefined) {
+        if (props.contactUID) {
 
           const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
           getDownloadURL(contactRef).then((url) => {
@@ -97,7 +97,7 @@ const ChatItem = (props) => {
     return (ts.Date === new Date().Date && ts.Month !== new Date().Date) ? ts.toTimeString().slice(0, 5) : ts.toLocaleString("de").slice(0, -10);
   };
 
-  return !chatStatus && (
+  return !chatStatusDel && (
     <div className={ containerStyle } onClick={ handleChatItemOnClick } >
       <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
         <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />

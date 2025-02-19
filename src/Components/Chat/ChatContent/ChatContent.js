@@ -18,7 +18,9 @@ const initialMessage = {
 const ChatContent = () => {
     const dispatch = useDispatch();
     let currentUser = useSelector((state) => state.user);
-    // const currentChat = useSelector((state) => state.chat.currentChat);
+    const currentChat = useSelector((state) => state.chat.currentChat);
+    let chatStatusBlock = currentUser.uid === currentChat.user1ID ? currentChat.chatStatus.user2Block : currentChat.chatStatus.user1Block;
+    let chatStatus = currentChat.chatStatus;
     const currentMessages = useSelector((state) => state.chat.currentChat.messages);
     const [message, setMessage] = useState(initialMessage);
     const [buttonAction, setButtonAction] = useState("Send");
@@ -90,23 +92,29 @@ const ChatContent = () => {
             <div className={ styles.chatContent }>
 
                 { currentMessages.map((message) => {
-                    return <MessageItem key={ message.messageID } text={ message.content } timestamp={new Date( message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
+                    return <MessageItem key={ message.messageID } text={ message.content } timestamp={ new Date(message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
                 }) }
 
             </div>
-            <div className={ styles.messageBoxContainer }>
-                <div className={ styles.inputContainer }>
-                    <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
-                        onKeyDown={ handleEnter } />
-                </div>
-                <div className={ styles.buttonContainer }>
-                    <CustomButton buttonText={ buttonAction } buttonSize="sm" buttonType="filled"
-                        handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
-                </div>
 
+            <div className={ styles.messageBoxContainer }>
+                { !chatStatusBlock ? (<>
+                    <div className={ styles.inputContainer }>
+                        <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
+                            onKeyDown={ handleEnter } />
+                    </div>
+                    <div className={ styles.buttonContainer }>
+                        <CustomButton buttonText={ buttonAction } buttonSize="sm" buttonType="filled"
+                            handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
+                    </div>
+                </>
+
+                ) : (<>
+
+                </>) }
             </div>
         </div>
     );
-}
+};
 
 export default ChatContent;

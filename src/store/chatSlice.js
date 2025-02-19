@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     uid: "",
@@ -10,6 +10,7 @@ const initialState = {
         contact: {
             profilePic: "",
             email: "",
+            uid: ""
         },
         messages: [
             {}
@@ -29,7 +30,7 @@ const chatSlice = createSlice({
 
         // Update a specific key in the state
         updateState: (state, action) => {
-            const {key, value} = action.payload;
+            const { key, value } = action.payload;
             return {
                 ...state,
                 [key]: value
@@ -69,7 +70,7 @@ const chatSlice = createSlice({
 
         // Update the currentChat
         updateCurrentChat: (state, action) => {
-            const {key, value} = action.payload;
+            const { key, value } = action.payload;
 
             return {
                 ...state,
@@ -77,6 +78,16 @@ const chatSlice = createSlice({
                     ...state.currentChat,
                     [key]: value
 
+                }
+            };
+        },
+
+        updateChatStatus: (state, action) => {
+            return {
+                ...state,
+                currentChat: {
+                    ...state.currentChat,
+                    chatStatus: action.payload
                 }
             };
         },
@@ -96,6 +107,20 @@ const chatSlice = createSlice({
                 allChats: [...state.allChats, action.payload]
             };
         },
+
+        updateChatByID: (state, action) => {
+            const updatedChat = action.payload;
+            
+            // Find the chat in allChats that matches the current chatId
+            const chatIndex = state.allChats.findIndex(
+                (chat) => chat.id === updatedChat.id
+            );
+            
+            if (chatIndex !== -1) {
+                state.allChats[chatIndex] = updatedChat;
+            }
+        },
+
         addMessageToCurrentChat: (state, action) => {
             const newMessage = action.payload;
 
@@ -104,7 +129,7 @@ const chatSlice = createSlice({
             console.log(newMessage);
             // Find the chat in allChats that matches the current chatId
             const chatIndex = state.allChats.findIndex(
-                (chat) => chat.chatId === state.currentChat.chatId
+                (chat) => chat.id === state.currentChat.chatId
             );
 
             // If the chat exists in allChats, update the messages
@@ -140,6 +165,8 @@ export const {
     setAllChats,
     updateAllChats,
     addMessageToCurrentChat,
-    setShowDefaultImage
+    setShowDefaultImage,
+    updateChatStatus,
+    updateChatByID,
 } = chatSlice.actions;
 export default chatSlice.reducer;
