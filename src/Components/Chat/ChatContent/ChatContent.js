@@ -18,9 +18,9 @@ const initialMessage = {
 const ChatContent = () => {
     const dispatch = useDispatch();
     let currentUser = useSelector((state) => state.user);
-    const currentChat = useSelector((state) => state.chat.currentChat);
-    let chatStatusBlock = currentUser.uid === currentChat.user1ID ? currentChat.chatStatus.user2Block : currentChat.chatStatus.user1Block;
-    let chatStatus = currentChat.chatStatus;
+    const chat = useSelector((state) => state.chat);
+    const currentChat = chat.currentChat;
+    const allChats = useSelector((state) => state.chat.allChats);
     const currentMessages = useSelector((state) => state.chat.currentChat.messages);
     const [message, setMessage] = useState(initialMessage);
     const [buttonAction, setButtonAction] = useState("Send");
@@ -86,35 +86,67 @@ const ChatContent = () => {
         }
     };
 
+    const returnMessageBox = () => {
+        let ownBlock = (<>
+            <div className={ styles.inputContainer + " " + styles.ownBlock }>
+                <div>You have blocked this user. To send a message, please Unblock them.</div>
+            </div>
+            <div className={ styles.buttonContainer }>
+                <CustomButton buttonText="Unblock" buttonSize="sm" buttonType="filled"
+                    handleSubmit={ () => { } } />
+            </div>
+        </>
+        );
+
+        let otherBlock = (
+            <div className={ styles.inputContainer + " " + styles.otherBlock }>
+                <div>You have been blocked by this user. You cannot send any messages.</div>
+            </div>
+        );
+        let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId)
+        if (currentUser.uid === currentChatFull.user1ID && currentChat.chatStatus.user1Block) {
+            return ownBlock;
+        }
+        else if (currentUser.uid === currentChatFull.user1ID && currentChat.chatStatus.user2Block) {
+            return otherBlock;
+        }
+        else if (currentUser.uid === currentChatFull.user2ID && currentChat.chatStatus.user2Block) {
+            return ownBlock;
+        }
+        else if (currentUser.uid === currentChatFull.user2ID && currentChat.chatStatus.user1Block) {
+            return otherBlock;
+        }
+
+        return (<>
+            <div className={ styles.inputContainer }>
+                <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
+                    onKeyDown={ handleEnter } />
+            </div>
+            <div className={ styles.buttonContainer }>
+                <CustomButton buttonText={ buttonAction } buttonSize="sm" buttonType="filled"
+                    handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
+            </div>
+        </>
+        );
+    };
+
     return (
         // Chat window content with message box and message input, no header
         <div className={ styles.mainChatContainer }>
             <div className={ styles.chatContent }>
-
                 { currentMessages.map((message) => {
                     return <MessageItem key={ message.messageID } text={ message.content } timestamp={ new Date(message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
                 }) }
-
             </div>
 
             <div className={ styles.messageBoxContainer }>
-                { !chatStatusBlock ? (<>
-                    <div className={ styles.inputContainer }>
-                        <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
-                            onKeyDown={ handleEnter } />
-                    </div>
-                    <div className={ styles.buttonContainer }>
-                        <CustomButton buttonText={ buttonAction } buttonSize="sm" buttonType="filled"
-                            handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
-                    </div>
-                </>
-
-                ) : (<>
-
-                </>) }
+                { returnMessageBox() }
             </div>
         </div>
     );
 };
+
+
+
 
 export default ChatContent;
