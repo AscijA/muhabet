@@ -143,7 +143,7 @@ const ChatContent = () => {
                 <CustomButton
                     buttonText={ buttonAction }
                     buttonSize="sm"
-                    buttonType="filled"
+                    buttonType=""
                     handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
             </div>
         </>

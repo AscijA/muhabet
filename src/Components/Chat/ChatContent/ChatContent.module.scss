@@ -73,13 +73,17 @@
 
     .buttonContainer {
       height: 100%;
-      padding: 0 8px;
+      // padding: 0 8px;
       background-color: $primary-color;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      border-radius: 10px;
+
+      :first-child {
+        height: 100%;
+        margin: 0;
+      }
     }
 
 
@@ -93,7 +97,8 @@
       padding: 0 8px;
       background-color: $primary-color;
       border-radius: 10px;
-      div{
+
+      div {
         display: flex;
         flex-direction: row;
         align-items: center;
