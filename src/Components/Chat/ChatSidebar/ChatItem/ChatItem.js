@@ -1,44 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import styles from "./ChatItem.module.scss";
+
+import { useSelector, useDispatch } from 'react-redux';
+
 import userIcon from "../../../../assets/user.svg";
 import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
+
 import { updateContact, setCurrentChat } from "../../../../store/chatSlice";
+import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
+
 import { storage, auth } from "../../../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
-
 import { onAuthStateChanged } from 'firebase/auth';
 
-import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
-import { useSelector, useDispatch } from 'react-redux';
-
-
+/**
+ * Chat item component shown in the side bar of the chat window
+ *
+ * @param {string} email - Email of the contact
+ * @param {string} contactUID - UID of the contact
+ * @param {Object} chat - Chat object
+ * @param {string} deliveryStatus - Delivery status of the message
+ * @param {Date} timestamp - Timestamp of the message
+ */
 const ChatItem = (props) => {
   const dispatch = useDispatch();
-  const [showUser, setShowUser] = useState(false);
+
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
+  let chat = useSelector((state) => state.chat);
+
+  const [showUser, setShowUser] = useState(false);
   const [numberUnread, setNumberUnread] = useState(0);
+  const [profilePic, setProfilePic] = useState("");
 
   let chatStatusDel = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : "");
-  let chat = useSelector((state) => state.chat);
-  const [profilePic, setProfilePic] = useState("");
 
+  // Fetch profile picture of the contact
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-
         if (props.contactUID) {
-
           const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
           getDownloadURL(contactRef).then((url) => {
             setProfilePic(url);
             setShowUser(true);
           }).catch((error) => {
           });
-
-
         }
         getUnreadMessagesCount(props.chat.messages);
       }
@@ -64,6 +73,7 @@ const ChatItem = (props) => {
     dispatch(setCurrentChat(currentChat));
   };
 
+  // Update contact profile picture
   useEffect(() => {
 
     if (chat.currentChat?.contact?.uid && !chat.currentChat.contact.profilePic) {
@@ -80,7 +90,6 @@ const ChatItem = (props) => {
         });
     }
   }, [chat.currentChat.contact.profilePic, chat.currentChat.contact.uid, dispatch]);
-
 
   const getUnreadMessagesCount = (arr) => {
     for (let i = arr.length - 1; i >= 0; i--) {

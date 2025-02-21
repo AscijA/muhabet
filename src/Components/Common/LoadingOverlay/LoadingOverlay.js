@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from "./LoadingOverlay.module.scss";
+
 import { ThreeCircles } from 'react-loader-spinner';
 
 /**

@@ -1,11 +1,16 @@
 import React from 'react';
+import styles from './ConfirmationWindow.module.scss';
+
 import BasicModal from '../BasicModal/BasicModal';
 import CustomButton from '../Buttons/CustomButton';
 
-import styles from './ConfirmationWindow.module.scss';
-
+/**
+ * 
+ * @param {function} handleToggleModal - Function to toggle the modal
+ * @param {string} text - Text to display in the modal
+ * @param {array} buttons - Array of objects containing text and onClick function
+ */
 const ConfirmationWindow = (props) => {
-
   return (
     <BasicModal
       handleToggleModal={ props.handleToggleModal }
@@ -26,7 +31,6 @@ const ConfirmationWindow = (props) => {
           }) }
         </div>
       </div>
-
     </BasicModal>
   );
 };

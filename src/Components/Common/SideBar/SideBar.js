@@ -4,6 +4,7 @@ import styles from "./SideBar.module.scss";
 /**
  * SideBar component is a re-usable component for a sidebar with a chat width.
  * @param {boolean} isChat - A boolean value to determine if the sidebar is for chat or not.
+ * @param {JSX} children - The children components to be rendered inside the sidebar.
  */
 const SideBar = (props) => {
   let widthStyle = styles.sign + (props.isChat ? " " + styles.chatWidth : "");

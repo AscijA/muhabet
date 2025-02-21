@@ -1,29 +1,31 @@
+import { useState, useEffect } from "react";
 import styles from './SignComponent.module.scss';
-// Import the functions you need from the SDKs you need
+
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
 import { onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from '../../Firebase/firebase';
 import { AuthErrorCodes } from "firebase/auth";
 
-import LoginForm from './LoginForm/LoginForm';
-import BasicModal from '../Common/BasicModal/BasicModal';
-import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
 import logo from "../../assets/logo_white.svg";
-import SideBar from '../Common/SideBar/SideBar';
-
-import { useNavigate } from 'react-router-dom';
-
-import { useState, useEffect } from "react";
-import { useDispatch } from 'react-redux';
-import { userSetUp, fetchChats } from '../../Helpers/DataHandling';
-
 
 // import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
+import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
+import BasicModal from '../Common/BasicModal/BasicModal';
+import SideBar from '../Common/SideBar/SideBar';
+import LoginForm from './LoginForm/LoginForm';
+
+import { userSetUp, fetchChats } from '../../Helpers/DataHandling';
 
 /**
  * SignComponent is the main component for the sign in and sign up page.
  */
 const SignComponent = () => {
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
+  
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
@@ -31,16 +33,11 @@ const SignComponent = () => {
   let [errorMessage, setErrorMessage] = useState("");
   let [resetEmail, setResetEmail] = useState("");
 
-  const dispatch = useDispatch();
-  let navigate = useNavigate();
-
   useEffect(() => {
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
         fetchChats(user.uid, dispatch);
-
         navigate("/chat");
       }
     });

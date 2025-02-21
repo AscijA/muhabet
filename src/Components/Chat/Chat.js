@@ -1,17 +1,23 @@
 import React, { useEffect } from 'react';
+import styles from "./Chat.module.scss";
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import ChatContent from './ChatContent/ChatContent';
+import ChatSidebar from './ChatSidebar/ChatSidebar';
 import SideBar from "../Common/SideBar/SideBar";
 import Nav from "../Nav/Nav";
-import ChatSidebar from './ChatSidebar/ChatSidebar';
-import styles from "./Chat.module.scss";
-import ChatContent from './ChatContent/ChatContent';
-import { useDispatch, useSelector } from 'react-redux';
+
 import { onAuthStateChanged } from 'firebase/auth';
-import { fetchChats, userSetUp } from '../../Helpers/DataHandling';
 import { auth } from '../../Firebase/firebase';
-// import BasicModal from '../Common/BasicModal/BasicModal';
 
+import { fetchChats, userSetUp } from '../../Helpers/DataHandling';
+
+
+/**
+ * Main Chat component all of the chat components, nav and sidebar
+ */
 const Chat = () => {
-
   const dispatch = useDispatch();
   const currentChat = useSelector((state) => state.chat.currentChat);
 
@@ -30,7 +36,8 @@ const Chat = () => {
     <div className={ styles.main }>
       <Nav />
       <div className={ styles.content }>
-        <SideBar isChat={ true }>
+        <SideBar 
+        isChat={ true }>
           <ChatSidebar />
 
         </SideBar>

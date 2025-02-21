@@ -1,11 +1,13 @@
 import React from 'react';
 import styles from "./ChatSidebar.module.scss";
-import ChatItem from './ChatItem/ChatItem';
+
 import { useSelector } from 'react-redux';
 
- const ChatSidebar = () => {
+import ChatItem from './ChatItem/ChatItem';
 
-  //const dispatch = useDispatch();
+/** Chat sidebar containing all the chats
+ */
+const ChatSidebar = () => {
   const allChats = useSelector((state) => state.chat.allChats);
   let currentUser = useSelector((state) => state.user);
 
@@ -22,10 +24,10 @@ import { useSelector } from 'react-redux';
           chat={ chat }
           key={ chat.id }
           contactUID={ contactUID }
-          />;
+        />;
 
       }) }
     </div>
   );
-}
+};
 export default ChatSidebar;

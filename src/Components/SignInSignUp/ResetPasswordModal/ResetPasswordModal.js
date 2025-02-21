@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from "./ResetPasswordModal.module.scss";
+
 import CustomInput from '../../Common/CustomInput/CustomInput';
 import CustomButton from '../../Common/Buttons/CustomButton';
-
 
 /**
  * ResetPasswordModal component component for the password reset form. Used inside a BaseModal

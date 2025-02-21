@@ -1,30 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from "./UserSettingsModal.module.scss";
+
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import { auth, storage } from '../../Firebase/firebase';
+
 import { resetUser, updateUser } from '../../store/userSlice';
 import { setShowDefaultImage } from '../../store/chatSlice';
-import { useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
+
 import userIcon from "../../assets/user.svg";
-import SettingsItem from '../Common/SettingsItem/SettingsItem';
+
 import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow';
+import SettingsItem from '../Common/SettingsItem/SettingsItem';
 
 /**
  * UserSettingsModal component that displays the user profile picture and email address.
  * Also allows the user to log out, delete their account or change profile picture. 
  */
- const UserSettingsModal = () => {
-  let user = useSelector((state) => state.user);
-  const fileInputRef = useRef(null);
+const UserSettingsModal = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  let currentUser = useSelector((state) => state.user);
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
+
   const [showConfirmWindowLogOut, setDisplayConfirmLogOut] = useState(false);
   const [showConfirmWindowDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
   const [showConfirmWindowDeleteAcc, setDisplayConfirmDeleteAcc] = useState(false);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
@@ -34,7 +41,6 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
     }).catch((error) => {
       dispatch(setShowDefaultImage(true));
     });
-
   }, [dispatch]);
 
   const handleSignOut = () => {
@@ -43,6 +49,7 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
       navigate("/");
     });
   };
+
   const handleDeleteUser = () => {
     deleteUser(auth.currentUser)
       .then(() => {
@@ -50,6 +57,7 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
         navigate("/");
       });
   };
+
   const handleChooseFileClick = () => {
     fileInputRef.current.click();
   };
@@ -65,9 +73,7 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-
     const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-
     uploadBytes(storageRef, file).then((snapshot) => {
       getDownloadURL(storageRef).then((url) => {
         dispatch(updateUser({ profilePic: url }));
@@ -83,9 +89,11 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
   const handleShowConfirmationWindowDeleteImage = () => {
     setDisplayConfirmDeleteImage(oldState => !oldState);
   };
+
   const handleShowConfirmationWindowDeleteUser = () => {
     setDisplayConfirmDeleteAcc(oldState => !oldState);
   };
+
   return (
     <>
       <div className={ styles.outerContainer }>
@@ -97,15 +105,22 @@ import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow'
             ref={ fileInputRef }
             style={ { display: 'none' } }
           />
-          <img src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+          <img src={ !showDefaultImage ? currentUser.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
         </div>
         <div className={ styles.email }>
-          { user.email }
+          { currentUser.email }
         </div>
         <div className={ styles.buttonsContainer }>
-          <SettingsItem title="Log Out" onClick={ handleShowConfirmationWindowLogOut } />
-          <SettingsItem title="Remove Profile Image" onClick={ handleShowConfirmationWindowDeleteImage } />
-          <SettingsItem title="Delete Account" onClick={ handleShowConfirmationWindowDeleteUser } color="red" />
+          <SettingsItem
+            title="Log Out"
+            onClick={ handleShowConfirmationWindowLogOut } />
+          <SettingsItem
+            title="Remove Profile Image"
+            onClick={ handleShowConfirmationWindowDeleteImage } />
+          <SettingsItem
+            title="Delete Account"
+            onClick={ handleShowConfirmationWindowDeleteUser }
+            color="red" />
         </div>
       </div>
 

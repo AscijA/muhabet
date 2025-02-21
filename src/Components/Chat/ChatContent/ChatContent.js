@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from "./ChatContent.module.scss";
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+
+import { useSelector, useDispatch } from 'react-redux';
 
 import { addMessageToCurrentChat } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
@@ -17,15 +17,21 @@ const initialMessage = {
     "status": "",
 };
 
+/**
+ * Chat window content with all messages and message input fields
+ */
 const ChatContent = () => {
     const dispatch = useDispatch();
+
     let currentUser = useSelector((state) => state.user);
     const chat = useSelector((state) => state.chat);
-    const currentChat = chat.currentChat;
     const allChats = useSelector((state) => state.chat.allChats);
     const currentMessages = useSelector((state) => state.chat.currentChat.messages);
+
     const [message, setMessage] = useState(initialMessage);
     const [buttonAction, setButtonAction] = useState("Send");
+
+    const currentChat = chat.currentChat;
 
     let handleChangeMessage = (event) => {
         setMessage(state => {
@@ -33,8 +39,7 @@ const ChatContent = () => {
                 ...state,
                 messageText: event.target.value,
             };
-        }
-        );
+        });
     };
 
     const handleEnter = event => {
@@ -43,6 +48,7 @@ const ChatContent = () => {
             handleSendMessage();
         }
     };
+
     const handleSendMessage = () => {
         if (message.messageText !== "") {
             // To be added
@@ -66,7 +72,6 @@ const ChatContent = () => {
         }
     };
 
-
     const handleEditMessage = () => {
         if (message.messageText !== "") {
             // To be added
@@ -88,13 +93,20 @@ const ChatContent = () => {
         }
     };
 
+    /** 
+     * Message box if user is blocked or has blocked the other user, else returns message input field
+     * 
+     */
     const returnMessageBox = () => {
         let ownBlock = (<>
             <div className={ styles.inputContainer + " " + styles.ownBlock }>
                 <div>You have blocked this user. To send a message, please Unblock them.</div>
             </div>
             <div className={ styles.buttonContainer }>
-                <CustomButton buttonText="Unblock" buttonSize="sm" buttonType="filled"
+                <CustomButton
+                    buttonText="Unblock"
+                    buttonSize="sm"
+                    buttonType="filled"
                     handleSubmit={ () => { handleChatStatus("block", chat, currentUser, dispatch); } } />
             </div>
         </>
@@ -121,11 +133,17 @@ const ChatContent = () => {
 
         return (<>
             <div className={ styles.inputContainer }>
-                <textarea placeholder="Type a message" value={ message.messageText } onChange={ handleChangeMessage }
+                <textarea
+                    placeholder="Type a message"
+                    value={ message.messageText }
+                    onChange={ handleChangeMessage }
                     onKeyDown={ handleEnter } />
             </div>
             <div className={ styles.buttonContainer }>
-                <CustomButton buttonText={ buttonAction } buttonSize="sm" buttonType="filled"
+                <CustomButton
+                    buttonText={ buttonAction }
+                    buttonSize="sm"
+                    buttonType="filled"
                     handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage } />
             </div>
         </>
@@ -133,22 +151,22 @@ const ChatContent = () => {
     };
 
     return (
-        // Chat window content with message box and message input, no header
         <div className={ styles.mainChatContainer }>
             <div className={ styles.chatContent }>
                 { currentMessages.map((message) => {
-                    return <MessageItem key={ message.messageID } text={ message.content } timestamp={ new Date(message.timestamp) } isOwnMessage={ message.ownerID === currentUser.uid } deliveryStatus={ message.messageStatus } />;
+                    return <MessageItem
+                        key={ message.messageID }
+                        text={ message.content }
+                        timestamp={ new Date(message.timestamp) }
+                        isOwnMessage={ message.ownerID === currentUser.uid }
+                        deliveryStatus={ message.messageStatus } />;
                 }) }
             </div>
-
             <div className={ styles.messageBoxContainer }>
                 { returnMessageBox() }
             </div>
         </div>
     );
 };
-
-
-
 
 export default ChatContent;

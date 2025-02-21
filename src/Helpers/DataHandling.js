@@ -1,7 +1,8 @@
-import { setUser } from '../store/userSlice';
 import { collection, getDocs, query, where, orderBy, Timestamp, doc, updateDoc } from "firebase/firestore";
 import { db } from '../Firebase/firebase';
+
 import { setAllChats, updateChatByID, updateChatStatus } from 'src/store/chatSlice';
+import { setUser } from '../store/userSlice';
 
 /**
  * Set up user object
@@ -19,26 +20,28 @@ const userSetUp = (authUser, dispatch) => {
   dispatch(setUser({ ...user }));
 };
 
+
+/**
+ *  Fetch all chats for the user ID
+ * @param {string} userID 
+ * @param {function} dispatch 
+ */
 const fetchChats = async (userID, dispatch) => {
   try {
-    // Firestore query to get chats where currentUserID is one of the participants
     const chatsRef = collection(db, "chats");
 
-    // Query 1: user1ID == userID
     const q1 = query(
       chatsRef,
       where("user1ID", "==", userID),
       orderBy("lastModified", "desc")
     );
 
-    // Query 2: user2ID == userID
     const q2 = query(
       chatsRef,
       where("user2ID", "==", userID),
       orderBy("lastModified", "desc")
     );
 
-    // Run both queries in parallel
     const [snapshot1, snapshot2] = await Promise.all([
       getDocs(q1),
       getDocs(q2)
@@ -46,10 +49,9 @@ const fetchChats = async (userID, dispatch) => {
 
     let chatsMap = new Map();
 
-    // Helper function to convert Firestore timestamps
     const convertTimestamps = (docData) => {
       if (docData.lastModified instanceof Timestamp) {
-        docData.lastModified = docData.lastModified.toDate().toISOString(); // Convert to ISO string
+        docData.lastModified = docData.lastModified.toDate().toISOString();
       }
 
       if (docData.messages) {
@@ -62,12 +64,10 @@ const fetchChats = async (userID, dispatch) => {
       return docData;
     };
 
-    // Process first query
     snapshot1.forEach(doc => {
       chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
     });
 
-    // Process second query
     snapshot2.forEach(doc => {
       chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
     });
@@ -81,7 +81,13 @@ const fetchChats = async (userID, dispatch) => {
 
 };
 
-
+/**
+ *  Update chat with new key value pair
+ * 
+ * @param {string} key - The key to update
+ * @param {any} value - The value to update
+ * @param {string} chatID - The chat ID
+ */
 const updateChat = async (key, value, chatID) => {
   const chatRef = doc(db, "chats", chatID);
 
@@ -91,12 +97,20 @@ const updateChat = async (key, value, chatID) => {
 
 };
 
-const handleChatStatus = (type = "block", chat, user, dispatch, handleShowContactInfoToggle = null) => {
+/**
+ * 
+ * @param {string} type - The type of action to perform
+ * @param {Object} chat - The chat object
+ * @param {Object} currentUser - The current user object
+ * @param {function} dispatch - Redux dispatch
+ * @param {function} handleShowContactInfoToggle - The function to toggle the contact info
+ */
+const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleShowContactInfoToggle = null) => {
   let currentChat = chat.currentChat;
   let allChats = chat.allChats;
   let chatStatus = chat.currentChat.chatStatus;
   let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
-  let currentUserUid = user.uid;
+  let currentUserUid = currentUser.uid;
 
   if (type === "delete") {
     if (currentUserUid === currentChatFull.user1ID) {
@@ -132,6 +146,11 @@ const handleChatStatus = (type = "block", chat, user, dispatch, handleShowContac
     chatStatus: chatStatus
   };
 
+  /**
+   * Update chat status Redux state
+   * @param {*} currentChatFull 
+   * @param {*} chatStatus 
+   */
   const dispatchChatUpdate = (currentChatFull, chatStatus) => {
     dispatch(updateChatByID(currentChatFull));
     dispatch(updateChatStatus(chatStatus));
