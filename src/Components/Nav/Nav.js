@@ -9,16 +9,16 @@ import { storage, auth } from "../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
-import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
-import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
 import { updateUser } from '../../store/userSlice';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage, setCurrentChat } from '../../store/chatSlice';
+
+import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
 
 import userIcon from "../../assets/user.svg";
 
 import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
-import ContactInfoModal from './ContactInfoModal/ContactInfoModal';
 import BasicModal from '../Common/BasicModal/BasicModal';
-
+import ContactInfo from './ContactInfoModal/ContactInfoModal';
 /**
  * Navbar
  */
@@ -26,7 +26,7 @@ const Nav = () => {
   const dispatch = useDispatch();
   let navigate = useNavigate();
 
-  let currentUser = useSelector((state) => state.user);
+  let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
 
@@ -80,14 +80,33 @@ const Nav = () => {
     dispatch(toggleShowChatInfo());
   };
 
+  const blockUser = () => { handleChatStatus("block", chat, user, dispatch, handleShowContactInfoToggle); };
+
+  const deleteChat = () => {
+    handleChatStatus("delete", chat, user, dispatch, handleShowContactInfoToggle);
+    let currentChat = {
+      chatId: "",
+      lastSeen: "",
+      contact: {
+        profilePic: "",
+        email: "",
+        uid: ""
+      },
+      messages: [],
+      chatStatus: {}
+    };
+
+    dispatch(setCurrentChat(currentChat));
+  };
+
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
           <div className={ !showDefaultImage ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ !showDefaultImage ? currentUser.profilePic : userIcon } alt="Profile" />
+            <img className={ styles.contactPicImg } src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" />
           </div>
-          <div className={ styles.userName } >{ currentUser.email }</div>
+          <div className={ styles.userName } >{ user.email }</div>
         </div>
         <div className={ styles.settingsButton } onClick={ handleShowSettingsToggle }><span>Settings</span></div>
       </div>
@@ -98,22 +117,27 @@ const Nav = () => {
             <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="Profile" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
-        </div>) }
+        </div>)
+        }
       </div>
 
       { showSettings && <BasicModal
         handleToggleModal={ handleShowSettingsToggle }
         fullscreen={ true }
-        transparent={ true }>
+        transparent={ true }
+      >
         <UserSettingsModal />
+
       </BasicModal> }
 
       { chat.showChatInfo && <BasicModal
         handleToggleModal={ handleShowContactInfoToggle }
         fullscreen={ true }
-        transparent={ true }>
-        <ContactInfoModal handleBlockUser={ () => { handleChatStatus("block", chat, currentUser, dispatch, handleShowContactInfoToggle); } }
-          handleDeleteChat={ () => { handleChatStatus("delete", chat, currentUser, dispatch, handleShowContactInfoToggle); } } />
+        transparent={ true }
+      >
+        <ContactInfo handleBlockUser={ blockUser }
+          handleDeleteChat={ deleteChat } />
+
       </BasicModal> }
     </div>
   );
