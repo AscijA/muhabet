@@ -8,7 +8,7 @@ import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage
 import { auth, storage } from '../../Firebase/firebase';
 
 import { resetUser, updateUser } from '../../store/userSlice';
-import { setShowDefaultImage } from '../../store/chatSlice';
+import { resetChatState, setShowDefaultImage } from '../../store/chatSlice';
 import { deleteUser } from 'firebase/auth';
 
 import userIcon from "../../assets/user.svg";
@@ -46,6 +46,7 @@ const UserSettingsModal = () => {
   const handleSignOut = () => {
     auth.signOut().then(() => {
       dispatch(resetUser());
+      dispatch(resetChatState());
       navigate("/");
     });
   };

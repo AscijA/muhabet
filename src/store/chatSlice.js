@@ -150,7 +150,10 @@ const chatSlice = createSlice({
                     }
                 }
             };
-        }
+        },
+        resetChatState: (state) => {
+            return initialState;
+        },
     },
 });
 
@@ -169,5 +172,6 @@ export const {
     setShowDefaultImage,
     updateChatStatus,
     updateChatByID,
+    resetChatState
 } = chatSlice.actions;
 export default chatSlice.reducer;
