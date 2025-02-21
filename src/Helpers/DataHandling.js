@@ -1,7 +1,7 @@
 import { collection, getDocs, query, where, orderBy, Timestamp, doc, updateDoc } from "firebase/firestore";
 import { db } from '../Firebase/firebase';
 
-import { setAllChats, updateChatByID, updateChatStatus } from 'src/store/chatSlice';
+import { setAllChats, updateChatByID, updateCurrentChatStatus } from 'src/store/chatSlice';
 import { setUser } from '../store/userSlice';
 
 /**
@@ -74,7 +74,6 @@ const fetchChats = async (userID, dispatch) => {
 
     const chats = Array.from(chatsMap.values());
     dispatch(setAllChats(chats));
-
   } catch (error) {
     console.error("Error fetching chats:", error);
   }
@@ -153,14 +152,15 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
    */
   const dispatchChatUpdate = (currentChatFull, chatStatus) => {
     dispatch(updateChatByID(currentChatFull));
-    dispatch(updateChatStatus(chatStatus));
+    dispatch(updateCurrentChatStatus(chatStatus));
     if (handleShowContactInfoToggle) {
       handleShowContactInfoToggle();
     }
   };
 
   updateChat("chatStatus", chatStatus, currentChat.chatId)
-    .then(dispatchChatUpdate(currentChatFull, chatStatus)).catch((error) => {
+    .then(dispatchChatUpdate(currentChatFull, chatStatus))
+    .catch((error) => {
       console.error("Error deleting user:", error);
     });
 };

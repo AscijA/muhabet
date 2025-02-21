@@ -18,6 +18,7 @@ import SideBar from '../Common/SideBar/SideBar';
 import LoginForm from './LoginForm/LoginForm';
 
 import { userSetUp, fetchChats } from '../../Helpers/DataHandling';
+import { setCurrentChat } from "src/store/chatSlice";
 
 /**
  * SignComponent is the main component for the sign in and sign up page.
@@ -39,6 +40,20 @@ const SignComponent = () => {
         userSetUp(user, dispatch);
         fetchChats(user.uid, dispatch);
         navigate("/chat");
+      }
+      else{
+        let currentChat = {
+          chatId: "",
+          lastSeen: "",
+          contact: {
+            profilePic: "",
+            email: "",
+            uid: ""
+          },
+          messages: [],
+          chatStatus: {}
+        };
+        dispatch(setCurrentChat(currentChat));
       }
     });
 

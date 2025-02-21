@@ -83,7 +83,7 @@ const chatSlice = createSlice({
             };
         },
 
-        updateChatStatus: (state, action) => {
+        updateCurrentChatStatus: (state, action) => {
             return {
                 ...state,
                 currentChat: {
@@ -170,7 +170,7 @@ export const {
     updateAllChats,
     addMessageToCurrentChat,
     setShowDefaultImage,
-    updateChatStatus,
+    updateCurrentChatStatus,
     updateChatByID,
     resetChatState
 } = chatSlice.actions;

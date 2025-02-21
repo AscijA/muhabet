@@ -10,7 +10,7 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { updateUser } from '../../store/userSlice';
-import { toggleShowChatInfo, updateContact, setShowDefaultImage, setCurrentChat } from '../../store/chatSlice';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
 
 import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
 
@@ -71,7 +71,6 @@ const Nav = () => {
     }
   }, [chat.currentChat?.contact?.uid, dispatch]);
 
-
   const handleShowSettingsToggle = () => {
     setShowSettings(oldState => !oldState);
   };
@@ -84,19 +83,7 @@ const Nav = () => {
 
   const deleteChat = () => {
     handleChatStatus("delete", chat, user, dispatch, handleShowContactInfoToggle);
-    let currentChat = {
-      chatId: "",
-      lastSeen: "",
-      contact: {
-        profilePic: "",
-        email: "",
-        uid: ""
-      },
-      messages: [],
-      chatStatus: {}
-    };
 
-    dispatch(setCurrentChat(currentChat));
   };
 
   return (
