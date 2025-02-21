@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import styles from "./ChatContent.module.scss";
 import { useSelector } from 'react-redux';
-// import BasicModal from '../../Common/BasicModal/BasicModal';
 import { useDispatch } from 'react-redux';
-import CustomButton from '../../Common/Buttons/CustomButton';
+
 import { addMessageToCurrentChat } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
+import { handleChatStatus } from 'src/Helpers/DataHandling';
+
+import CustomButton from '../../Common/Buttons/CustomButton';
 import MessageItem from '../MessageItem/MessageItem';
 
 const initialMessage = {
@@ -93,7 +95,7 @@ const ChatContent = () => {
             </div>
             <div className={ styles.buttonContainer }>
                 <CustomButton buttonText="Unblock" buttonSize="sm" buttonType="filled"
-                    handleSubmit={ () => { } } />
+                    handleSubmit={ () => { handleChatStatus("block", chat, currentUser, dispatch); } } />
             </div>
         </>
         );
@@ -103,7 +105,7 @@ const ChatContent = () => {
                 <div>You have been blocked by this user. You cannot send any messages.</div>
             </div>
         );
-        let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId)
+        let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
         if (currentUser.uid === currentChatFull.user1ID && currentChat.chatStatus.user1Block) {
             return ownBlock;
         }

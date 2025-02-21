@@ -5,18 +5,17 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
-import BasicModal from '../Common/BasicModal/BasicModal';
-
 import { storage, auth } from "../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { updateUser } from '../../store/userSlice';
-import { toggleShowChatInfo, updateContact, setShowDefaultImage, updateChatStatus, updateChatByID } from '../../store/chatSlice';
-
-import { updateChat, userSetUp } from '../../Helpers/DataHandling';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
+import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
 import userIcon from "../../assets/user.svg";
+
+import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
+import BasicModal from '../Common/BasicModal/BasicModal';
 import SettingsItem from '../Common/SettingsItem/SettingsItem';
 import ConfirmationWindow from '../Common/ConfirmationWindow/ConfirmationWindow';
 
@@ -142,78 +141,6 @@ const Nav = () => {
     dispatch(toggleShowChatInfo());
   };
 
-  const handleDeleteChat = () => {
-    let currentChat = chat.currentChat;
-    let allChats = chat.allChats;
-    let chatStatus = chat.currentChat.chatStatus;
-    let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
-    let currentUserUid = user.uid;
-
-    if (currentUserUid === currentChatFull.user1ID) {
-
-      chatStatus = {
-        ...chatStatus,
-        user1Del: true
-      };
-    }
-    else {
-      chatStatus = {
-        ...chatStatus,
-        user2Del: true
-      };
-
-    }
-
-    currentChatFull = {
-      ...currentChatFull,
-      chatStatus: chatStatus
-    };
-
-    updateChat("chatStatus", chatStatus, currentChat.chatId)
-      .then(() => {
-        dispatch(updateChatByID(currentChatFull));
-        dispatch(updateChatStatus(chatStatus));
-        handleShowContactInfoToggle();
-      }).catch((error) => {
-        console.error("Error blocking user:", error);
-      });
-  };
-
-  const handleBlockUser = () => {
-    let currentChat = chat.currentChat;
-    let allChats = chat.allChats;
-    let chatStatus = chat.currentChat.chatStatus;
-    let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
-    let currentUserUid = user.uid;
-
-    if (currentUserUid === currentChatFull.user1ID) {
-
-      chatStatus = {
-        ...chatStatus,
-        user1Block: !chatStatus.user1Block,
-      };
-    }
-    else {
-      chatStatus = {
-        ...chatStatus,
-        user2Block: !chatStatus.user2Block,
-      };
-    }
-
-    currentChatFull = {
-      ...currentChatFull,
-      chatStatus: chatStatus
-    };
-    updateChat("chatStatus", chatStatus, currentChat.chatId)
-      .then(() => {
-        dispatch(updateChatByID(currentChatFull));
-        dispatch(updateChatStatus(chatStatus));
-        handleShowContactInfoToggle();
-      }).catch((error) => {
-        console.error("Error blocking user:", error);
-      });
-  };
-
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
@@ -250,7 +177,8 @@ const Nav = () => {
         fullscreen={ true }
         transparent={ true }
       >
-        <ContactInfo handleBlockUser={ handleBlockUser } handleDeleteChat={ handleDeleteChat } />
+        <ContactInfo handleBlockUser={ () => { handleChatStatus("block", chat, user, dispatch, handleShowContactInfoToggle); } }
+          handleDeleteChat={ () => { handleChatStatus("delete", chat, user, dispatch, handleShowContactInfoToggle); } } />
 
       </BasicModal> }
     </div>

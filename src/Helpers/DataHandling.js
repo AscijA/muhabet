@@ -1,7 +1,7 @@
 import { setUser } from '../store/userSlice';
 import { collection, getDocs, query, where, orderBy, Timestamp, doc, updateDoc } from "firebase/firestore";
 import { db } from '../Firebase/firebase';
-import { setAllChats } from 'src/store/chatSlice';
+import { setAllChats, updateChatByID, updateChatStatus } from 'src/store/chatSlice';
 
 /**
  * Set up user object
@@ -90,4 +90,60 @@ const updateChat = async (key, value, chatID) => {
   });
 
 };
-export { userSetUp, fetchChats, updateChat };
+
+const handleChatStatus = (type = "block", chat, user, dispatch, handleShowContactInfoToggle = null) => {
+  let currentChat = chat.currentChat;
+  let allChats = chat.allChats;
+  let chatStatus = chat.currentChat.chatStatus;
+  let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
+  let currentUserUid = user.uid;
+
+  if (type === "delete") {
+    if (currentUserUid === currentChatFull.user1ID) {
+      chatStatus = {
+        ...chatStatus,
+        user1Del: true
+      };
+    }
+    else {
+      chatStatus = {
+        ...chatStatus,
+        user2Del: true
+      };
+    }
+  }
+  else {
+    if (currentUserUid === currentChatFull.user1ID) {
+      chatStatus = {
+        ...chatStatus,
+        user1Block: !chatStatus.user1Block,
+      };
+    }
+    else {
+      chatStatus = {
+        ...chatStatus,
+        user2Block: !chatStatus.user2Block,
+      };
+    }
+  }
+
+  currentChatFull = {
+    ...currentChatFull,
+    chatStatus: chatStatus
+  };
+
+  const dispatchChatUpdate = (currentChatFull, chatStatus) => {
+    dispatch(updateChatByID(currentChatFull));
+    dispatch(updateChatStatus(chatStatus));
+    if (handleShowContactInfoToggle) {
+      handleShowContactInfoToggle();
+    }
+  };
+
+  updateChat("chatStatus", chatStatus, currentChat.chatId)
+    .then(dispatchChatUpdate(currentChatFull, chatStatus)).catch((error) => {
+      console.error("Error deleting user:", error);
+    });
+};
+
+export { userSetUp, fetchChats, updateChat, handleChatStatus };

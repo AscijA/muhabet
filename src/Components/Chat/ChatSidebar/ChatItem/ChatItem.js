@@ -19,10 +19,9 @@ const ChatItem = (props) => {
   const [showUser, setShowUser] = useState(false);
   let currentChat = useSelector((state) => state.chat.currentChat.contact.email);
   const [numberUnread, setNumberUnread] = useState(0);
-  
+
   let chatStatusDel = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
-  let chatStatusBlock = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Block : props.chat.chatStatus.user1Block;
-  let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : "") + " " + (chatStatusBlock ? styles.blocked : "");
+  let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : "");
   let chat = useSelector((state) => state.chat);
   const [profilePic, setProfilePic] = useState("");
 
