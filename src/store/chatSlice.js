@@ -4,6 +4,7 @@ const initialState = {
     uid: "",
     showChatInfo: false,
     showDefaultImage: true,
+    showContactDefaultImage: true,
     currentChat: {
         chatId: 0,
         lastSeen: "",
@@ -61,6 +62,13 @@ const chatSlice = createSlice({
             };
         },
 
+        setShowContactDefaultImage: (state, action) => {
+            return {
+                ...state,
+                showContactDefaultImage: action.payload
+            };
+        },
+
         // Set the currentChat
         setCurrentChat: (state, action) => {
             return {
@@ -111,12 +119,12 @@ const chatSlice = createSlice({
 
         updateChatByID: (state, action) => {
             const updatedChat = action.payload;
-            
+
             // Find the chat in allChats that matches the current chatId
             const chatIndex = state.allChats.findIndex(
                 (chat) => chat.id === updatedChat.id
             );
-            
+
             if (chatIndex !== -1) {
                 state.allChats[chatIndex] = updatedChat;
             }
@@ -172,6 +180,7 @@ export const {
     setShowDefaultImage,
     updateCurrentChatStatus,
     updateChatByID,
-    resetChatState
+    resetChatState,
+    setShowContactDefaultImage
 } = chatSlice.actions;
 export default chatSlice.reducer;

@@ -9,7 +9,7 @@ import { setUser } from '../store/userSlice';
  * @param {Object} authUser - Firebase auth user object
  * @param {Object} dispatch - Redux dispatch
  */
-const userSetUp = (authUser, dispatch) => {
+const userSetUp = async (authUser, dispatch) => {
   const user = {
     email: authUser.email,
     displayName: authUser.displayName,

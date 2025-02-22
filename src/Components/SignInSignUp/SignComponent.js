@@ -26,7 +26,7 @@ import { setCurrentChat } from "src/store/chatSlice";
 const SignComponent = () => {
   const dispatch = useDispatch();
   let navigate = useNavigate();
-  
+
   let [credentials, setCredentials] = useState({ email: "", password: "", });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
@@ -37,11 +37,14 @@ const SignComponent = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        userSetUp(user, dispatch);
-        fetchChats(user.uid, dispatch);
-        navigate("/chat");
+        userSetUp(user, dispatch).then(() => {
+          return fetchChats(user.uid, dispatch);
+
+        }).then(() => {
+          navigate("/chat");
+        });
       }
-      else{
+      else {
         let currentChat = {
           chatId: "",
           lastSeen: "",
@@ -121,8 +124,10 @@ const SignComponent = () => {
         .then(() => {
           signInWithEmailAndPassword(auth, credentials.email, credentials.password)
             .then((userCredential) => {
-              userSetUp(auth.currentUser, dispatch);
-              navigate("/chat");
+              userSetUp(auth.currentUser, dispatch)
+                .then(() => {
+                  navigate("/chat");
+                });
 
             })
             .catch((error) => {
@@ -140,10 +145,8 @@ const SignComponent = () => {
   const handleResetPassword = (event) => {
     event.preventDefault();
     if (resetEmail) {
-      console.log(resetEmail);
       sendPasswordResetEmail(auth, resetEmail)
         .then((userCredential) => {
-          console.log(userCredential);
           setShowResetModal(false);
         })
         .catch((error) => {
@@ -205,7 +208,7 @@ const SignComponent = () => {
           />
         </BasicModal> }
       </SideBar>
-      <div className={ styles.imageContainer }> 
+      <div className={ styles.imageContainer }>
       </div>
     </div>
   );

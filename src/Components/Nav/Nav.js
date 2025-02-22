@@ -10,7 +10,7 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { updateUser } from '../../store/userSlice';
-import { toggleShowChatInfo, updateContact, setShowDefaultImage } from '../../store/chatSlice';
+import { toggleShowChatInfo, updateContact, setShowDefaultImage, setShowContactDefaultImage } from '../../store/chatSlice';
 
 import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
 
@@ -29,9 +29,9 @@ const Nav = () => {
   let user = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
   const showDefaultImage = useSelector((state) => state.chat.showDefaultImage);
+  const showContact = useSelector((state) => state.chat.showContactDefaultImage);
 
   const [showSettings, setShowSettings] = useState(false);
-  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -62,10 +62,10 @@ const Nav = () => {
       getDownloadURL(contactRef)
         .then((url) => {
           dispatch(updateContact({ profilePic: url }));
-          setShowContact(true);
+          dispatch(setShowContactDefaultImage(true));
         })
         .catch((error) => {
-          setShowContact(false);
+          dispatch(setShowContactDefaultImage(false));
           console.error("Error fetching contact profile pic:", error);
         });
     }
