@@ -2,7 +2,7 @@
 
 
 .chatItemContainer {
-  font-size: 24px;
+  font-size: 1.5rem;
   display: flex;
   // justify-content: space-between;
   align-items: center;
@@ -10,7 +10,7 @@
 
   .icons{
     display: flex;
-    margin-right: 10px;
+    margin-right: 0.625rem;
     align-items: center;
     img{
       height: 20px;
@@ -22,7 +22,7 @@
   }
 
   .chatItemProfile {
-    margin: 12px 24px;
+    margin: 0.75rem 1.5rem;
     margin-left: 0;
     display: flex;
   }
@@ -30,11 +30,11 @@
   .contactPicBG {
     @include dimensionsMaxDimensions(64px);
 
-    margin: 12px 24px;
+    margin: 0.75rem 1.5rem;
   }
 
   .contactPic {
-    margin: 12px 24px;
+    margin: 0.75rem 1.5rem;
     @include dimensionsMaxDimensions(64px);
   }
 
@@ -43,9 +43,9 @@
   }
 
   .chatItemMostRecentMessageSeen {
-    margin: 12px 24px;
-    margin-left: 0px;
-    font-size: 16px;
+    margin: 0.75rem 1.5rem;
+    margin-left: 0;
+    font-size: 1rem ;
     display: flex;
     justify-content: space-between;
 
@@ -65,7 +65,7 @@
   .statusAndTime {
     display: flex;
     color: $timestamp-color;
-    font-size: 16px;
+    font-size: 1rem;
     align-items: center;
   }
   
@@ -74,13 +74,13 @@
     color: $primary-color;
     height: 100%;
     min-width: 16px;
-    padding: 0 6px;
+    padding: 0 0.375rem;
     text-align: center;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     div{
-      margin-bottom: 2px;
+      margin-bottom: 0.125rem;
     }
   }
 }

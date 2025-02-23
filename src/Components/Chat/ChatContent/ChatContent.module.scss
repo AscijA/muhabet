@@ -5,7 +5,7 @@
   flex-direction: column;
   width: 100%;
   justify-content: space-between;
-  margin-top: 60px;
+  margin-top: 3.75rem;
   background-color: #f0f0f0;
 
   .chatContent {
@@ -15,11 +15,11 @@
 
   .messageBoxContainer {
     width: 100%;
-    min-height: 48px;
+    min-height: 3rem;
     display: flex;
     flex-direction: row;
     border-top: 1px solid $primary-color;
-    padding-top: 2px;
+    padding-top: 0.125rem;
     background-color: $primary-color;
 
     textarea::-webkit-scrollbar {
@@ -60,9 +60,9 @@
         //height: 100%;
         width: 100%;
         box-sizing: border-box;
-        font-size: 16px;
+        font-size: 1rem;
         color: $primary-color;
-        padding: 1vh;
+        padding: 0.75rem;
         word-break: break-word;
 
         &:focus {
@@ -94,7 +94,7 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      padding: 0 8px;
+      padding: 0 0.5rem;
       background-color: $primary-color;
       border-radius: 10px;
 
