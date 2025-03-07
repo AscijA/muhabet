@@ -4,7 +4,7 @@ const initialState = {
     uid: "",
     showChatInfo: false,
     showDefaultImage: true,
-    showContactDefaultImage: true,
+    showContactDefaultImage: false,
     currentChat: {
         chatId: 0,
         lastSeen: "",

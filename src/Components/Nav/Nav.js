@@ -9,16 +9,15 @@ import { storage, auth } from "../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
 
-import { updateUser } from '../../store/userSlice';
-import { toggleShowChatInfo, updateContact, setShowDefaultImage, setShowContactDefaultImage } from '../../store/chatSlice';
-
-import { userSetUp, handleChatStatus } from '../../Helpers/DataHandling';
+import { toggleShowChatInfo, updateContact, setShowContactDefaultImage } from '../../store/chatSlice';
+import { handleChatStatus } from '../../Helpers/DataHandling';
+import { getContactImage, getImageFromFirebaseAndSaveToIDB } from 'src/Helpers/idb';
 
 import userIcon from "../../assets/user.svg";
 
 import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
-import BasicModal from '../Common/BasicModal/BasicModal';
 import ContactInfo from './ContactInfoModal/ContactInfoModal';
+import BasicModal from '../Common/BasicModal/BasicModal';
 /**
  * Navbar
  */
@@ -36,38 +35,35 @@ const Nav = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        userSetUp(user, dispatch);
-
-        const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-        getDownloadURL(gsRef)
-          .then((url) => {
-            dispatch(updateUser({ profilePic: url }));
-            dispatch(setShowDefaultImage(false));
-          })
-          .catch((error) => {
-            console.error("Error fetching user profile pic:", error);
-          });
       } else {
         navigate("/");
       }
     });
-
     return () => unsubscribe();
-  }, [dispatch, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     if (chat.currentChat?.contact?.uid) {
-      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-
-      getDownloadURL(contactRef)
-        .then((url) => {
-          dispatch(updateContact({ profilePic: url }));
-          dispatch(setShowContactDefaultImage(true));
-        })
-        .catch((error) => {
+      getContactImage(chat.currentChat?.contact?.uid).then((image) => {
+        if (image) {
+          dispatch(updateContact({ profilePic: URL.createObjectURL(image) }));
           dispatch(setShowContactDefaultImage(false));
-          console.error("Error fetching contact profile pic:", error);
-        });
+
+        }
+        const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
+
+        getDownloadURL(contactRef)
+          .then((url) => {
+            dispatch(updateContact({ profilePic: url }));
+            dispatch(setShowContactDefaultImage(false));
+            getImageFromFirebaseAndSaveToIDB(chat.currentChat?.contact?.uid, url);
+
+          })
+          .catch((error) => {
+            dispatch(setShowContactDefaultImage(true));
+            console.error("Error fetching contact profile pic:", error);
+          });
+      });
     }
   }, [chat.currentChat?.contact?.uid, dispatch]);
 
@@ -90,8 +86,8 @@ const Nav = () => {
     <div className={ styles.main }>
       <div className={ styles.side }>
         <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
-          <div className={ !showDefaultImage ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ !showDefaultImage ? user.profilePic : userIcon } alt="Profile" />
+          <div className={ showDefaultImage ? styles.contactPicBG : styles.contactPic }>
+            <img className={ styles.contactPicImg } src={ showDefaultImage ? userIcon : user.profilePic } alt="Profile" />
           </div>
           <div className={ styles.userName } >{ user.email }</div>
         </div>
@@ -100,8 +96,8 @@ const Nav = () => {
       <div className={ styles.chatContent }>
 
         { chat.currentChat.contact.uid && (<div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
-          <div className={ showContact ? styles.contactPic : styles.contactPicBG }>
-            <img className={ styles.contactPicImg } src={ showContact ? chat.currentChat.contact.profilePic : userIcon } alt="Profile" />
+          <div className={ showContact ? styles.contactPicBG : styles.contactPic }>
+            <img className={ styles.contactPicImg } src={ showContact ? userIcon : chat.currentChat.contact.profilePic } alt="Profile" />
           </div>
           <div >{ chat.currentChat.contact.email }</div>
         </div>)

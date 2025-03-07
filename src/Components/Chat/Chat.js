@@ -9,10 +9,14 @@ import ChatSidebar from './ChatSidebar/ChatSidebar';
 import SideBar from "../Common/SideBar/SideBar";
 import Nav from "../Nav/Nav";
 
+import { auth, storage } from '../../Firebase/firebase';
+import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../Firebase/firebase';
 
+import { getContactImage, getImageFromFirebaseAndSaveToIDB } from 'src/Helpers/idb';
 import { fetchChats, userSetUp } from '../../Helpers/DataHandling';
+import { setShowDefaultImage } from 'src/store/chatSlice';
+import { updateUser } from 'src/store/userSlice';
 
 
 /**
@@ -28,6 +32,27 @@ const Chat = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userSetUp(user, dispatch);
+
+        getContactImage(user.uid).then((image) => {
+          if (image) {
+            dispatch(updateUser({ profilePic: URL.createObjectURL(image) }));
+            dispatch(setShowDefaultImage(false));
+          }
+          const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+          getDownloadURL(gsRef)
+            .then((url) => {
+              dispatch(updateUser({ profilePic: url }));
+              dispatch(setShowDefaultImage(false));
+
+              getImageFromFirebaseAndSaveToIDB(user.uid, url)
+              
+            })
+            .catch((error) => {
+              console.error("Error fetching user profile pic:", error);
+            });
+        });
+
+
         fetchChats(user.uid, dispatch)
           .then(() => setLoading(false
           ))
