@@ -14,6 +14,7 @@ import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 import { storage, auth } from "../../../../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from 'firebase/auth';
+import { getContactImage } from 'src/Helpers/idb';
 
 /**
  * Chat item component shown in the side bar of the chat window
@@ -42,12 +43,20 @@ const ChatItem = (props) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         if (props.contactUID) {
-          const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
-          getDownloadURL(contactRef).then((url) => {
-            setProfilePic(url);
-            setShowUser(true);
-          }).catch((error) => {
+
+          getContactImage(props.contactUID).then((image) => {
+            if (image) {
+              setProfilePic(URL.createObjectURL(image));
+              setShowUser(true);
+            }
+            const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
+            getDownloadURL(contactRef).then((url) => {
+              setProfilePic(url);
+              setShowUser(true);
+            }).catch((error) => {
+            });
           });
+
         }
         getUnreadMessagesCount(props.chat.messages);
       }
@@ -107,7 +116,7 @@ const ChatItem = (props) => {
 
   return !chatStatusDel && (
     <div className={ containerStyle } onClick={ handleChatItemOnClick } >
-      <div className={ !showUser ? styles.contactPic : styles.contactPicBG }>
+      <div className={ showUser ? styles.contactPicBG : styles.contactPic }>
         <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />
 
       </div>
