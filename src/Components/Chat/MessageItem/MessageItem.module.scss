@@ -28,7 +28,7 @@
     margin-top: 0.3125rem;
     color: $timestamp-color;
 
-    .icons{
+    .icons {
       display: flex;
       margin-left: 5px;
       justify-self: center;
@@ -60,10 +60,22 @@
       font-size: 0.875rem;
       cursor: pointer;
 
+      &:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+      }
+
       &:hover {
         background-color: $menu-hover-bg;
-        border-radius: 5px;
 
+        &:first-child {
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+        }
       }
     }
   }
