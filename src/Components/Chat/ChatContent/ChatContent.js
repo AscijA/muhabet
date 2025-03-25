@@ -5,7 +5,7 @@ import styles from "./ChatContent.module.scss";
 
 import { addMessageToCurrentChat } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
-import { handleChatStatus } from 'src/Helpers/DataHandling';
+import { handleChatStatus } from "src/Helpers/UserUtils";
 
 import CustomButton from '../../Common/Buttons/CustomButton';
 import MessageItem from '../MessageItem/MessageItem';

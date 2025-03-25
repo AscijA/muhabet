@@ -1,8 +1,11 @@
-import { collection, getDocs, query, where, orderBy, Timestamp, doc, updateDoc } from "firebase/firestore";
-import { db } from '../Firebase/firebase';
 
-import { setAllChats, updateChatByID, updateCurrentChatStatus } from 'src/store/chatSlice';
-import { setUser } from '../store/userSlice';
+import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
+import { updateChatByID, updateCurrentChatStatus } from "src/store/chatSlice";
+import { auth, storage } from '../Firebase/firebase';
+import { doc, updateDoc } from "firebase/firestore";
+import { setUser } from "src/store/userSlice";
+import { db } from "src/Firebase/firebase";
+import { deleteUser } from 'firebase/auth';
 
 /**
  * Set up user object
@@ -20,69 +23,9 @@ const userSetUp = async (authUser, dispatch) => {
   dispatch(setUser({ ...user }));
 };
 
-
-/**
- *  Fetch all chats for the user ID
- * @param {string} userID 
- * @param {function} dispatch 
- */
-const fetchChats = async (userID, dispatch) => {
-  try {
-    const chatsRef = collection(db, "chats");
-
-    const q1 = query(
-      chatsRef,
-      where("user1ID", "==", userID),
-      orderBy("lastModified", "desc")
-    );
-
-    const q2 = query(
-      chatsRef,
-      where("user2ID", "==", userID),
-      orderBy("lastModified", "desc")
-    );
-
-    const [snapshot1, snapshot2] = await Promise.all([
-      getDocs(q1),
-      getDocs(q2)
-    ]);
-
-    let chatsMap = new Map();
-
-    const convertTimestamps = (docData) => {
-      if (docData.lastModified instanceof Timestamp) {
-        docData.lastModified = docData.lastModified.toDate().toISOString();
-      }
-
-      if (docData.messages) {
-        docData.messages = docData.messages.map(msg => ({
-          ...msg,
-          timestamp: msg.timestamp instanceof Timestamp ? msg.timestamp.toDate().toISOString() : msg.timestamp
-        }));
-      }
-
-      return docData;
-    };
-
-    snapshot1.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
-    });
-
-    snapshot2.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
-    });
-
-    const chats = Array.from(chatsMap.values());
-    dispatch(setAllChats(chats));
-  } catch (error) {
-    console.error("Error fetching chats:", error);
-  }
-
-};
-
 /**
  *  Update chat with new key value pair
- * 
+ *
  * @param {string} key - The key to update
  * @param {any} value - The value to update
  * @param {string} chatID - The chat ID
@@ -97,7 +40,7 @@ const updateChat = async (key, value, chatID) => {
 };
 
 /**
- * 
+ *
  * @param {string} type - The type of action to perform
  * @param {Object} chat - The chat object
  * @param {Object} currentUser - The current user object
@@ -147,8 +90,8 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
 
   /**
    * Update chat status Redux state
-   * @param {*} currentChatFull 
-   * @param {*} chatStatus 
+   * @param {*} currentChatFull
+   * @param {*} chatStatus
    */
   const dispatchChatUpdate = (currentChatFull, chatStatus) => {
     dispatch(updateChatByID(currentChatFull));
@@ -165,4 +108,59 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
     });
 };
 
-export { userSetUp, fetchChats, updateChat, handleChatStatus };
+const getUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
+  try {
+    const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+    const url = await getDownloadURL(gsRef);
+    dispatch(updateUser({ profilePic: url }));
+    dispatch(setShowDefaultImage(false));
+  } catch (error) {
+    dispatch(setShowDefaultImage(true));
+  }
+};
+
+const uploadProfileImage = async (file, dispatch, updateUser, setShowDefaultImage) => {
+  try {
+    const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    dispatch(updateUser({ profilePic: url }));
+    dispatch(setShowDefaultImage(false));
+  } catch (error) {
+    console.error("Error uploading profile image:", error);
+  }
+};
+
+const removeUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
+  try {
+    const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
+    await deleteObject(storageRef);
+    dispatch(updateUser({ profilePic: "" }));
+    dispatch(setShowDefaultImage(true));
+  } catch (error) {
+    console.error("Error deleting profile image:", error);
+  }
+};
+
+const signOutUser = async (dispatch, resetUser, resetChatState, navigate) => {
+  try {
+    await auth.signOut();
+    dispatch(resetUser());
+    dispatch(resetChatState());
+    navigate("/");
+  } catch (error) {
+    console.error("Error signing out:", error);
+  }
+};
+
+const deleteUserAccount = async (dispatch, resetUser, navigate) => {
+  try {
+    await deleteUser(auth.currentUser);
+    dispatch(resetUser());
+    navigate("/");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+  }
+};
+
+export { userSetUp, updateChat, handleChatStatus, getUserProfileImage, uploadProfileImage, removeUserProfileImage, signOutUser, deleteUserAccount };

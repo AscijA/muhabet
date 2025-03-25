@@ -4,21 +4,16 @@ import styles from './SignComponent.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
-import { auth, db } from '../../Firebase/firebase';
-import { AuthErrorCodes } from "firebase/auth";
+import { signInUser, signUpUser, resetUserPassword, subscribeToAuthChangesOnLogin } from 'src/Helpers/AuthUtils';
+import { userSetUp } from "src/Helpers/UserUtils";
 
 import logo from "../../assets/logo_white.svg";
 
-// import { LoadingOverlay } from '../Common/LoadingOverlay/LoadingOverlay';
 import ResetPasswordModal from './ResetPasswordModal/ResetPasswordModal';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import SideBar from '../Common/SideBar/SideBar';
 import LoginForm from './LoginForm/LoginForm';
 
-import { userSetUp, fetchChats } from '../../Helpers/DataHandling';
-import { setCurrentChat } from "src/store/chatSlice";
 
 /**
  * SignComponent is the main component for the sign in and sign up page.
@@ -27,7 +22,7 @@ const SignComponent = () => {
   const dispatch = useDispatch();
   let navigate = useNavigate();
 
-  let [credentials, setCredentials] = useState({ email: "", password: "", });
+  let [credentials, setCredentials] = useState({ email: "", password: "" });
   let [isSignIn, setIsSignIn] = useState(true);
   let [showResetModal, setShowResetModal] = useState(false);
   let [showError, setShowError] = useState(false);
@@ -35,46 +30,12 @@ const SignComponent = () => {
   let [resetEmail, setResetEmail] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        userSetUp(user, dispatch).then(() => {
-          return fetchChats(user.uid, dispatch);
-
-        }).then(() => {
-          navigate("/chat");
-        });
-      }
-      else {
-        let currentChat = {
-          chatId: "",
-          lastSeen: "",
-          contact: {
-            profilePic: "",
-            email: "",
-            uid: ""
-          },
-          messages: [],
-          chatStatus: {}
-        };
-        dispatch(setCurrentChat(currentChat));
-      }
-    });
-
-    // Cleanup subscription on unmount
+    const unsubscribe = subscribeToAuthChangesOnLogin(dispatch, navigate);
     return () => unsubscribe();
   }, [dispatch, navigate]);
 
-  const handleChangeEmail = (event) => {
-    setCredentials(oldState => {
-      return { ...oldState, email: event.target.value };
-    });
-    setShowError(false);
-  };
-
-  const handleChangePassword = (event) => {
-    setCredentials(oldState => {
-      return { ...oldState, password: event.target.value };
-    });
+  const handleChange = (field, value) => {
+    setCredentials((prev) => ({ ...prev, [field]: value }));
     setShowError(false);
   };
 
@@ -85,105 +46,37 @@ const SignComponent = () => {
 
   const handleSignUp = (event) => {
     event.preventDefault();
-    if (credentials.email && credentials.password) {
-      createUserWithEmailAndPassword(auth, credentials.email, credentials.password)
-        .then(async (userCredential) => {
-          const userInfo = userCredential.user;
-          const user = {
-            email: userInfo.email,
-            displayName: userInfo.displayName,
-            emailVerified: userInfo.emailVerified,
-            createdAt: userInfo.metadata.creationTime,
-            uid: userInfo.uid,
-          };
-          await addDoc(collection(db, "users"), user);
-        })
-        .catch((error) => {
-          switch (error.code) {
-            case AuthErrorCodes.WEAK_PASSWORD:
-              setErrorMessage("Password has to be at least 6 characters long");
-              break;
-            case AuthErrorCodes.INVALID_EMAIL:
-              setErrorMessage("Email is invalid");
-              break;
-            case AuthErrorCodes.EMAIL_EXISTS:
-              setErrorMessage("Email is already in use");
-              break;
-            default:
-              setErrorMessage("An Error Occured");
-              break;
-          }
-          setShowError(true);
-        });
-    }
+    signUpUser(credentials.email, credentials.password, setErrorMessage, setShowError);
   };
+
   const handleSignIn = (event) => {
     event.preventDefault();
-    if (credentials.email && credentials.password) {
-      setPersistence(auth, browserLocalPersistence)
-        .then(() => {
-          signInWithEmailAndPassword(auth, credentials.email, credentials.password)
-            .then((userCredential) => {
-              userSetUp(auth.currentUser, dispatch)
-                .then(() => {
-                  navigate("/chat");
-                });
-
-            })
-            .catch((error) => {
-              setShowError(true);
-              setErrorMessage("Invalid Credentials");
-            });
-        });
-    }
-    else {
-      setShowError(true);
-      setErrorMessage("Email and/or password cannot be empty");
-    }
+    signInUser(credentials.email, credentials.password, dispatch, navigate, setErrorMessage, setShowError, userSetUp);
   };
 
   const handleResetPassword = (event) => {
     event.preventDefault();
-    if (resetEmail) {
-      sendPasswordResetEmail(auth, resetEmail)
-        .then((userCredential) => {
-          setShowResetModal(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          switch (error.code) {
-            case AuthErrorCodes.INVALID_EMAIL:
-              setErrorMessage("Email is invalid");
-              break;
-            case AuthErrorCodes.USER_DELETED:
-              setErrorMessage("Email/User not found");
-              break;
-            default:
-              setErrorMessage("An Error Occured");
-              break;
-          }
-          setShowError(true);
-        });
-    }
+    resetUserPassword(resetEmail, setShowResetModal, setErrorMessage, setShowError);
   };
+
   const handleChangeFormType = () => {
-    setIsSignIn(oldState => !oldState);
+    setIsSignIn((prev) => !prev);
   };
 
   const handleResetPasswordToggle = () => {
-    setShowResetModal(oldState => !oldState);
+    setShowResetModal((prev) => !prev);
   };
 
   return (
     <div className={ styles.main }>
       <SideBar isChat={ false }>
-        <div className={ styles.logoContainer } >
+        <div className={ styles.logoContainer }>
           <img src={ logo } alt="Logo" className={ styles.logo } />
         </div>
         <div className={ styles.formContainer }>
           <LoginForm
-            handleChangeEmail={ handleChangeEmail }
-            handleChangePassword={ handleChangePassword }
+            handleChangeEmail={ (e) => handleChange("email", e.target.value) }
+            handleChangePassword={ (e) => handleChange("password", e.target.value) }
             handleResetPasswordToggle={ handleResetPasswordToggle }
             handleChangeFormType={ handleChangeFormType }
             email={ credentials.email }
@@ -195,24 +88,21 @@ const SignComponent = () => {
             showError={ showError }
           />
         </div>
-        { showResetModal && <BasicModal
-          handleToggleModal={ handleResetPasswordToggle }
-          fullscreen={ true }
-        >
-          <ResetPasswordModal
-            handleResetPassword={ handleResetPassword }
-            stateElement={ resetEmail }
-            stateElementChangeHandler={ handleChangeResetEmail }
-            showError={ showError }
-            errorMessage={ errorMessage }
-          />
-        </BasicModal> }
+        { showResetModal &&
+          <BasicModal handleToggleModal={ handleResetPasswordToggle } fullscreen={ true }>
+            <ResetPasswordModal
+              handleResetPassword={ handleResetPassword }
+              stateElement={ resetEmail }
+              stateElementChangeHandler={ handleChangeResetEmail }
+              showError={ showError }
+              errorMessage={ errorMessage }
+            />
+          </BasicModal>
+        }
       </SideBar>
-      <div className={ styles.imageContainer }>
-      </div>
+      <div className={ styles.imageContainer }></div>
     </div>
   );
 };
 
 export default SignComponent;
-

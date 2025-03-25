@@ -8,13 +8,11 @@ import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
 
+import { fetchProfilePicture, fetchAndUpdateContactProfile } from "../../../../Helpers/ContactUtils";
 import { updateContact, setCurrentChat } from "../../../../store/chatSlice";
+import { subscribeToAuthChangesBasic } from "src/Helpers/AuthUtils";
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
 
-import { storage, auth } from "../../../../Firebase/firebase";
-import { ref, getDownloadURL } from "firebase/storage";
-import { onAuthStateChanged } from 'firebase/auth';
-import { getContactImage } from 'src/Helpers/idb';
 
 /**
  * Chat item component shown in the side bar of the chat window
@@ -40,31 +38,15 @@ const ChatItem = (props) => {
 
   // Fetch profile picture of the contact
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (props.contactUID) {
-
-          getContactImage(props.contactUID).then((image) => {
-            if (image) {
-              setProfilePic(URL.createObjectURL(image));
-              setShowUser(true);
-            }
-            const contactRef = ref(storage, `profile-pics/${props.contactUID}`);
-            getDownloadURL(contactRef).then((url) => {
-              setProfilePic(url);
-              setShowUser(true);
-            }).catch((error) => {
-            });
-          });
-
-        }
+    const unsubscribe = subscribeToAuthChangesBasic((user) => {
+      if (user && props.contactUID) {
+        fetchProfilePicture(props.contactUID, setProfilePic, setShowUser);
         getUnreadMessagesCount(props.chat.messages);
       }
     });
 
     return () => unsubscribe();
   }, [props.contactUID, dispatch, props.chat.messages]);
-
 
   const handleChatItemOnClick = () => {
     let currentChat = {
@@ -84,20 +66,7 @@ const ChatItem = (props) => {
 
   // Update contact profile picture
   useEffect(() => {
-
-    if (chat.currentChat?.contact?.uid && !chat.currentChat.contact.profilePic) {
-      const contactRef = ref(storage, `profile-pics/${chat.currentChat.contact.uid}`);
-
-      getDownloadURL(contactRef)
-        .then((url) => {
-          if (chat.currentChat.contact.profilePic !== url) {
-            dispatch(updateContact({ profilePic: url }));
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching profile pic:", error);
-        });
-    }
+    fetchAndUpdateContactProfile(chat.currentChat?.contact?.uid, chat.currentChat?.contact?.profilePic, updateContact, dispatch);
   }, [chat.currentChat.contact.profilePic, chat.currentChat.contact.uid, dispatch]);
 
   const getUnreadMessagesCount = (arr) => {
@@ -118,7 +87,6 @@ const ChatItem = (props) => {
     <div className={ containerStyle } onClick={ handleChatItemOnClick } >
       <div className={ showUser ? styles.contactPicBG : styles.contactPic }>
         <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />
-
       </div>
       <div className={ styles.chatInfo }>
         <div className={ styles.chatItemProfile }>
@@ -139,14 +107,12 @@ const ChatItem = (props) => {
                 { props.deliveryStatus === MESSAGE_STATUS.SEEN && (
                   <img className={ "" } src={ seen } alt="Delivery Status: Seen" />
                 ) }
-
               </div>
               <div>
                 { convertTimestamp(props.timestamp) }
               </div>
             </div>
           </div>
-
         </div>
         <div className={ styles.chatItemMostRecentMessageSeen }>
           <div>
@@ -159,7 +125,6 @@ const ChatItem = (props) => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

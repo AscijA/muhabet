@@ -4,12 +4,9 @@ import styles from "./UserSettingsModal.module.scss";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
-import { auth, storage } from '../../Firebase/firebase';
-
-import { resetUser, updateUser } from '../../store/userSlice';
+import { removeUserProfileImage, deleteUserAccount, getUserProfileImage, signOutUser, uploadProfileImage } from 'src/Helpers/UserUtils';
 import { resetChatState, setShowDefaultImage } from '../../store/chatSlice';
-import { deleteUser } from 'firebase/auth';
+import { resetUser, updateUser } from '../../store/userSlice';
 
 import userIcon from "../../assets/user.svg";
 
@@ -34,65 +31,12 @@ const UserSettingsModal = () => {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-    getDownloadURL(gsRef).then((url) => {
-      dispatch(updateUser({ profilePic: url }));
-      dispatch(setShowDefaultImage(false));
-    }).catch((error) => {
-      dispatch(setShowDefaultImage(true));
-    });
+    getUserProfileImage(dispatch, updateUser, setShowDefaultImage);
   }, [dispatch]);
-
-  const handleSignOut = () => {
-    auth.signOut().then(() => {
-      dispatch(resetUser());
-      dispatch(resetChatState());
-      navigate("/");
-    });
-  };
-
-  const handleDeleteUser = () => {
-    deleteUser(auth.currentUser)
-      .then(() => {
-        dispatch(resetUser());
-        navigate("/");
-      });
-  };
-
-  const handleChooseFileClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleDeleteProfileImage = () => {
-    const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-    deleteObject(storageRef).then(() => {
-      dispatch(updateUser({ profilePic: "" }));
-      dispatch(setShowDefaultImage(true));
-    }).catch((error) => {
-    });
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-    uploadBytes(storageRef, file).then((snapshot) => {
-      getDownloadURL(storageRef).then((url) => {
-        dispatch(updateUser({ profilePic: url }));
-        dispatch(setShowDefaultImage(false));
-      });
-    });
-  };
-
-  const handleShowConfirmationWindowLogOut = () => {
-    setDisplayConfirmLogOut(oldState => !oldState);
-  };
-
-  const handleShowConfirmationWindowDeleteImage = () => {
-    setDisplayConfirmDeleteImage(oldState => !oldState);
-  };
-
-  const handleShowConfirmationWindowDeleteUser = () => {
-    setDisplayConfirmDeleteAcc(oldState => !oldState);
+    uploadProfileImage(file, dispatch, updateUser, setShowDefaultImage);
   };
 
   return (
@@ -106,57 +50,49 @@ const UserSettingsModal = () => {
             ref={ fileInputRef }
             style={ { display: 'none' } }
           />
-          <img src={ !showDefaultImage ? currentUser.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ handleChooseFileClick } />
+          <img src={ !showDefaultImage ? currentUser.profilePic : userIcon } alt="Profile" className={ styles.profilePic } onClick={ () => fileInputRef.current.click() } />
         </div>
         <div className={ styles.email }>
           { currentUser.email }
         </div>
         <div className={ styles.buttonsContainer }>
-          <SettingsItem
-            title="Log Out"
-            onClick={ handleShowConfirmationWindowLogOut } />
-          <SettingsItem
-            title="Remove Profile Image"
-            onClick={ handleShowConfirmationWindowDeleteImage } />
-          <SettingsItem
-            title="Delete Account"
-            onClick={ handleShowConfirmationWindowDeleteUser }
-            color="red" />
+          <SettingsItem title="Log Out" onClick={() => setDisplayConfirmLogOut(true)} />
+          <SettingsItem title="Remove Profile Image" onClick={() => setDisplayConfirmDeleteImage(true)} />
+          <SettingsItem title="Delete Account" onClick={() => setDisplayConfirmDeleteAcc(true)} color="red" />
         </div>
       </div>
 
       { showConfirmWindowLogOut &&
         (<ConfirmationWindow
           text="Are you sure you want to Log Out?"
-          buttons={ [
-            { text: "Yes", onClick: handleSignOut },
-            { text: "No", onClick: handleShowConfirmationWindowLogOut }
-          ] }
-          handleToggleModal={ handleShowConfirmationWindowLogOut }
+          buttons={[
+            { text: "Yes", onClick: () => signOutUser(dispatch, resetUser, resetChatState, navigate) },
+            { text: "No", onClick: () => setDisplayConfirmLogOut(false) }
+          ]}
+          handleToggleModal={() => setDisplayConfirmLogOut(false)}
         />) }
 
       { showConfirmWindowDeleteImage &&
         (<ConfirmationWindow
           text="Are you sure you want to remove Your profile picture?"
-          buttons={ [
-            { text: "Yes", onClick: handleDeleteProfileImage },
-            { text: "No", onClick: handleShowConfirmationWindowDeleteImage }
-          ] }
-          handleToggleModal={ handleShowConfirmationWindowDeleteImage }
+          buttons={[
+            { text: "Yes", onClick: () => removeUserProfileImage(dispatch, updateUser, setShowDefaultImage) },
+            { text: "No", onClick: () => setDisplayConfirmDeleteImage(false) }
+          ]}
+          handleToggleModal={() => setDisplayConfirmDeleteImage(false)}
         />) }
 
       { showConfirmWindowDeleteAcc &&
         (<ConfirmationWindow
           text="Are you sure you want to Delete Your Account? This action cannot be undone."
-          buttons={ [
-            { text: "Yes", onClick: handleDeleteUser },
-            { text: "No", onClick: handleShowConfirmationWindowDeleteUser }
-          ] }
-          handleToggleModal={ handleShowConfirmationWindowDeleteUser }
+          buttons={[
+            { text: "Yes", onClick: () => deleteUserAccount(dispatch, resetUser, navigate) },
+            { text: "No", onClick: () => setDisplayConfirmDeleteAcc(false) }
+          ]}
+          handleToggleModal={() => setDisplayConfirmDeleteAcc(false)}
         />) }
     </>
   );
 };
-
 
 export default UserSettingsModal;

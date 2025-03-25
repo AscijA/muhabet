@@ -3,8 +3,8 @@ import styles from './ContactInfoModal.module.scss';
 
 import { useSelector } from 'react-redux';
 
-import SettingsItem from '../../Common/SettingsItem/SettingsItem';
 import ConfirmationWindow from '../../Common/ConfirmationWindow/ConfirmationWindow';
+import SettingsItem from '../../Common/SettingsItem/SettingsItem';
 
 /** Modal for the contact info settings.
  * 
