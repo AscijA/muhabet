@@ -108,6 +108,13 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
     });
 };
 
+/**
+ * Get user profile image from Firebase Storage
+ *
+ * @param {*} dispatch - Redux dispatch function
+ * @param {*} updateUser - Redux action to update user
+ * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ */
 const getUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
   try {
     const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
@@ -119,6 +126,14 @@ const getUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) =>
   }
 };
 
+/**
+ * Upload user profile image to Firebase Storage
+ *
+ * @param {*} file - The image file to upload
+ * @param {*} dispatch - Redux dispatch function
+ * @param {*} updateUser - Redux action to update user
+ * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ */
 const uploadProfileImage = async (file, dispatch, updateUser, setShowDefaultImage) => {
   try {
     const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
@@ -131,6 +146,13 @@ const uploadProfileImage = async (file, dispatch, updateUser, setShowDefaultImag
   }
 };
 
+/**
+ * Remove user profile image from Firebase Storage
+ *
+ * @param {*} dispatch - Redux dispatch function
+ * @param {*} updateUser - Redux action to update user
+ * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ */
 const removeUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
   try {
     const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
@@ -142,6 +164,14 @@ const removeUserProfileImage = async (dispatch, updateUser, setShowDefaultImage)
   }
 };
 
+/**
+ * Sign out user and reset state
+ *
+ * @param {*} dispatch - Redux dispatch function
+ * @param {*} resetUser - Redux action to reset user
+ * @param {*} resetChatState - Redux action to reset chat state
+ * @param {*} navigate - Router Navigation function 
+ */
 const signOutUser = async (dispatch, resetUser, resetChatState, navigate) => {
   try {
     await auth.signOut();
@@ -153,6 +183,13 @@ const signOutUser = async (dispatch, resetUser, resetChatState, navigate) => {
   }
 };
 
+/**
+ * Delete user account from Firebase
+ *
+ * @param {*} dispatch - Redux dispatch function
+ * @param {*} resetUser - Redux action to reset user
+ * @param {*} navigate - Router Navigation function
+ */
 const deleteUserAccount = async (dispatch, resetUser, navigate) => {
   try {
     await deleteUser(auth.currentUser);

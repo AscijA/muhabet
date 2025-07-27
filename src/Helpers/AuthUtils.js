@@ -16,6 +16,14 @@ import { setCurrentChat, setShowDefaultImage } from "src/store/chatSlice";
 import { getContactImage, getImageFromFirebaseAndSaveToIDB } from "./idb";
 import { updateUser } from "src/store/userSlice";
 
+
+/**
+ * Subscribes to authentication state changes when the chat loads.
+ *
+ * @param {*} dispatch 
+ * @param {*} setLoading
+ * @return {*} 
+ */
 const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -48,6 +56,13 @@ const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
   });
 };
 
+/**
+ * Subscribes to authentication state changes when the user logs in.
+ *
+ * @param {*} dispatch
+ * @param {*} navigate
+ * @return {*} 
+ */
 const subscribeToAuthChangesOnLogin = (dispatch, navigate) => {
   return onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -66,6 +81,14 @@ const subscribeToAuthChangesOnLogin = (dispatch, navigate) => {
   });
 };
 
+/**
+ * Signs up a new user with email and password.
+ *
+ * @param {*} email Email of the user
+ * @param {*} password Password for the user
+ * @param {*} setErrorMessage Function to set error message
+ * @param {*} setShowError Function to show error message
+ */
 const signUpUser = async (email, password, setErrorMessage, setShowError) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -85,7 +108,17 @@ const signUpUser = async (email, password, setErrorMessage, setShowError) => {
   }
 };
 
-const signInUser = async (email, password, dispatch, navigate, setErrorMessage, setShowError, userSetUp) => {
+/**
+ * Signs in an existing user with email and password.
+ *
+ * @param {*} email Email of the user
+ * @param {*} password Password for the user
+ * @param {*} dispatch Dispatch function to update the store
+ * @param {*} navigate Function to navigate after login
+ * @param {*} setErrorMessage Function to set error message
+ * @param {*} setShowError Function to show error message
+ */
+const signInUser = async (email, password, dispatch, navigate, setErrorMessage, setShowError) => {
   try {
     await setPersistence(auth, browserLocalPersistence);
     await signInWithEmailAndPassword(auth, email, password);
@@ -97,6 +130,14 @@ const signInUser = async (email, password, dispatch, navigate, setErrorMessage, 
   }
 };
 
+/**
+ * Resets the user's password by sending a password reset email.
+ *
+ * @param {*} email Email of the user
+ * @param {*} setShowResetModal Function to show/hide the reset modal
+ * @param {*} setErrorMessage Function to set error message
+ * @param {*} setShowError Function to show error message
+ */
 const resetUserPassword = async (email, setShowResetModal, setErrorMessage, setShowError) => {
   try {
     await sendPasswordResetEmail(auth, email);
@@ -106,6 +147,13 @@ const resetUserPassword = async (email, setShowResetModal, setErrorMessage, setS
   }
 };
 
+/**
+ * Handles authentication errors and sets appropriate error messages.
+ *
+ * @param {*} error Error object from Firebase
+ * @param {*} setErrorMessage Function to set error message
+ * @param {*} setShowError Function to show error message
+ */
 const handleAuthError = (error, setErrorMessage, setShowError) => {
   switch (error.code) {
     case AuthErrorCodes.WEAK_PASSWORD:
@@ -127,6 +175,12 @@ const handleAuthError = (error, setErrorMessage, setShowError) => {
   setShowError(true);
 };
 
+/**
+ * Subscribes to authentication state changes with a basic callback.
+ *
+ * @param {*} callback Callback function to handle auth state changes
+ * @return {*} 
+ */
 const subscribeToAuthChangesBasic = (callback) => {
   return onAuthStateChanged(auth, callback);
 };

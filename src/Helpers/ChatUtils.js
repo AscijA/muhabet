@@ -30,21 +30,6 @@ const fetchChats = async (userID, dispatch) => {
 
     let chatsMap = new Map();
 
-    const convertTimestamps = (docData) => {
-      if (docData.lastModified instanceof Timestamp) {
-        docData.lastModified = docData.lastModified.toDate().toISOString();
-      }
-
-      if (docData.messages) {
-        docData.messages = docData.messages.map(msg => ({
-          ...msg,
-          timestamp: msg.timestamp instanceof Timestamp ? msg.timestamp.toDate().toISOString() : msg.timestamp
-        }));
-      }
-
-      return docData;
-    };
-
     snapshot1.forEach(doc => {
       chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
     });
@@ -61,5 +46,25 @@ const fetchChats = async (userID, dispatch) => {
 
 };
 
+/**
+ * Convert Firestore Timestamps to ISO strings in chat documents
+ *
+ * @param {*} docData
+ * @return {*}
+  */
+const convertTimestamps = (docData) => {
+  if (docData.lastModified instanceof Timestamp) {
+    docData.lastModified = docData.lastModified.toDate().toISOString();
+  }
+
+  if (docData.messages) {
+    docData.messages = docData.messages.map(msg => ({
+      ...msg,
+      timestamp: msg.timestamp instanceof Timestamp ? msg.timestamp.toDate().toISOString() : msg.timestamp
+    }));
+  }
+
+  return docData;
+};
 
 export { fetchChats };

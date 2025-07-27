@@ -2,6 +2,14 @@ import { storage } from "../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { getContactImage, getImageFromFirebaseAndSaveToIDB } from "src/Helpers/idb";
 
+/**
+ * Fetches the profile picture of a contact.
+ *
+ * @param {*} contactUID UID of the contact
+ * @param {*} setProfilePic Function to set the profile picture
+ * @param {*} setShowUser Function to show/hide the user
+ * @returns
+ */
 const fetchProfilePicture = async (contactUID, setProfilePic, setShowUser) => {
   try {
     if (!contactUID) return;
@@ -21,6 +29,15 @@ const fetchProfilePicture = async (contactUID, setProfilePic, setShowUser) => {
   }
 };
 
+/**
+ * Fetches and updates the profile picture of a contact.
+ *
+ * @param {*} contactUID UID of the contact
+ * @param {*} currentProfilePic Current profile picture URL
+ * @param {*} updateContact Function to update the contact in the store
+ * @param {*} dispatch Dispatch function to update the store
+ * @returns
+ */
 const fetchAndUpdateContactProfile = async (contactUID, currentProfilePic, updateContact, dispatch) => {
   try {
     if (!contactUID || currentProfilePic) return;
@@ -36,6 +53,15 @@ const fetchAndUpdateContactProfile = async (contactUID, currentProfilePic, updat
   }
 };
 
+/**
+ * Fetches the profile picture of a contact.
+ *
+ * @param {*} contactUID UID of the contact
+ * @param {*} dispatch Dispatch function to update the store
+ * @param {*} updateContact Function to update the contact in the store
+ * @param {*} setShowContactDefaultImage Function to show/hide the default contact image
+ * @returns
+ */
 const fetchContactProfile = async (contactUID, dispatch, updateContact, setShowContactDefaultImage) => {
   try {
     if (!contactUID) return;
