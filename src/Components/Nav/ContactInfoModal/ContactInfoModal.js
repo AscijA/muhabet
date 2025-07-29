@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 
 import ConfirmationWindow from '../../Common/ConfirmationWindow/ConfirmationWindow';
 import SettingsItem from '../../Common/SettingsItem/SettingsItem';
+import userIcon from "../../../assets/user.svg";
 
 /** Modal for the contact info settings.
  * 
@@ -14,6 +15,8 @@ import SettingsItem from '../../Common/SettingsItem/SettingsItem';
 const ContactInfoModal = (props) => {
   let currentUser = useSelector((state) => state.user);
   let chat = useSelector((state) => state.chat);
+  const showContact = useSelector((state) => state.chat.showContactDefaultImage);
+
 
   const [showConfirmWindowDeleteChat, setDisplayConfirmDeleteChat] = useState(false);
   const [showConfirmWindowBlockUser, setDisplayConfirmBlockUser] = useState(false);
@@ -33,6 +36,12 @@ const ContactInfoModal = (props) => {
   return (
     <>
       <div className={ styles.contactInfo }>
+        <div className={ showContact ? styles.contactPicBG : styles.contactPic }>
+          <img className={ styles.contactPicImg } src={ showContact ? userIcon : chat.currentChat.contact.profilePic } alt="Profile" />
+        </div>
+        <div className={ styles.email }>
+          { props.email }
+        </div>
         <SettingsItem
           title="Delete Chat"
           onClick={ handleShowConfirmationWindowDeleteChat } />

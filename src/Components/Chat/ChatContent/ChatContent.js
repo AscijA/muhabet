@@ -5,16 +5,18 @@ import styles from "./ChatContent.module.scss";
 
 import { addMessageToCurrentChat } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
-import { handleChatStatus } from "src/Helpers/UserUtils";
+import { handleChatStatus, updateChat } from "src/Helpers/UserUtils";
 
 import CustomButton from '../../Common/Buttons/CustomButton';
 import MessageItem from '../MessageItem/MessageItem';
 
 const initialMessage = {
-    "messageText": "",
-    "sender": "",
+    "content": "",
+    "contentType": "text",
+    "messageID": "",
+    "messageStatus": "",
+    "ownerID": "",
     "timestamp": "",
-    "status": "",
 };
 
 const ChatContent = () => {
@@ -34,7 +36,7 @@ const ChatContent = () => {
     let handleChangeMessage = (event) => {
         setMessage(state => ({
             ...state,
-            messageText: event.target.value,
+            content: event.target.value,
         }));
     };
 
@@ -49,14 +51,17 @@ const ChatContent = () => {
         if (message.messageText !== "") {
             let newMessage = {
                 ...message,
-                sender: currentUser.uid,
-                status: MESSAGE_STATUS.SENT,
+                ownerID: currentUser.uid,
+                messageStatus: MESSAGE_STATUS.SENT,
                 timestamp: Date.now(),
+                messageID: `${currentMessages.length}`,
             };
             setMessage(initialMessage);
 
+            // used to prevent the message from being sent immediately
             setTimeout(() => {
                 dispatch(addMessageToCurrentChat(newMessage));
+                updateChat("messages", [...currentMessages, newMessage], currentChat.chatId);
             }, 0);
         }
     };
@@ -76,22 +81,22 @@ const ChatContent = () => {
     const returnMessageBox = () => {
         let ownBlock = (
             <>
-                <div className={`${styles.inputContainer} ${styles.ownBlock}`}>
+                <div className={ `${styles.inputContainer} ${styles.ownBlock}` }>
                     <div>You have blocked this user. To send a message, please Unblock them.</div>
                 </div>
-                <div className={styles.buttonContainer}>
+                <div className={ styles.buttonContainer }>
                     <CustomButton
                         buttonText="Unblock"
                         buttonSize="sm"
                         buttonType="filled"
-                        handleSubmit={() => { handleChatStatus("block", chat, currentUser, dispatch); }}
+                        handleSubmit={ () => { handleChatStatus("block", chat, currentUser, dispatch); } }
                     />
                 </div>
             </>
         );
 
         let otherBlock = (
-            <div className={`${styles.inputContainer} ${styles.otherBlock}`}>
+            <div className={ `${styles.inputContainer} ${styles.otherBlock}` }>
                 <div>You have been blocked by this user. You cannot send any messages.</div>
             </div>
         );
@@ -111,20 +116,20 @@ const ChatContent = () => {
 
         return (
             <>
-                <div className={styles.inputContainer}>
+                <div className={ styles.inputContainer }>
                     <textarea
                         placeholder="Type a message"
-                        value={message.messageText}
-                        onChange={handleChangeMessage}
-                        onKeyDown={handleEnter}
+                        value={ message.content }
+                        onChange={ handleChangeMessage }
+                        onKeyDown={ handleEnter }
                     />
                 </div>
-                <div className={styles.buttonContainer}>
+                <div className={ styles.buttonContainer }>
                     <CustomButton
-                        buttonText={buttonAction}
+                        buttonText={ buttonAction }
                         buttonSize="sm"
                         buttonType=""
-                        handleSubmit={buttonAction === "Send" ? handleSendMessage : handleEditMessage}
+                        handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage }
                     />
                 </div>
             </>

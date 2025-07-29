@@ -86,7 +86,7 @@ const Nav = () => {
 
       { chat.showChatInfo && 
         <BasicModal handleToggleModal={ handleShowContactInfoToggle } fullscreen={ true } transparent={ true }>
-          <ContactInfo handleBlockUser={ blockUser } handleDeleteChat={ deleteChat } />
+          <ContactInfo handleBlockUser={ blockUser } handleDeleteChat={ deleteChat } email={ user.email } />
         </BasicModal> 
       }
     </div>
