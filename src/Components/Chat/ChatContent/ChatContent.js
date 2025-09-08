@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import styles from "./ChatContent.module.scss";
 
-import { addMessageToCurrentChat, updateChatByID } from "../../../store/chatSlice";
+import { updateChatByID } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
 import { handleChatStatus, updateChat } from "src/Helpers/UserUtils";
 
