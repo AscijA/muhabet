@@ -7,25 +7,25 @@ import CustomInput from 'src/Components/Common/CustomInput/CustomInput';
 import { createChat, getUidFromEmail } from 'src/Helpers/UserUtils';
 import { setCurrentChat, updateChatByID } from 'src/store/chatSlice';
 
-
 /**
- * UserSettingsModal component that displays the user profile picture and email address.
- * Also allows the user to log out, delete their account or change profile picture. 
+ * NewChatModal: creates a 1:1 chat using the new participants[] schema.
  */
 const NewChatModal = (props) => {
   const dispatch = useDispatch();
 
-  let currentUser = useSelector((state) => state.user);
-  let allChats = useSelector((state) => state.chat.allChats);
-  let [newEmail, setNewEmail] = useState("");
-  let [errorMessage, setErrorMessage] = useState("");
-  let [showError, setShowError] = useState(false);
+  const currentUser = useSelector((state) => state.user);
+  const allChats = useSelector((state) => state.chat.allChats);
+  const [newEmail, setNewEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const confirmCreateChat = async () => {
-    let user2UID = await getUidFromEmail(newEmail);
+    setShowError(false);
+    setErrorMessage("");
 
-    if (!user2UID) {
-      setErrorMessage("No user found with this email address.");
+    // Basic validation
+    if (!newEmail) {
+      setErrorMessage("Please enter an email address.");
       setShowError(true);
       return;
     }
@@ -35,96 +35,128 @@ const NewChatModal = (props) => {
       return;
     }
 
-    // Create chat object
+    // Look up the other user's UID
+    const user2UID = await getUidFromEmail(newEmail);
+    if (!user2UID) {
+      setErrorMessage("No user found with this email address.");
+      setShowError(true);
+      return;
+    }
+
+    // Build new schema fields
+    const participants = [
+      { userID: currentUser.uid, email: currentUser.email, blockStatus: false, deleteStatus: false },
+      { userID: user2UID,        email: newEmail,          blockStatus: false, deleteStatus: false },
+    ];
+    const participantIDs = participants.map(p => p.userID);
+
     const chatData = {
-      chatStatus: {
-        user1Block: false,
-        user1Del: false,
-        user2Block: false,
-        user2Del: false
-      },
-      lastMessageStatus: {
-        status: "",
-        userID: "",
-      },
+      participants,
+      participantIDs,
+      lastMessageStatus: { status: "", userID: "" },
       messages: [],
-      lastModified: "",
-      user1Email: currentUser.email,
-      user1ID: currentUser.uid,
-      user2Email: newEmail,
-      user2ID: user2UID
+      lastModified: "", // keep as-is if your backend sets this later
     };
 
-    // Check if chat already exists
-    let existingChat = allChats.find(chat =>
-      (chat.user1ID === currentUser.uid && chat.user2ID === user2UID) ||
-      (chat.user2ID === currentUser.uid && chat.user1ID === user2UID)
-    );
+    // De-dupe: find existing chat with the same two participant IDs
+    const existingChat = allChats.find(c => {
+      if (Array.isArray(c?.participantIDs)) {
+        // Fast path if the array exists
+        return participantIDs.every(id => c.participantIDs.includes(id))
+               && c.participantIDs.length === participantIDs.length;
+      }
+      // Fallback if participantIDs not present locally yet (e.g., pending migration)
+      if (Array.isArray(c?.participants)) {
+        const ids = c.participants.map(p => p.userID);
+        return participantIDs.every(id => ids.includes(id))
+               && ids.length === participantIDs.length;
+      }
+      return false;
+    });
+
     if (!existingChat) {
-      let newChatId = await createChat(chatData);
-      dispatch(updateChatByID(newChatId));
-    }
-    else {
-      existingChat = {
-        ...existingChat,
-        chatStatus: {
-          ...existingChat.chatStatus,
-          user1Del: false,
-          user2Del: false
-        }
+      // Create on Firestore
+      const newChatId = await createChat(chatData);
+
+      // Construct a local chat object for the store
+      const newChat = {
+        id: newChatId,
+        chatId: newChatId,
+        ...chatData,
       };
 
-      chatToCurrentChat(existingChat);
+      // Push to store
+      dispatch(updateChatByID(newChat));
+      chatToCurrentChat(newChat);
+    } else {
+      // If it exists, "undelete" for both users (matches old behavior resetting user1Del/user2Del)
+      const restoredParticipants = existingChat.participants?.map(p => ({
+        ...p,
+        deleteStatus: false,
+      })) || participants;
 
-      dispatch(updateChatByID(existingChat));
+      const merged = {
+        ...existingChat,
+        participants: restoredParticipants,
+        participantIDs: existingChat.participantIDs || participantIDs,
+      };
 
+      // Update Redux (persist to Firestore elsewhere if desired)
+      dispatch(updateChatByID(merged));
+      chatToCurrentChat(merged);
     }
+
+    // Close modal and reset input
     props.handleToggleModal();
     setNewEmail("");
-
   };
 
   const chatToCurrentChat = (chatToCon) => {
-    let currentChat = {
+    // Find the "other" participant
+    const other = Array.isArray(chatToCon.participants)
+      ? chatToCon.participants.find(p => p.userID !== currentUser.uid)
+      : null;
+
+    const currentChat = {
       chatId: chatToCon.id,
       lastSeen: "",
       contact: {
         profilePic: "",
-        email: currentUser.email === chatToCon.user1Email ? chatToCon.user2Email : chatToCon.user1Email,
-        uid: currentUser.email === chatToCon.user1Email ? chatToCon.user2ID : chatToCon.user1ID
+        email: other?.email || "",
+        uid: other?.userID || "",
       },
-      messages: chatToCon.messages,
-      chatStatus: chatToCon.chatStatus
+      messages: chatToCon.messages || [],
+      // If your UI still reads chatStatus, you can derive it here if needed,
+      // but ideally migrate UI to read from participants[] instead.
     };
+
     dispatch(setCurrentChat(currentChat));
   };
-
-
 
   const handleInputChange = (e) => {
     setNewEmail(e.target.value);
   };
 
   return (
-    <div className={ styles.outerContainer }>
-      <div className={ styles.inputContainer }>
-        <form onSubmit={ (e) => { e.preventDefault(); confirmCreateChat(); } }>
+    <div className={styles.outerContainer}>
+      <div className={styles.inputContainer}>
+        <form onSubmit={(e) => { e.preventDefault(); confirmCreateChat(); }}>
           <CustomInput
             label="Email address"
             inputType="email"
-            stateElement={ newEmail }
-            stateElementChangeHandler={ handleInputChange }
+            stateElement={newEmail}
+            stateElementChangeHandler={handleInputChange}
           />
         </form>
       </div>
-      { showError && <div className={ styles.errorMessage }>{ errorMessage }</div> }
-      <div className={ styles.buttonsContainer }>
-        <SettingsItem title="Confirm" onClick={ confirmCreateChat } />
-        <SettingsItem title="Cancel" onClick={ props.handleToggleModal } color="red" />
+
+      {showError && <div className={styles.errorMessage}>{errorMessage}</div>}
+
+      <div className={styles.buttonsContainer}>
+        <SettingsItem title="Confirm" onClick={confirmCreateChat} />
+        <SettingsItem title="Cancel" onClick={props.handleToggleModal} color="red" />
       </div>
     </div>
-
-
   );
 };
 

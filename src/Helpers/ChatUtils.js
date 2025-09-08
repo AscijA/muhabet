@@ -8,41 +8,26 @@ import { setAllChats } from "src/store/chatSlice";
  * @param {function} dispatch
  */
 const fetchChats = async (userID, dispatch) => {
-  try {
-    const chatsRef = collection(db, "chats");
+ try {
+  const chatsRef = collection(db, "chats");
 
-    const q1 = query(
-      chatsRef,
-      where("user1ID", "==", userID),
-      orderBy("lastModified", "desc")
-    );
+  const q = query(
+    chatsRef,
+    where("participantIDs", "array-contains", userID),
+    orderBy("lastModified", "desc")
+  );
 
-    const q2 = query(
-      chatsRef,
-      where("user2ID", "==", userID),
-      orderBy("lastModified", "desc")
-    );
+  const snapshot = await getDocs(q);
 
-    const [snapshot1, snapshot2] = await Promise.all([
-      getDocs(q1),
-      getDocs(q2)
-    ]);
+  const chats = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...convertTimestamps(doc.data()),
+  }));
 
-    let chatsMap = new Map();
-
-    snapshot1.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
-    });
-
-    snapshot2.forEach(doc => {
-      chatsMap.set(doc.id, { id: doc.id, ...convertTimestamps(doc.data()) });
-    });
-
-    const chats = Array.from(chatsMap.values());
-    dispatch(setAllChats(chats));
-  } catch (error) {
-    console.error("Error fetching chats:", error);
-  }
+  dispatch(setAllChats(chats));
+} catch (error) {
+  console.error("Error fetching chats:", error);
+}
 
 };
 

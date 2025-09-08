@@ -1,6 +1,5 @@
-
 import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
-import { updateChatByID, updateCurrentChatStatus } from "src/store/chatSlice";
+import { updateChatByID } from "src/store/chatSlice";
 import { auth, storage } from '../Firebase/firebase';
 import { doc, updateDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { setUser } from "src/store/userSlice";
@@ -10,7 +9,7 @@ import { deleteUser } from 'firebase/auth';
 /**
  * Set up user object
  * @param {Object} authUser - Firebase auth user object
- * @param {Object} dispatch - Redux dispatch
+ * @param {Function} dispatch - Redux dispatch
  */
 const userSetUp = async (authUser, dispatch) => {
   const user = {
@@ -24,7 +23,7 @@ const userSetUp = async (authUser, dispatch) => {
 };
 
 /**
- *  Update chat with new key value pair
+ * Generic: Update chat with new key/value
  *
  * @param {string} key - The key to update
  * @param {any} value - The value to update
@@ -32,17 +31,38 @@ const userSetUp = async (authUser, dispatch) => {
  */
 const updateChat = async (key, value, chatID) => {
   const chatRef = doc(db, "chats", chatID);
+  await updateDoc(chatRef, { [key]: value });
+};
 
+/**
+ * Specific: Update participants and keep participantIDs in sync
+ * @param {string} chatID
+ * @param {Array} participants
+ */
+const updateChatParticipants = async (chatID, participants) => {
+  const chatRef = doc(db, "chats", chatID);
+  const participantIDs = Array.isArray(participants)
+    ? participants.map(p => p.userID)
+    : [];
   await updateDoc(chatRef, {
-    [key]: value,
+    participants,
+    participantIDs,
   });
-
 };
 
 const createChat = async (chatData) => {
   try {
     const chatRef = doc(collection(db, "chats")); // generates a unique ID
-    await setDoc(chatRef, { ...chatData, chatId: chatRef.id });
+    const participantIDs = Array.isArray(chatData.participants)
+      ? chatData.participants.map(p => p.userID)
+      : [];
+
+    await setDoc(chatRef, {
+      ...chatData,
+      chatId: chatRef.id,
+      participantIDs,
+    });
+
     console.log("New chat created with ID:", chatRef.id);
     return chatRef.id;
   } catch (error) {
@@ -51,69 +71,49 @@ const createChat = async (chatData) => {
 };
 
 /**
+ * Toggle block/delete for the current user in this chat (new participants[] schema)
  *
- * @param {string} type - The type of action to perform
- * @param {Object} chat - The chat object
- * @param {Object} currentUser - The current user object
- * @param {function} dispatch - Redux dispatch
- * @param {function} handleShowContactInfoToggle - The function to toggle the contact info
+ * @param {string} type - "block" | "delete"
+ * @param {Object} chat - Chat slice state
+ * @param {Object} currentUser - Current user object
+ * @param {Function} dispatch - Redux dispatch
+ * @param {Function|null} handleShowContactInfoToggle - optional UI toggle
  */
-const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleShowContactInfoToggle = null) => {
-  let currentChat = chat.currentChat;
-  let allChats = chat.allChats;
-  let chatStatus = chat.currentChat.chatStatus;
-  let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
-  let currentUserUid = currentUser.uid;
+const handleChatStatus = (
+  type = "block",
+  chat,
+  currentUser,
+  dispatch,
+  handleShowContactInfoToggle = null
+) => {
+  const { currentChat, allChats } = chat;
+  let currentChatFull = allChats.find(c => c.id === currentChat.chatId);
+  const currentUserUid = currentUser.uid;
 
-  if (type === "delete") {
-    if (currentUserUid === currentChatFull.user1ID) {
-      chatStatus = {
-        ...chatStatus,
-        user1Del: !chatStatus.user1Del
-      };
-    }
-    else {
-      chatStatus = {
-        ...chatStatus,
-        user2Del: !chatStatus.user2Del
-      };
-    }
-  }
-  else {
-    if (currentUserUid === currentChatFull.user1ID) {
-      chatStatus = {
-        ...chatStatus,
-        user1Block: !chatStatus.user1Block,
-      };
-    }
-    else {
-      chatStatus = {
-        ...chatStatus,
-        user2Block: !chatStatus.user2Block,
-      };
-    }
-  }
+  if (!currentChatFull?.participants) return;
 
-  currentChatFull = {
+  // Toggle the current user's flag in participants
+  const updatedParticipants = currentChatFull.participants.map(p => {
+    if (p.userID !== currentUserUid) return p;
+    if (type === "delete") {
+      return { ...p, deleteStatus: !p.deleteStatus };
+    }
+    return { ...p, blockStatus: !p.blockStatus };
+  });
+
+  const updatedChat = {
     ...currentChatFull,
-    chatStatus: chatStatus
+    participants: updatedParticipants
   };
 
-  /**
-   * Update chat status Redux state
-   * @param {*} currentChatFull
-   * @param {*} chatStatus
-   */
-  const dispatchChatUpdate = (currentChatFull, chatStatus) => {
-    dispatch(updateChatByID(currentChatFull));
-    dispatch(updateCurrentChatStatus(chatStatus));
-    if (handleShowContactInfoToggle) {
-      handleShowContactInfoToggle();
-    }
+  const dispatchChatUpdate = () => {
+    dispatch(updateChatByID(updatedChat));
+    if (handleShowContactInfoToggle) handleShowContactInfoToggle();
   };
 
-  updateChat("chatStatus", chatStatus, currentChat.chatId)
-    .then(dispatchChatUpdate(currentChatFull, chatStatus))
+  // Persist participants + participantIDs
+  updateChatParticipants(currentChat.chatId, updatedParticipants)
+    .then(() => dispatchChatUpdate())
     .catch((error) => {
       console.error("Error updating chat:", error);
     });
@@ -122,9 +122,9 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
 /**
  * Get user profile image from Firebase Storage
  *
- * @param {*} dispatch - Redux dispatch function
- * @param {*} updateUser - Redux action to update user
- * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Function} updateUser - Redux action to update user
+ * @param {Function} setShowDefaultImage - Redux action to show/hide default image
  */
 const getUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
   try {
@@ -140,10 +140,10 @@ const getUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) =>
 /**
  * Upload user profile image to Firebase Storage
  *
- * @param {*} file - The image file to upload
- * @param {*} dispatch - Redux dispatch function
- * @param {*} updateUser - Redux action to update user
- * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ * @param {File} file - The image file to upload
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Function} updateUser - Redux action to update user
+ * @param {Function} setShowDefaultImage - Redux action to show/hide default image
  */
 const uploadProfileImage = async (file, dispatch, updateUser, setShowDefaultImage) => {
   try {
@@ -160,9 +160,9 @@ const uploadProfileImage = async (file, dispatch, updateUser, setShowDefaultImag
 /**
  * Remove user profile image from Firebase Storage
  *
- * @param {*} dispatch - Redux dispatch function
- * @param {*} updateUser - Redux action to update user
- * @param {*} setShowDefaultImage - Redux action to show/hide default image
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Function} updateUser - Redux action to update user
+ * @param {Function} setShowDefaultImage - Redux action to show/hide default image
  */
 const removeUserProfileImage = async (dispatch, updateUser, setShowDefaultImage) => {
   try {
@@ -178,10 +178,10 @@ const removeUserProfileImage = async (dispatch, updateUser, setShowDefaultImage)
 /**
  * Sign out user and reset state
  *
- * @param {*} dispatch - Redux dispatch function
- * @param {*} resetUser - Redux action to reset user
- * @param {*} resetChatState - Redux action to reset chat state
- * @param {*} navigate - Router Navigation function 
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Function} resetUser - Redux action to reset user
+ * @param {Function} resetChatState - Redux action to reset chat state
+ * @param {Function} navigate - Router Navigation function
  */
 const signOutUser = async (dispatch, resetUser, resetChatState, navigate) => {
   try {
@@ -197,9 +197,9 @@ const signOutUser = async (dispatch, resetUser, resetChatState, navigate) => {
 /**
  * Delete user account from Firebase
  *
- * @param {*} dispatch - Redux dispatch function
- * @param {*} resetUser - Redux action to reset user
- * @param {*} navigate - Router Navigation function
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Function} resetUser - Redux action to reset user
+ * @param {Function} navigate - Router Navigation function
  */
 const deleteUserAccount = async (dispatch, resetUser, navigate) => {
   try {
@@ -211,18 +211,27 @@ const deleteUserAccount = async (dispatch, resetUser, navigate) => {
   }
 };
 
+/**
+ * Resolve UID from an email via Firestore
+ * @param {string} email
+ * @returns {Promise<string|null>}
+ */
 export const getUidFromEmail = async (email) => {
-  const q = query(
-    collection(db, "users"),
-    where("email", "==", email)
-  );
+  const q = query(collection(db, "users"), where("email", "==", email));
   const snapshot = await getDocs(q);
-  if (snapshot.empty) {
-    return null;
-  }
-  const doc = snapshot.docs[0].data().uid;
-
-  return doc; 
+  if (snapshot.empty) return null;
+  return snapshot.docs[0].data().uid;
 };
 
-export { userSetUp, updateChat, handleChatStatus, getUserProfileImage, uploadProfileImage, removeUserProfileImage, signOutUser, deleteUserAccount, createChat };
+export {
+  userSetUp,
+  updateChat,
+  updateChatParticipants,
+  handleChatStatus,
+  getUserProfileImage,
+  uploadProfileImage,
+  removeUserProfileImage,
+  signOutUser,
+  deleteUserAccount,
+  createChat
+};

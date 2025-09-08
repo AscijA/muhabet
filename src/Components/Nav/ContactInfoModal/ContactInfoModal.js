@@ -17,11 +17,14 @@ const ContactInfoModal = (props) => {
   let chat = useSelector((state) => state.chat);
   const showContact = useSelector((state) => state.chat.showContactDefaultImage);
 
-
   const [showConfirmWindowDeleteChat, setDisplayConfirmDeleteChat] = useState(false);
   const [showConfirmWindowBlockUser, setDisplayConfirmBlockUser] = useState(false);
 
-  let chatStatusBlock = currentUser.uid === chat.currentChat.user1ID ? chat.currentChat.chatStatus.user2Block : chat.currentChat.chatStatus.user1Block;
+  // const me = chat.currentChat.participants.find(p => p.userID === currentUser.uid);
+  const other = chat.currentChat.participants.find(p => p.userID !== currentUser.uid);
+
+  const chatStatusBlock = other?.blockStatus || false;
+
 
   let text = chatStatusBlock ? "Unblock User" : "Block User";
   let confirmTextTitle = chatStatusBlock ? "Are you sure you want to unblock this user?" : "Are you sure you want to block this user?";

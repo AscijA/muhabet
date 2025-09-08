@@ -100,19 +100,14 @@ const ChatContent = () => {
                 <div>You have been blocked by this user. You cannot send any messages.</div>
             </div>
         );
-        let currentChatFull = allChats.find(chat => chat.id === currentChat.chatId);
-        if (currentUser.uid === currentChatFull.user1ID && currentChat.chatStatus.user1Block) {
-            return ownBlock;
-        }
-        else if (currentUser.uid === currentChatFull.user1ID && currentChat.chatStatus.user2Block) {
-            return otherBlock;
-        }
-        else if (currentUser.uid === currentChatFull.user2ID && currentChat.chatStatus.user2Block) {
-            return ownBlock;
-        }
-        else if (currentUser.uid === currentChatFull.user2ID && currentChat.chatStatus.user1Block) {
-            return otherBlock;
-        }
+        let currentChatFull = allChats.find(c => c.id === currentChat.chatId);
+        if (!currentChatFull) return;
+
+        const me = currentChatFull.participants.find(p => p.userID === currentUser.uid);
+        const other = currentChatFull.participants.find(p => p.userID !== currentUser.uid);
+
+        if (me?.blockStatus) return ownBlock;     // you blocked them
+        if (other?.blockStatus) return otherBlock; // they blocked you
 
         return (
             <>

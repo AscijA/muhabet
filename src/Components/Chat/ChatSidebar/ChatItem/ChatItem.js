@@ -33,7 +33,12 @@ const ChatItem = (props) => {
   const [numberUnread, setNumberUnread] = useState(0);
   const [profilePic, setProfilePic] = useState("");
 
-  let chatStatusDel = props.email === props.chat.user1Email ? props.chat.chatStatus.user2Del : props.chat.chatStatus.user1Del;
+
+  // const me = props.chat.participants.find(p => p.email === props.email);
+  const other = props.chat.participants.find(p => p.email !== props.email);
+
+  const chatStatusDel = other?.deleteStatus || false;
+
   let containerStyle = styles.chatItemContainer + " " + (currentChat === props.email ? styles.currentChat : "");
 
   // Fetch profile picture of the contact

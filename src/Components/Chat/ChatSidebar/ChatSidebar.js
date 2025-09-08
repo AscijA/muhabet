@@ -27,9 +27,18 @@ const ChatSidebar = () => {
         <div>
 
           { allChats.map(chat => {
-            var chatOwner = currentUser.uid === chat.user1ID ? chat.user2Email : chat.user1Email;
-            var contactUID = currentUser.uid === chat.user1ID ? chat.user2ID : chat.user1ID;
-            var deliveryStatus = currentUser.uid === chat.lastMessageStatus.userID ? chat.lastMessageStatus.status : "";
+            let chatOwner = "";
+            let contactUID = "";
+            let deliveryStatus = "";
+
+            const me = chat.participants.find(p => p.userID === currentUser.uid);
+            const other = chat.participants.find(p => p.userID !== currentUser.uid);
+
+            chatOwner = other.email || me.email;
+            contactUID = other.userID || me.userID;
+            deliveryStatus = chat?.lastMessageStatus?.userID === currentUser.uid
+              ? chat.lastMessageStatus.status
+              : "";
             return <ChatItem
               deliveryStatus={ deliveryStatus }
               email={ chatOwner }
@@ -47,7 +56,7 @@ const ChatSidebar = () => {
       </div>
       { showNewChatModal &&
         <BasicModal handleToggleModal={ handleToggleNewChatModal } fullscreen={ true } transparent={ true }>
-          <NewChatModal handleToggleModal={ handleToggleNewChatModal }/>
+          <NewChatModal handleToggleModal={ handleToggleNewChatModal } />
         </BasicModal> }
     </>
   );
