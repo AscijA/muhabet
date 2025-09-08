@@ -7,11 +7,12 @@ import styles from "./SideBar.module.scss";
  * @param {JSX} children - The children components to be rendered inside the sidebar.
  */
 const SideBar = (props) => {
-  let widthStyle = styles.sign + (props.isChat ? " " + styles.chatWidth : "");
+  let widthStyle = styles.sign + (props.isChat ? " " + styles.chatWidth: "");
+  let innerContainerStyle = styles.innerContainer + (props.isChat ? " " + styles.fh : "");
   return (
     <div className={ styles.container } >
       <div className={ widthStyle }>
-        <div className={ styles.innerContainer }>
+        <div className={ innerContainerStyle }>
           { props.children }
         </div>
       </div>

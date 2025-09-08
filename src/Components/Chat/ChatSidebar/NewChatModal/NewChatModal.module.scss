@@ -1,0 +1,42 @@
+@import "../../../../styles/styles";
+
+.buttonsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  div:not(:last-child) {
+    border-bottom: 1px solid $border-color;
+  }
+}
+
+.outerContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
+.email {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.inputContainer {
+  width: 100%;
+}
+
+input {
+  width: 100%;
+  font-size: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.errorMessage {
+  color: red;
+}

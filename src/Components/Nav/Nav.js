@@ -4,14 +4,14 @@ import styles from './Nav.module.scss';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { toggleShowChatInfo, updateContact, setShowContactDefaultImage } from '../../store/chatSlice';
+import { toggleShowChatInfo, updateContact, setShowContactDefaultImage, setCurrentChat } from '../../store/chatSlice';
 import { subscribeToAuthChangesBasic } from 'src/Helpers/AuthUtils';
 import { fetchContactProfile } from 'src/Helpers/ContactUtils';
 import { handleChatStatus } from "src/Helpers/UserUtils";
 
 import userIcon from "../../assets/user.svg";
 
-import UserSettingsModal from '../UserSettingsModal/UserSettingsModal';
+import UserSettingsModal from './UserSettingsModal/UserSettingsModal';
 import ContactInfo from './ContactInfoModal/ContactInfoModal';
 import BasicModal from '../Common/BasicModal/BasicModal';
 
@@ -54,6 +54,19 @@ const Nav = () => {
 
   const deleteChat = () => {
     handleChatStatus("delete", chat, user, dispatch, handleShowContactInfoToggle);
+    dispatch(setCurrentChat({
+      chatId: 0,
+      lastSeen: "",
+      contact: {
+        profilePic: "",
+        email: "",
+        uid: ""
+      },
+      messages: [
+        {}
+      ]
+    },));
+
   };
 
   return (
@@ -75,19 +88,19 @@ const Nav = () => {
             </div>
             <div>{ chat.currentChat.contact.email }</div>
           </div>
-        )}
+        ) }
       </div>
 
-      { showSettings && 
+      { showSettings &&
         <BasicModal handleToggleModal={ handleShowSettingsToggle } fullscreen={ true } transparent={ true }>
           <UserSettingsModal />
-        </BasicModal> 
+        </BasicModal>
       }
 
-      { chat.showChatInfo && 
+      { chat.showChatInfo &&
         <BasicModal handleToggleModal={ handleShowContactInfoToggle } fullscreen={ true } transparent={ true }>
           <ContactInfo handleBlockUser={ blockUser } handleDeleteChat={ deleteChat } email={ user.email } />
-        </BasicModal> 
+        </BasicModal>
       }
     </div>
   );

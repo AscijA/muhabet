@@ -2,7 +2,7 @@
 import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import { updateChatByID, updateCurrentChatStatus } from "src/store/chatSlice";
 import { auth, storage } from '../Firebase/firebase';
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { setUser } from "src/store/userSlice";
 import { db } from "src/Firebase/firebase";
 import { deleteUser } from 'firebase/auth';
@@ -39,6 +39,17 @@ const updateChat = async (key, value, chatID) => {
 
 };
 
+const createChat = async (chatData) => {
+  try {
+    const chatRef = doc(collection(db, "chats")); // generates a unique ID
+    await setDoc(chatRef, { ...chatData, chatId: chatRef.id });
+    console.log("New chat created with ID:", chatRef.id);
+    return chatRef.id;
+  } catch (error) {
+    console.error("Error creating chat:", error);
+  }
+};
+
 /**
  *
  * @param {string} type - The type of action to perform
@@ -58,13 +69,13 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
     if (currentUserUid === currentChatFull.user1ID) {
       chatStatus = {
         ...chatStatus,
-        user1Del: true
+        user1Del: !chatStatus.user1Del
       };
     }
     else {
       chatStatus = {
         ...chatStatus,
-        user2Del: true
+        user2Del: !chatStatus.user2Del
       };
     }
   }
@@ -104,7 +115,7 @@ const handleChatStatus = (type = "block", chat, currentUser, dispatch, handleSho
   updateChat("chatStatus", chatStatus, currentChat.chatId)
     .then(dispatchChatUpdate(currentChatFull, chatStatus))
     .catch((error) => {
-      console.error("Error deleting user:", error);
+      console.error("Error updating chat:", error);
     });
 };
 
@@ -200,4 +211,18 @@ const deleteUserAccount = async (dispatch, resetUser, navigate) => {
   }
 };
 
-export { userSetUp, updateChat, handleChatStatus, getUserProfileImage, uploadProfileImage, removeUserProfileImage, signOutUser, deleteUserAccount };
+export const getUidFromEmail = async (email) => {
+  const q = query(
+    collection(db, "users"),
+    where("email", "==", email)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) {
+    return null;
+  }
+  const doc = snapshot.docs[0].data().uid;
+
+  return doc; 
+};
+
+export { userSetUp, updateChat, handleChatStatus, getUserProfileImage, uploadProfileImage, removeUserProfileImage, signOutUser, deleteUserAccount, createChat };

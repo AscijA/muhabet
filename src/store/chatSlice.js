@@ -5,6 +5,7 @@ const initialState = {
     showChatInfo: false,
     showDefaultImage: true,
     showContactDefaultImage: false,
+    showNewChatModal: false,
     currentChat: {
         chatId: 0,
         lastSeen: "",
@@ -69,6 +70,13 @@ const chatSlice = createSlice({
             };
         },
 
+        setShowNewChatModal: (state, action) => {
+            return {
+                ...state,
+                showNewChatModal: action.payload
+            };
+        },
+
         // Set the currentChat
         setCurrentChat: (state, action) => {
             return {
@@ -128,6 +136,9 @@ const chatSlice = createSlice({
             if (chatIndex !== -1) {
                 state.allChats[chatIndex] = updatedChat;
             }
+            else {
+                state.allChats.push(updatedChat);
+            }
         },
 
         addMessageToCurrentChat: (state, action) => {
@@ -144,6 +155,15 @@ const chatSlice = createSlice({
             // If the chat exists in allChats, update the messages
             if (chatIndex !== -1) {
                 state.allChats[chatIndex].messages.push(newMessage);
+            }
+        },
+
+        updateChatStatusById: (state, action) => {
+            const { chatId, field, value } = action.payload;
+            const chatIndex = state.allChats.findIndex(chat => chat.id === chatId);
+
+            if (chatIndex !== -1) {
+                state.allChats[chatIndex].chatStatus[field] = value;
             }
         },
 
@@ -181,6 +201,8 @@ export const {
     updateCurrentChatStatus,
     updateChatByID,
     resetChatState,
-    setShowContactDefaultImage
+    setShowContactDefaultImage,
+    setShowNewChatModal,
+    updateChatStatusById,
 } = chatSlice.actions;
 export default chatSlice.reducer;

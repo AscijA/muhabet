@@ -79,8 +79,22 @@ const ChatItem = (props) => {
   };
 
   const convertTimestamp = (timestamp) => {
-    var ts = new Date(timestamp);
-    return (ts.Date === new Date().Date && ts.Month !== new Date().Date) ? ts.toTimeString().slice(0, 5) : ts.toLocaleString("de").slice(0, -10);
+    const ts = new Date(timestamp);
+    if (isNaN(ts.getTime())) return "";
+
+    const now = new Date();
+
+    const isToday =
+      ts.getDate() === now.getDate() &&
+      ts.getMonth() === now.getMonth() &&
+      ts.getFullYear() === now.getFullYear();
+
+    if (isToday) {
+      return ts.toTimeString().slice(0, 5);
+    } else {
+      return ts.toLocaleDateString("de");
+    }
+
   };
 
   return !chatStatusDel && (
@@ -116,7 +130,7 @@ const ChatItem = (props) => {
         </div>
         <div className={ styles.chatItemMostRecentMessageSeen }>
           <div>
-            { props.chat.messages.at(-1).content }
+            { props.chat.messages?.at(-1)?.content ?? "" }
           </div>
           <div className={ styles.chatItemNumberOfUnreadMessages }>
             { numberUnread !== 0 && (<div>
