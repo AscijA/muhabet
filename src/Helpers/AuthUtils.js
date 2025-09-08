@@ -8,74 +8,102 @@ import {
   AuthErrorCodes
 } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
-import { auth, db,storage } from "../Firebase/firebase";
+import { auth, db, storage } from "../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { userSetUp } from "./UserUtils";
-import { fetchChats } from "./ChatUtils";
 import { setCurrentChat, setShowDefaultImage } from "src/store/chatSlice";
 import { getContactImage, getImageFromFirebaseAndSaveToIDB } from "./idb";
 import { updateUser } from "src/store/userSlice";
-
+import { subscribeToChats } from "src/subscriptions/subscribeToChats";
 
 /**
  * Subscribes to authentication state changes when the chat loads.
+ * - Populates user
+ * - Loads profile image (IDB -> Storage)
+ * - Starts realtime chat subscription
+ * - Calls setLoading(false) after the FIRST chat snapshot arrives (or on error)
  *
- * @param {*} dispatch 
- * @param {*} setLoading
- * @return {*} 
+ * @param {Function} dispatch
+ * @param {Function} setLoading
+ * @return {Function} unsubscribe
  */
 const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
-  return onAuthStateChanged(auth, async (user) => {
+  let unsubChats = null;
+
+  const unsubAuth = onAuthStateChanged(auth, async (user) => {
     if (user) {
       await userSetUp(user, dispatch);
-      
+
       try {
         const image = await getContactImage(user.uid);
         if (image) {
           dispatch(updateUser({ profilePic: URL.createObjectURL(image) }));
           dispatch(setShowDefaultImage(false));
         }
-        
+      } catch (e) {
+        // ignore
+      }
+
+      try {
         const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
         const url = await getDownloadURL(gsRef);
-        
         dispatch(updateUser({ profilePic: url }));
         dispatch(setShowDefaultImage(false));
         await getImageFromFirebaseAndSaveToIDB(user.uid, url);
       } catch (error) {
-        console.error("Error fetching user profile pic:", error);
+        // 404 is normal if the user never uploaded an image
+        // Only show default if we didn't already set one from IDB above
+        // If you want to force default: dispatch(setShowDefaultImage(true));
       }
-      
-      try {
-        await fetchChats(user.uid, dispatch);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching chats:", error);
+
+      // Start realtime chat subscription; mark loading false on first snapshot
+      if (unsubChats) {
+        unsubChats();
+        unsubChats = null;
       }
+      unsubChats = subscribeToChats(user.uid, dispatch, () => setLoading(false));
+    } else {
+      // Signed out: stop chat stream and reset loading
+      if (unsubChats) {
+        unsubChats();
+        unsubChats = null;
+      }
+      setLoading(false);
+      // Optionally clear current chat UI
+      dispatch(setCurrentChat({
+        chatId: "",
+        lastSeen: "",
+        contact: { profilePic: "", email: "", uid: "" },
+        messages: [],
+      }));
     }
   });
+
+  // Return a single unsubscribe that cleans up both listeners
+  return () => {
+    try { unsubChats?.(); } catch { }
+    try { unsubAuth?.(); } catch { }
+  };
 };
 
 /**
- * Subscribes to authentication state changes when the user logs in.
+ * Subscribes to authentication state changes when the user logs in (pre-chat screens).
+ * After sign-in, we navigate to /chat; the Chat page will start the realtime subscription.
  *
- * @param {*} dispatch
- * @param {*} navigate
- * @return {*} 
+ * @param {Function} dispatch
+ * @param {Function} navigate
+ * @return {Function} unsubscribe
  */
 const subscribeToAuthChangesOnLogin = (dispatch, navigate) => {
   return onAuthStateChanged(auth, (user) => {
     if (user) {
-      userSetUp(user, dispatch)
-        .then(() => fetchChats(user.uid, dispatch))
-        .then(() => navigate("/chat"));
+      userSetUp(user, dispatch).then(() => navigate("/chat"));
     } else {
       dispatch(setCurrentChat({
         chatId: "",
         lastSeen: "",
         contact: { profilePic: "", email: "", uid: "" },
         messages: [],
-        chatStatus: {}
       }));
     }
   });
@@ -83,11 +111,6 @@ const subscribeToAuthChangesOnLogin = (dispatch, navigate) => {
 
 /**
  * Signs up a new user with email and password.
- *
- * @param {*} email Email of the user
- * @param {*} password Password for the user
- * @param {*} setErrorMessage Function to set error message
- * @param {*} setShowError Function to show error message
  */
 const signUpUser = async (email, password, setErrorMessage, setShowError) => {
   try {
@@ -110,13 +133,7 @@ const signUpUser = async (email, password, setErrorMessage, setShowError) => {
 
 /**
  * Signs in an existing user with email and password.
- *
- * @param {*} email Email of the user
- * @param {*} password Password for the user
- * @param {*} dispatch Dispatch function to update the store
- * @param {*} navigate Function to navigate after login
- * @param {*} setErrorMessage Function to set error message
- * @param {*} setShowError Function to show error message
+ * Navigation to /chat triggers Chat screen which starts the realtime subscription.
  */
 const signInUser = async (email, password, dispatch, navigate, setErrorMessage, setShowError) => {
   try {
@@ -132,11 +149,6 @@ const signInUser = async (email, password, dispatch, navigate, setErrorMessage, 
 
 /**
  * Resets the user's password by sending a password reset email.
- *
- * @param {*} email Email of the user
- * @param {*} setShowResetModal Function to show/hide the reset modal
- * @param {*} setErrorMessage Function to set error message
- * @param {*} setShowError Function to show error message
  */
 const resetUserPassword = async (email, setShowResetModal, setErrorMessage, setShowError) => {
   try {
@@ -149,10 +161,6 @@ const resetUserPassword = async (email, setShowResetModal, setErrorMessage, setS
 
 /**
  * Handles authentication errors and sets appropriate error messages.
- *
- * @param {*} error Error object from Firebase
- * @param {*} setErrorMessage Function to set error message
- * @param {*} setShowError Function to show error message
  */
 const handleAuthError = (error, setErrorMessage, setShowError) => {
   switch (error.code) {
@@ -177,12 +185,16 @@ const handleAuthError = (error, setErrorMessage, setShowError) => {
 
 /**
  * Subscribes to authentication state changes with a basic callback.
- *
- * @param {*} callback Callback function to handle auth state changes
- * @return {*} 
  */
 const subscribeToAuthChangesBasic = (callback) => {
   return onAuthStateChanged(auth, callback);
 };
 
-export { subscribeToAuthChangesOnLogin, signUpUser, signInUser, resetUserPassword, subscribeToAuthChangesBasic, subscribeToAuthChangesOnChatLoad };
+export {
+  subscribeToAuthChangesOnLogin,
+  signUpUser,
+  signInUser,
+  resetUserPassword,
+  subscribeToAuthChangesBasic,
+  subscribeToAuthChangesOnChatLoad
+};

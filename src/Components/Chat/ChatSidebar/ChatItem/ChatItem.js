@@ -34,7 +34,6 @@ const ChatItem = (props) => {
   const [profilePic, setProfilePic] = useState("");
 
 
-  // const me = props.chat.participants.find(p => p.email === props.email);
   const other = props.chat.participants.find(p => p.email !== props.email);
 
   const chatStatusDel = other?.deleteStatus || false;
