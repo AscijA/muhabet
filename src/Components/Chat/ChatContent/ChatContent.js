@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import styles from "./ChatContent.module.scss";
 
-import { updateChatByID } from "../../../store/chatSlice";
+import { setCurrentChat, updateChatByID } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
-import { handleChatStatus, updateChat } from "src/Helpers/UserUtils";
+import { updateChat } from 'src/Helpers/ChatUtils';
+import { handleChatStatus } from 'src/Helpers/ChatUtils';
 
 import CustomButton from '../../Common/Buttons/CustomButton';
 import MessageItem from '../MessageItem/MessageItem';
@@ -37,6 +38,71 @@ const ChatContent = () => {
 
   const [message, setMessage] = useState(initialMessage);
   const [buttonAction, setButtonAction] = useState("Send");
+
+  useEffect(() => {
+    if (!currentChatFull) return;
+    if (currentChatMeta?.chatId === currentChatFull.id &&
+        currentChatMeta?.messages !== currentChatFull.messages) {
+      dispatch(setCurrentChat({ ...currentChatMeta, messages: currentChatFull.messages }));
+    }
+  }, [
+    currentChatFull?.messages,
+    currentChatFull?.id,
+    currentChatMeta?.chatId,
+    currentChatMeta?.messages,
+    dispatch
+  ]);
+
+  const messagesRef = useRef(currentMessages);
+  const chatFullRef = useRef(currentChatFull);
+  const chatMetaRef = useRef(currentChatMeta);
+  const userRef = useRef(currentUser);
+
+  useEffect(() => { messagesRef.current = currentMessages; }, [currentMessages]);
+  useEffect(() => { chatFullRef.current = currentChatFull; }, [currentChatFull]);
+  useEffect(() => { chatMetaRef.current = currentChatMeta; }, [currentChatMeta]);
+  useEffect(() => { userRef.current = currentUser; }, [currentUser]);
+
+  const seenQueueRef = useRef(new Set());
+  const rafRef = useRef(0);
+
+  const flushSeenQueue = useCallback(() => {
+    rafRef.current = 0;
+    const ids = Array.from(seenQueueRef.current);
+    seenQueueRef.current.clear();
+    if (ids.length === 0) return;
+
+    const msgs = messagesRef.current;
+    const updated = msgs.map(m =>
+      (ids.includes(m.messageID) &&
+       m.ownerID !== userRef.current.uid &&
+       m.messageStatus !== MESSAGE_STATUS.SEEN)
+        ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
+        : m
+    );
+
+    let changed = false;
+    for (let i = 0; i < msgs.length; i++) { if (msgs[i] !== updated[i]) { changed = true; break; } }
+    if (!changed) return;
+
+    const cf = chatFullRef.current;
+    const cm = chatMetaRef.current;
+    if (!cf) return;
+
+    const newChat = { ...cf, messages: updated };
+    dispatch(updateChatByID(newChat));
+    dispatch(setCurrentChat({ ...cm, messages: updated }));
+
+    updateChat("messages", updated, cm.chatId)
+      .catch(err => console.error("Error marking messages as seen:", err));
+  }, [dispatch]);
+
+  const onVisibleSeen = useCallback((messageID) => {
+    seenQueueRef.current.add(messageID);
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(flushSeenQueue);
+    }
+  }, [flushSeenQueue]);
 
   const handleChangeMessage = (event) => {
     setMessage((state) => ({
@@ -71,6 +137,7 @@ const ChatContent = () => {
         messages: [...currentMessages, newMessage],
       };
       dispatch(updateChatByID(updatedChat));
+      dispatch(setCurrentChat({ ...currentChatMeta, messages: updatedChat.messages }));
     } 
 
     updateChat("messages", [...currentMessages, newMessage], currentChatMeta.chatId)
@@ -86,6 +153,9 @@ const ChatContent = () => {
     const updated = [...currentMessages, newMessage];
     if (currentChatFull) {
       dispatch(updateChatByID({ ...currentChatFull, messages: updated }));
+      dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
+      updateChat("messages", updated, currentChatMeta.chatId)
+        .catch((err) => console.error("Error updating messages:", err));
     }
     setButtonAction("Send");
   };
@@ -118,8 +188,8 @@ const ChatContent = () => {
       </div>
     );
 
-    if (me?.blockStatus) return ownBlock;     // you blocked them
-    if (other?.blockStatus) return otherBlock; // they blocked you
+    if (me?.blockStatus) return ownBlock;
+    if (other?.blockStatus) return otherBlock;
 
     return (
       <>
@@ -143,12 +213,36 @@ const ChatContent = () => {
     );
   };
 
-  // attach the ref to the scrollable element and auto-scroll on message changes
   useEffect(() => {
-    if (chatContentRef.current) {
-      chatContentRef.current.scrollTop = chatContentRef.current.scrollHeight;
-    }
-  }, [currentMessages.length]); // scroll when count changes
+    if (!currentChatFull) return;
+
+    const msgs = currentChatFull.messages || [];
+    const incomingUnseen = msgs.some(
+      m => m.ownerID !== currentUser.uid && m.messageStatus !== MESSAGE_STATUS.SEEN
+    );
+    if (!incomingUnseen) return;
+
+    const updated = msgs.map(m =>
+      (m.ownerID !== currentUser.uid && m.messageStatus !== MESSAGE_STATUS.SEEN)
+        ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
+        : m
+    );
+
+    let changed = false;
+    for (let i = 0; i < msgs.length; i++) if (msgs[i] !== updated[i]) { changed = true; break; }
+    if (!changed) return;
+
+    const newChat = { ...currentChatFull, messages: updated };
+    dispatch(updateChatByID(newChat));
+    dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
+    updateChat("messages", updated, currentChatMeta.chatId)
+      .catch(err => console.error("Error marking messages as seen:", err));
+  }, [currentChatFull, currentUser.uid, currentChatMeta, dispatch]);
+
+  useEffect(() => {
+    const el = chatContentRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [currentMessages.length]);
 
   return (
     <div className={styles.mainChatContainer}>
@@ -156,10 +250,13 @@ const ChatContent = () => {
         {currentMessages.map((m) => (
           <MessageItem
             key={m.messageID}
+            messageID={m.messageID}
             text={m.content}
-            timestamp={new Date(m.timestamp)}
+            timestampMs={m.timestamp}
             isOwnMessage={m.ownerID === currentUser.uid}
             deliveryStatus={m.messageStatus}
+            rootEl={chatContentRef.current}
+            onVisibleSeen={onVisibleSeen}
           />
         ))}
       </div>

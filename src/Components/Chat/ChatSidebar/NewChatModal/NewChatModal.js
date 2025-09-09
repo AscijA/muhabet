@@ -4,7 +4,8 @@ import styles from "./NewChatModal.module.scss";
 import { useDispatch, useSelector } from 'react-redux';
 import SettingsItem from 'src/Components/Common/SettingsItem/SettingsItem';
 import CustomInput from 'src/Components/Common/CustomInput/CustomInput';
-import { createChat, getUidFromEmail } from 'src/Helpers/UserUtils';
+import { getUidFromEmail } from 'src/Helpers/UserUtils';
+import { createChat } from 'src/Helpers/ChatUtils';
 import { setCurrentChat, updateChatByID } from 'src/store/chatSlice';
 
 /**
@@ -46,7 +47,7 @@ const NewChatModal = (props) => {
     // Build new schema fields
     const participants = [
       { userID: currentUser.uid, email: currentUser.email, blockStatus: false, deleteStatus: false },
-      { userID: user2UID,        email: newEmail,          blockStatus: false, deleteStatus: false },
+      { userID: user2UID, email: newEmail, blockStatus: false, deleteStatus: false },
     ];
     const participantIDs = participants.map(p => p.userID);
 
@@ -63,22 +64,19 @@ const NewChatModal = (props) => {
       if (Array.isArray(c?.participantIDs)) {
         // Fast path if the array exists
         return participantIDs.every(id => c.participantIDs.includes(id))
-               && c.participantIDs.length === participantIDs.length;
+          && c.participantIDs.length === participantIDs.length;
       }
-      // Fallback if participantIDs not present locally yet (e.g., pending migration)
       if (Array.isArray(c?.participants)) {
         const ids = c.participants.map(p => p.userID);
         return participantIDs.every(id => ids.includes(id))
-               && ids.length === participantIDs.length;
+          && ids.length === participantIDs.length;
       }
       return false;
     });
 
     if (!existingChat) {
-      // Create on Firestore
       const newChatId = await createChat(chatData);
 
-      // Construct a local chat object for the store
       const newChat = {
         id: newChatId,
         chatId: newChatId,
@@ -89,7 +87,6 @@ const NewChatModal = (props) => {
       dispatch(updateChatByID(newChat));
       chatToCurrentChat(newChat);
     } else {
-      // If it exists, "undelete" for both users (matches old behavior resetting user1Del/user2Del)
       const restoredParticipants = existingChat.participants?.map(p => ({
         ...p,
         deleteStatus: false,
@@ -101,18 +98,15 @@ const NewChatModal = (props) => {
         participantIDs: existingChat.participantIDs || participantIDs,
       };
 
-      // Update Redux (persist to Firestore elsewhere if desired)
       dispatch(updateChatByID(merged));
       chatToCurrentChat(merged);
     }
 
-    // Close modal and reset input
     props.handleToggleModal();
     setNewEmail("");
   };
 
   const chatToCurrentChat = (chatToCon) => {
-    // Find the "other" participant
     const other = Array.isArray(chatToCon.participants)
       ? chatToCon.participants.find(p => p.userID !== currentUser.uid)
       : null;
@@ -126,8 +120,6 @@ const NewChatModal = (props) => {
         uid: other?.userID || "",
       },
       messages: chatToCon.messages || [],
-      // If your UI still reads chatStatus, you can derive it here if needed,
-      // but ideally migrate UI to read from participants[] instead.
     };
 
     dispatch(setCurrentChat(currentChat));
@@ -138,23 +130,23 @@ const NewChatModal = (props) => {
   };
 
   return (
-    <div className={styles.outerContainer}>
-      <div className={styles.inputContainer}>
-        <form onSubmit={(e) => { e.preventDefault(); confirmCreateChat(); }}>
+    <div className={ styles.outerContainer }>
+      <div className={ styles.inputContainer }>
+        <form onSubmit={ (e) => { e.preventDefault(); confirmCreateChat(); } }>
           <CustomInput
             label="Email address"
             inputType="email"
-            stateElement={newEmail}
-            stateElementChangeHandler={handleInputChange}
+            stateElement={ newEmail }
+            stateElementChangeHandler={ handleInputChange }
           />
         </form>
       </div>
 
-      {showError && <div className={styles.errorMessage}>{errorMessage}</div>}
+      { showError && <div className={ styles.errorMessage }>{ errorMessage }</div> }
 
-      <div className={styles.buttonsContainer}>
-        <SettingsItem title="Confirm" onClick={confirmCreateChat} />
-        <SettingsItem title="Cancel" onClick={props.handleToggleModal} color="red" />
+      <div className={ styles.buttonsContainer }>
+        <SettingsItem title="Confirm" onClick={ confirmCreateChat } />
+        <SettingsItem title="Cancel" onClick={ props.handleToggleModal } color="red" />
       </div>
     </div>
   );

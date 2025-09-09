@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { MESSAGE_STATUS } from 'src/Helpers/Constants';
 
 const initialState = {
   uid: "",
@@ -14,91 +15,150 @@ const initialState = {
       email: "",
       uid: ""
     },
-    messages: [{}]
+    messages: []
   },
   allChats: [],
+};
+
+const lastMessageTs = (chat) => {
+  const msgs = chat?.messages || [];
+  const last = msgs[msgs.length - 1];
+  return last?.timestamp ?? 0;
+};
+
+const activityKey = (chat) => {
+  return lastMessageTs(chat) || chat?.createdAt || 0;
+};
+
+const compareChatsDesc = (a, b) => {
+  const ka = activityKey(a);
+  const kb = activityKey(b);
+  if (ka !== kb) return kb - ka;
+  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
 };
 
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    // Replace entire state
     setState: (state, action) => action.payload,
 
-    // Update a top-level key
     updateState: (state, action) => {
       const { key, value } = action.payload;
       return { ...state, [key]: value };
     },
 
-    // Set the uid
     setUid: (state, action) => ({ ...state, uid: action.payload }),
 
-    // UI toggles
     toggleShowChatInfo: (state) => ({ ...state, showChatInfo: !state.showChatInfo }),
     setShowDefaultImage: (state, action) => ({ ...state, showDefaultImage: action.payload }),
     setShowContactDefaultImage: (state, action) => ({ ...state, showContactDefaultImage: action.payload }),
     setShowNewChatModal: (state, action) => ({ ...state, showNewChatModal: action.payload }),
 
-    // Current chat
     setCurrentChat: (state, action) => ({ ...state, currentChat: action.payload }),
+
     updateCurrentChat: (state, action) => {
       const { key, value } = action.payload;
       return { ...state, currentChat: { ...state.currentChat, [key]: value } };
     },
 
-    // Chats collection
-    setAllChats: (state, action) => ({ ...state, allChats: action.payload }),
-    updateAllChats: (state, action) => ({ ...state, allChats: [...state.allChats, action.payload] }),
+    setAllChats: (state, action) => {
+      const list = Array.isArray(action.payload) ? action.payload.slice() : [];
+      list.sort(compareChatsDesc);
+      return { ...state, allChats: list };
+    },
 
-    // Upsert a chat (by id)
+    updateAllChats: (state, action) => {
+      const next = [...state.allChats, action.payload];
+      next.sort(compareChatsDesc);
+      return { ...state, allChats: next };
+    },
+
     updateChatByID: (state, action) => {
-      const updatedChat = action.payload;
-      const idx = state.allChats.findIndex(c => c.id === updatedChat.id);
-      if (idx !== -1) state.allChats[idx] = updatedChat;
-      else state.allChats.push(updatedChat);
+      const incoming = action.payload;
+      const idx = state.allChats.findIndex(c => c.id === incoming.id);
+      if (idx === -1) {
+        state.allChats.push(incoming);
+        state.allChats.sort(compareChatsDesc);
+      } else {
+        const prev = state.allChats[idx];
+        const prevKey = activityKey(prev);
+        const nextKey = activityKey(incoming);
+        state.allChats[idx] = incoming;
+        if (prevKey !== nextKey) {
+          state.allChats.sort(compareChatsDesc);
+        }
+      }
+      if (state.currentChat?.chatId === incoming.id) {
+        const merged = {
+          ...state.currentChat,
+          ...(['participants', 'messages', 'contact'].reduce((acc, k) => {
+            if (k in incoming) acc[k] = incoming[k];
+            return acc;
+          }, {})),
+        };
+        state.currentChat = merged;
+      }
     },
 
     addMessageToCurrentChat: (state, action) => {
       const newMessage = action.payload;
-      state.currentChat.messages.push(newMessage);
+      state.currentChat = {
+        ...state.currentChat,
+        messages: [...(state.currentChat.messages || []), newMessage],
+      };
       const idx = state.allChats.findIndex(c => c.id === state.currentChat.chatId);
-      if (idx !== -1) state.allChats[idx].messages.push(newMessage);
+      if (idx !== -1) {
+        const updated = {
+          ...state.allChats[idx],
+          messages: [...(state.allChats[idx].messages || []), newMessage],
+        };
+        state.allChats[idx] = updated;
+        state.allChats.sort(compareChatsDesc);
+      }
     },
 
-    // ✅ NEW: remove a chat by id (for docChanges 'removed')
     removeChatByID: (state, action) => {
       const id = action.payload;
       state.allChats = state.allChats.filter(c => c.id !== id);
+      if (state.currentChat?.chatId === id) {
+        state.currentChat = { ...initialState.currentChat };
+      }
     },
 
-    // ✅ NEW: upsert a chat and keep allChats sorted by lastModified desc
     upsertChatSorted: (state, action) => {
-      const chat = action.payload;
-      const idx = state.allChats.findIndex(c => c.id === chat.id);
-      if (idx !== -1) state.allChats[idx] = chat;
-      else state.allChats.push(chat);
-
-      const getMillis = (lm) => {
-        if (!lm) return 0;
-        if (typeof lm.toMillis === 'function') return lm.toMillis(); // Firestore Timestamp
-        if (lm instanceof Date) return lm.getTime();
-        if (typeof lm === 'number') return lm;
-        const t = Date.parse(lm); // ISO string
-        return Number.isNaN(t) ? 0 : t;
-        // If you have a convertTimestamps step earlier, this stays robust.
-      };
-
-      state.allChats.sort((a, b) => getMillis(b.lastModified) - getMillis(a.lastModified));
+      const incoming = action.payload;
+      const idx = state.allChats.findIndex(c => c.id === incoming.id);
+      if (idx === -1) {
+        state.allChats.push(incoming);
+        state.allChats.sort(compareChatsDesc);
+      } else {
+        const prev = state.allChats[idx];
+        const prevKey = activityKey(prev);
+        const nextKey = activityKey(incoming);
+        state.allChats[idx] = incoming;
+        if (prevKey !== nextKey) {
+          state.allChats.sort(compareChatsDesc);
+        }
+      }
+      if (state.currentChat?.chatId === incoming.id) {
+        const merged = {
+          ...state.currentChat,
+          ...(['participants', 'messages', 'contact'].reduce((acc, k) => {
+            if (k in incoming) acc[k] = incoming[k];
+            return acc;
+          }, {})),
+        };
+        state.currentChat = merged;
+      }
     },
 
-    // ✅ Optional helpers if you want to toggle flags locally:
     updateChatParticipantsById: (state, action) => {
       const { chatId, participants } = action.payload;
       const idx = state.allChats.findIndex(c => c.id === chatId);
       if (idx !== -1) {
-        state.allChats[idx] = { ...state.allChats[idx], participants };
+        const incoming = { ...state.allChats[idx], participants };
+        state.allChats[idx] = incoming;
       }
       if (state.currentChat.chatId === chatId) {
         state.currentChat = { ...state.currentChat, participants };
@@ -106,7 +166,7 @@ const chatSlice = createSlice({
     },
 
     toggleParticipantFlag: (state, action) => {
-      const { chatId, userId, field, value } = action.payload; // 'blockStatus' | 'deleteStatus'
+      const { chatId, userId, field, value } = action.payload;
       const apply = (list) =>
         list?.map(p => (p.userID === userId ? { ...p, [field]: typeof value === 'boolean' ? value : !p[field] } : p));
 
@@ -122,7 +182,6 @@ const chatSlice = createSlice({
       }
     },
 
-    // Contact update
     updateContact: (state, action) => ({
       ...state,
       currentChat: {
@@ -131,7 +190,6 @@ const chatSlice = createSlice({
       },
     }),
 
-    // Reset
     resetChatState: () => initialState,
   },
 });
@@ -152,8 +210,6 @@ export const {
   setShowContactDefaultImage,
   setShowNewChatModal,
   setShowDefaultImage,
-
-  // new
   upsertChatSorted,
   removeChatByID,
   updateChatParticipantsById,

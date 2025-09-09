@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { toggleShowChatInfo, updateContact, setShowContactDefaultImage, setCurrentChat } from '../../store/chatSlice';
 import { subscribeToAuthChangesBasic } from 'src/Helpers/AuthUtils';
 import { fetchContactProfile } from 'src/Helpers/ContactUtils';
-import { handleChatStatus } from "src/Helpers/UserUtils";
+import { handleChatStatus } from 'src/Helpers/ChatUtils';
 
 import userIcon from "../../assets/user.svg";
 
