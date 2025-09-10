@@ -37,7 +37,6 @@ const ChatItem = (props) => {
   );
   const chatDeletedByOther = other?.deleteStatus || false;
 
-  // --- Derived info from messages ---
   const {
     lastMessage,
     lastOutgoingStatus,
@@ -49,14 +48,12 @@ const ChatItem = (props) => {
 
     const last = messages.length ? messages[messages.length - 1] : null;
 
-    // unread = incoming (from contact) not SEEN
     let unread = 0;
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i];
       if (m.ownerID === contactUID && m.messageStatus !== MESSAGE_STATUS.SEEN) unread++;
     }
 
-    // delivery icon = apply only to my last message
     let lastOutStatus = null;
     if (last && last.ownerID !== contactUID) {
       lastOutStatus = last.messageStatus || null;
@@ -142,7 +139,7 @@ const ChatItem = (props) => {
         </div>
 
         <div className={styles.chatItemMostRecentMessageSeen}>
-          <div>{lastMessage?.content ?? ""}</div>
+          <div>{lastMessage?.content && lastMessage?.content !== "*This message was deleted*" ? lastMessage?.content : <em>*This message was deleted*</em>}</div>
           <div className={styles.chatItemNumberOfUnreadMessages}>
             {unreadCountIncoming > 0 && <div>{unreadCountIncoming}</div>}
           </div>
@@ -153,7 +150,6 @@ const ChatItem = (props) => {
 };
 
 function areEqual(prev, next) {
-  // Keep it efficient but reactive to last message + unread count changes
   const prevMsgs = prev.chat.messages || [];
   const nextMsgs = next.chat.messages || [];
 

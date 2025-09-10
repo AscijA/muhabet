@@ -5,7 +5,7 @@ import styles from "./ChatContent.module.scss";
 
 import { setCurrentChat, updateChatByID } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
-import { updateChat } from 'src/Helpers/ChatUtils';
+import { updateChat, updateChatNoModify } from 'src/Helpers/ChatUtils';
 import { handleChatStatus } from 'src/Helpers/ChatUtils';
 
 import CustomButton from '../../Common/Buttons/CustomButton';
@@ -42,7 +42,7 @@ const ChatContent = () => {
   useEffect(() => {
     if (!currentChatFull) return;
     if (currentChatMeta?.chatId === currentChatFull.id &&
-        currentChatMeta?.messages !== currentChatFull.messages) {
+      currentChatMeta?.messages !== currentChatFull.messages) {
       dispatch(setCurrentChat({ ...currentChatMeta, messages: currentChatFull.messages }));
     }
   }, [
@@ -75,8 +75,8 @@ const ChatContent = () => {
     const msgs = messagesRef.current;
     const updated = msgs.map(m =>
       (ids.includes(m.messageID) &&
-       m.ownerID !== userRef.current.uid &&
-       m.messageStatus !== MESSAGE_STATUS.SEEN)
+        m.ownerID !== userRef.current.uid &&
+        m.messageStatus !== MESSAGE_STATUS.SEEN )
         ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
         : m
     );
@@ -126,7 +126,7 @@ const ChatContent = () => {
       ownerID: currentUser.uid,
       messageStatus: MESSAGE_STATUS.SENT,
       timestamp: Date.now(),
-      messageID: `${Date.now()}_${currentUser.uid}`, 
+      messageID: `${Date.now()}_${currentUser.uid}`,
     };
 
     setMessage(initialMessage);
@@ -138,7 +138,7 @@ const ChatContent = () => {
       };
       dispatch(updateChatByID(updatedChat));
       dispatch(setCurrentChat({ ...currentChatMeta, messages: updatedChat.messages }));
-    } 
+    }
 
     updateChat("messages", [...currentMessages, newMessage], currentChatMeta.chatId)
       .catch((err) => console.error("Error updating messages:", err));
@@ -150,14 +150,32 @@ const ChatContent = () => {
     const newMessage = { ...message };
     setMessage(initialMessage);
 
-    const updated = [...currentMessages, newMessage];
+    const updated = currentMessages.map(msg =>
+      msg.messageID === newMessage.messageID ? { ...msg, ...newMessage } : msg
+    );
+
     if (currentChatFull) {
       dispatch(updateChatByID({ ...currentChatFull, messages: updated }));
       dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
-      updateChat("messages", updated, currentChatMeta.chatId)
+      updateChatNoModify("messages", updated, currentChatMeta.chatId)
         .catch((err) => console.error("Error updating messages:", err));
     }
     setButtonAction("Send");
+  };
+
+  const handleDeleteMessage = (messageID) => {
+    if (!messageID) return;
+
+    const updated = currentMessages.map(msg =>
+      msg.messageID === messageID ? { ...msg, content: "" } : msg
+    );
+
+    if (currentChatFull) {
+      dispatch(updateChatByID({ ...currentChatFull, messages: updated }));
+      dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
+      updateChatNoModify("messages", updated, currentChatMeta.chatId)
+        .catch((err) => console.error("Error updating messages:", err));
+    }
   };
 
   const renderMessageBox = () => {
@@ -168,22 +186,22 @@ const ChatContent = () => {
 
     const ownBlock = (
       <>
-        <div className={`${styles.inputContainer} ${styles.ownBlock}`}>
+        <div className={ `${styles.inputContainer} ${styles.ownBlock}` }>
           <div>You have blocked this user. To send a message, please Unblock them.</div>
         </div>
-        <div className={styles.buttonContainer}>
+        <div className={ styles.buttonContainer }>
           <CustomButton
             buttonText="Unblock"
             buttonSize="sm"
             buttonType="filled"
-            handleSubmit={() => { handleChatStatus("block", chatState, currentUser, dispatch); }}
+            handleSubmit={ () => { handleChatStatus("block", chatState, currentUser, dispatch); } }
           />
         </div>
       </>
     );
 
     const otherBlock = (
-      <div className={`${styles.inputContainer} ${styles.otherBlock}`}>
+      <div className={ `${styles.inputContainer} ${styles.otherBlock}` }>
         <div>You have been blocked by this user. You cannot send any messages.</div>
       </div>
     );
@@ -193,20 +211,20 @@ const ChatContent = () => {
 
     return (
       <>
-        <div className={styles.inputContainer}>
+        <div className={ styles.inputContainer }>
           <textarea
             placeholder="Type a message"
-            value={message.content}
-            onChange={handleChangeMessage}
-            onKeyDown={handleEnter}
+            value={ message.content }
+            onChange={ handleChangeMessage }
+            onKeyDown={ handleEnter }
           />
         </div>
-        <div className={styles.buttonContainer}>
+        <div className={ styles.buttonContainer }>
           <CustomButton
-            buttonText={buttonAction}
+            buttonText={ buttonAction }
             buttonSize="sm"
             buttonType=""
-            handleSubmit={buttonAction === "Send" ? handleSendMessage : handleEditMessage}
+            handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage }
           />
         </div>
       </>
@@ -245,23 +263,26 @@ const ChatContent = () => {
   }, [currentMessages.length]);
 
   return (
-    <div className={styles.mainChatContainer}>
-      <div className={styles.chatContent} ref={chatContentRef}>
-        {currentMessages.map((m) => (
+    <div className={ styles.mainChatContainer }>
+      <div className={ styles.chatContent } ref={ chatContentRef }>
+        { currentMessages.map((m) => (
           <MessageItem
-            key={m.messageID}
-            messageID={m.messageID}
-            text={m.content}
-            timestampMs={m.timestamp}
-            isOwnMessage={m.ownerID === currentUser.uid}
-            deliveryStatus={m.messageStatus}
-            rootEl={chatContentRef.current}
-            onVisibleSeen={onVisibleSeen}
+            key={ m.messageID }
+            messageID={ m.messageID }
+            text={ m.content }
+            timestampMs={ m.timestamp }
+            isOwnMessage={ m.ownerID === currentUser.uid }
+            deliveryStatus={ m.messageStatus }
+            rootEl={ chatContentRef.current }
+            onVisibleSeen={ onVisibleSeen }
+            setMessage={ setMessage }
+            setButtonAction={ setButtonAction }
+            handleDeleteMessage={ handleDeleteMessage }
           />
-        ))}
+        )) }
       </div>
-      <div className={styles.messageBoxContainer}>
-        {renderMessageBox()}
+      <div className={ styles.messageBoxContainer }>
+        { renderMessageBox() }
       </div>
     </div>
   );

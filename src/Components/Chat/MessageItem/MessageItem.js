@@ -23,6 +23,9 @@ const MessageItem = ({
   messageID,
   rootEl,
   onVisibleSeen,
+  setMessage,
+  setButtonAction,
+  handleDeleteMessage
 }) => {
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [renderUpwards, setRenderUpwards] = useState(false);
@@ -119,40 +122,54 @@ const MessageItem = ({
     return () => { cancelAnimationFrame(raf); io.disconnect(); };
   }, [isOwnMessage, deliveryStatus, onVisibleSeen, messageID, rootEl]);
 
+  const handleEditClick = () => {
+    setShowMessageMenu(false);
+    setButtonAction("Edit");
+    setMessage({ content: text, messageID: messageID });
+  };
+
+  const handleDeleteClick = () => {
+    setShowMessageMenu(false);
+    handleDeleteMessage(messageID);
+  };
+
   return (
-    <div ref={messageRef} className={messageType} onContextMenu={toggleMenu}>
+    <div ref={ messageRef } className={ messageType } onContextMenu={ toggleMenu }>
       <div>
-        <div className={styles.messageContent}>{text}</div>
+        <div className={ styles.messageContent }>
+          { text ? text : <em>*This message was deleted*</em> }
+        </div>
 
-        <div className={styles.messageTimestamp}>
-          {timeText}
+        <div className={ styles.messageTimestamp }>
+          { timeText }
 
-          {isOwnMessage && (
-            <div className={styles.icons}>
-              {deliveryStatus === MESSAGE_STATUS.SENT && <img src={sentIcon} alt="Delivery Status: Sent" />}
-              {deliveryStatus === MESSAGE_STATUS.DELIVERED && <img src={delivered} alt="Delivery Status: Delivered" />}
-              {deliveryStatus === MESSAGE_STATUS.SEEN && <img src={seen} alt="Delivery Status: Seen" />}
+          { isOwnMessage && (
+            <div className={ styles.icons }>
+              { deliveryStatus === MESSAGE_STATUS.SENT && <img src={ sentIcon } alt="Delivery Status: Sent" /> }
+              { deliveryStatus === MESSAGE_STATUS.DELIVERED && <img src={ delivered } alt="Delivery Status: Delivered" /> }
+              { deliveryStatus === MESSAGE_STATUS.SEEN && <img src={ seen } alt="Delivery Status: Seen" /> }
+              {}
             </div>
-          )}
+          ) }
         </div>
       </div>
 
-      {isOwnMessage && (
-        <div className={styles.dotMenu} onClick={toggleMenu} aria-haspopup="menu" aria-expanded={showMessageMenu}>
+      { isOwnMessage && (
+        <div className={ styles.dotMenu } onClick={ toggleMenu } aria-haspopup="menu" aria-expanded={ showMessageMenu }>
           &#8942;
         </div>
-      )}
+      ) }
 
-      {showMessageMenu && (
+      { showMessageMenu && (
         <div
-          ref={menuRef}
-          className={`${styles.customMenu} ${renderUpwards ? styles.upwards : ""}`}
+          ref={ menuRef }
+          className={ `${styles.customMenu} ${renderUpwards ? styles.upwards : ""}` }
           role="menu"
         >
-          <div className={styles.menuItem} role="menuitem">Edit</div>
-          <div className={styles.menuItem} role="menuitem">Delete</div>
+          <div className={ styles.menuItem } role="menuitem" onClick={ handleEditClick }>Edit</div>
+          <div className={ styles.menuItem } role="menuitem" onClick={ handleDeleteClick }>Delete</div>
         </div>
-      )}
+      ) }
     </div>
   );
 };
