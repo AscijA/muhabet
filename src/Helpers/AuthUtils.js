@@ -51,9 +51,6 @@ const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
         dispatch(setShowDefaultImage(false));
         await getImageFromFirebaseAndSaveToIDB(user.uid, url);
       } catch (error) {
-        // 404 is normal if the user never uploaded an image
-        // Only show default if we didn't already set one from IDB above
-        // If you want to force default: dispatch(setShowDefaultImage(true));
       }
 
       // Start realtime chat subscription; mark loading false on first snapshot

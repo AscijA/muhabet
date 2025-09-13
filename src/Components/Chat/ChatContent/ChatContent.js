@@ -34,7 +34,7 @@ const ChatContent = () => {
     [allChats, currentChatMeta.chatId]
   );
 
-  const currentMessages = currentChatFull?.messages || [];
+  const currentMessages = currentChatFull?.messages ;
 
   const [message, setMessage] = useState(initialMessage);
   const [buttonAction, setButtonAction] = useState("Send");

@@ -25,17 +25,16 @@ const ContactInfoModal = (props) => {
     () => allChats.find(c => c.id === currentChat.chatId),
     [allChats, currentChat.chatId]
   );
-
-  const other = chatFull?.participants?.find(p => p.userID !== currentUser.uid) ?? null;
+  const me = chatFull?.participants?.find(p => p.userID === currentUser.uid) ?? null;
 
   const displayOtherEmail = currentChat?.contact?.email ?? "";
   const displayPic = showContact
     ? userIcon
     : (currentChat?.contact?.profilePic || userIcon);
 
-  const chatStatusBlock = other?.blockStatus ?? false;
+  const chatStatusBlock = me?.blockStatus ?? false;
 
-  const blockButtonText   = chatStatusBlock ? "Unblock User" : "Block User";
+  const blockButtonText = chatStatusBlock ? "Unblock User" : "Block User";
   const confirmBlockTitle = chatStatusBlock
     ? "Are you sure you want to unblock this user?"
     : "Are you sure you want to block this user?";
@@ -49,23 +48,23 @@ const ContactInfoModal = (props) => {
 
   return (
     <>
-      <div className={styles.contactInfo}>
-        <div className={showContact ? styles.contactPicBG : styles.contactPic}>
-          <img className={styles.contactPicImg} src={displayPic} alt="Profile" />
+      <div className={ styles.contactInfo }>
+        <div className={ showContact ? styles.contactPicBG : styles.contactPic }>
+          <img className={ styles.contactPicImg } src={ displayPic } alt="Profile" />
         </div>
 
-        <div className={styles.email}>
-          {displayOtherEmail}
+        <div className={ styles.email }>
+          { displayOtherEmail }
         </div>
 
-        <SettingsItem title="Delete Chat" onClick={handleShowConfirmationWindowDeleteChat} />
-        <SettingsItem title={blockButtonText} onClick={handleShowConfirmationWindowBlockUser} />
+        <SettingsItem title="Delete Chat" onClick={ handleShowConfirmationWindowDeleteChat } />
+        <SettingsItem title={ blockButtonText } onClick={ handleShowConfirmationWindowBlockUser } />
       </div>
 
-      {showConfirmWindowDeleteChat && (
+      { showConfirmWindowDeleteChat && (
         <ConfirmationWindow
           text="Are you sure you want to delete this chat? This action cannot be undone."
-          buttons={[
+          buttons={ [
             {
               text: "Yes",
               onClick: () => {
@@ -74,15 +73,15 @@ const ContactInfoModal = (props) => {
               },
             },
             { text: "No", onClick: handleShowConfirmationWindowDeleteChat },
-          ]}
-          handleToggleModal={handleShowConfirmationWindowDeleteChat}
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowDeleteChat }
         />
-      )}
+      ) }
 
-      {showConfirmWindowBlockUser && (
+      { showConfirmWindowBlockUser && (
         <ConfirmationWindow
-          text={confirmBlockTitle}
-          buttons={[
+          text={ confirmBlockTitle }
+          buttons={ [
             {
               text: "Yes",
               onClick: () => {
@@ -91,10 +90,10 @@ const ContactInfoModal = (props) => {
               },
             },
             { text: "No", onClick: handleShowConfirmationWindowBlockUser },
-          ]}
-          handleToggleModal={handleShowConfirmationWindowBlockUser}
+          ] }
+          handleToggleModal={ handleShowConfirmationWindowBlockUser }
         />
-      )}
+      ) }
     </>
   );
 };

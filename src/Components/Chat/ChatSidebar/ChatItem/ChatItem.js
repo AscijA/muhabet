@@ -9,10 +9,9 @@ import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
 
 import { fetchProfilePicture, fetchAndUpdateContactProfile } from "../../../../Helpers/ContactUtils";
-import { updateContact, setCurrentChat, updateChatByID } from "../../../../store/chatSlice";
+import { updateContact, setCurrentChat } from "../../../../store/chatSlice";
 import { subscribeToAuthChangesBasic } from "src/Helpers/AuthUtils";
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
-import { updateChatNoModify } from 'src/Helpers/ChatUtils';
 
 /**
  * Sidebar chat item
@@ -87,7 +86,7 @@ const ChatItem = (props) => {
 
   const handleChatItemOnClick = () => {
     const messages = props.chat.messages || [];
-   
+
     const currentChat = {
       chatId: props.chat.id,
       lastSeen: "",
@@ -117,31 +116,31 @@ const ChatItem = (props) => {
   if (chatDeletedByOther) return null;
 
   return (
-    <div className={containerStyle} onClick={handleChatItemOnClick}>
-      <div className={showUser ? styles.contactPicBG : styles.contactPic}>
-        <img className={styles.contactPicImg} src={showUser ? profilePic : userIcon} alt="Profile" />
+    <div className={ containerStyle } onClick={ handleChatItemOnClick }>
+      <div className={ showUser ? styles.contactPicBG : styles.contactPic }>
+        <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />
       </div>
 
-      <div className={styles.chatInfo}>
-        <div className={styles.chatItemProfile}>
-          <div className={styles.chatTitle}>
-            <div>{props.email}</div>
+      <div className={ styles.chatInfo }>
+        <div className={ styles.chatItemProfile }>
+          <div className={ styles.chatTitle }>
+            <div>{ props.email }</div>
 
-            <div className={styles.statusAndTime}>
-              <div className={styles.icons}>
-                {lastOutgoingStatus === MESSAGE_STATUS.SENT && <img src={sentIcon} alt="Delivery Status: Sent" />}
-                {lastOutgoingStatus === MESSAGE_STATUS.DELIVERED && <img src={delivered} alt="Delivery Status: Delivered" />}
-                {lastOutgoingStatus === MESSAGE_STATUS.SEEN && <img src={seen} alt="Delivery Status: Seen" />}
+            <div className={ styles.statusAndTime }>
+              <div className={ styles.icons }>
+                { lastOutgoingStatus === MESSAGE_STATUS.SENT && <img src={ sentIcon } alt="Delivery Status: Sent" /> }
+                { lastOutgoingStatus === MESSAGE_STATUS.DELIVERED && <img src={ delivered } alt="Delivery Status: Delivered" /> }
+                { lastOutgoingStatus === MESSAGE_STATUS.SEEN && <img src={ seen } alt="Delivery Status: Seen" /> }
               </div>
-              <div>{convertTimestamp(lastTimestamp)}</div>
+              <div>{ convertTimestamp(lastTimestamp) }</div>
             </div>
           </div>
         </div>
 
-        <div className={styles.chatItemMostRecentMessageSeen}>
-          <div>{lastMessage?.content && lastMessage?.content !== "*This message was deleted*" ? lastMessage?.content : <em>*This message was deleted*</em>}</div>
-          <div className={styles.chatItemNumberOfUnreadMessages}>
-            {unreadCountIncoming > 0 && <div>{unreadCountIncoming}</div>}
+        <div className={ styles.chatItemMostRecentMessageSeen }>
+          <div>{ lastMessage?.content && lastMessage?.content !== "*This message was deleted*" ? lastMessage?.content : <em>*This message was deleted*</em> }</div>
+          <div className={ styles.chatItemNumberOfUnreadMessages }>
+            { unreadCountIncoming > 0 && <div>{ unreadCountIncoming }</div> }
           </div>
         </div>
       </div>
