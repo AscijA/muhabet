@@ -46,10 +46,8 @@ const ChatContent = () => {
       dispatch(setCurrentChat({ ...currentChatMeta, messages: currentChatFull.messages }));
     }
   }, [
-    currentChatFull?.messages,
-    currentChatFull?.id,
-    currentChatMeta?.chatId,
-    currentChatMeta?.messages,
+    currentChatFull,
+    currentChatMeta,
     dispatch
   ]);
 
