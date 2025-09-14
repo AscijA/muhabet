@@ -34,10 +34,11 @@ const ChatContent = () => {
     [allChats, currentChatMeta.chatId]
   );
 
-  const currentMessages = currentChatFull?.messages ;
+  const currentMessages = currentChatFull?.messages;
 
   const [message, setMessage] = useState(initialMessage);
   const [buttonAction, setButtonAction] = useState("Send");
+  const [replyEditId, setReplyEditId] = useState(null);
 
   useEffect(() => {
     if (!currentChatFull) return;
@@ -74,7 +75,7 @@ const ChatContent = () => {
     const updated = msgs.map(m =>
       (ids.includes(m.messageID) &&
         m.ownerID !== userRef.current.uid &&
-        m.messageStatus !== MESSAGE_STATUS.SEEN )
+        m.messageStatus !== MESSAGE_STATUS.SEEN)
         ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
         : m
     );
@@ -125,6 +126,7 @@ const ChatContent = () => {
       messageStatus: MESSAGE_STATUS.SENT,
       timestamp: Date.now(),
       messageID: `${Date.now()}_${currentUser.uid}`,
+      replyTo: replyEditId || null,
     };
 
     setMessage(initialMessage);
@@ -176,6 +178,18 @@ const ChatContent = () => {
     }
   };
 
+  const handleReplyMessage = (messageID) => {
+    if (!message.content.trim() || !messageID) return;
+    cancelReply();
+    handleSendMessage();
+  };
+
+  const cancelReply = () => {
+    setReplyEditId(null);
+    setButtonAction("Send");
+    if (message.messageID) { setMessage(initialMessage); }
+  };
+
   const renderMessageBox = () => {
     if (!currentChatFull) return null;
 
@@ -207,9 +221,23 @@ const ChatContent = () => {
     if (me?.blockStatus) return ownBlock;
     if (other?.blockStatus) return otherBlock;
 
+    let replyEditContent = null;
+    if (replyEditId) {
+      replyEditContent = currentMessages.find(m => m.messageID === replyEditId)?.content || "*This message was deleted*";
+      if (replyEditContent.length > 100) { replyEditContent = replyEditContent.substring(0, 100) + "..."; }
+    }
+
     return (
       <>
         <div className={ styles.inputContainer }>
+          { replyEditId && (
+            <div className={ styles.replyInfo }>
+              <span>{ replyEditContent }</span>
+              <span className={ styles.cancelReply } onClick={ cancelReply }>
+                &times;
+              </span>
+            </div>
+          ) }
           <textarea
             placeholder="Type a message"
             value={ message.content }
@@ -222,7 +250,9 @@ const ChatContent = () => {
             buttonText={ buttonAction }
             buttonSize="sm"
             buttonType=""
-            handleSubmit={ buttonAction === "Send" ? handleSendMessage : handleEditMessage }
+            handleSubmit={ buttonAction === "Send" ? handleSendMessage
+              : buttonAction === "Edit" ? handleEditMessage
+                : handleReplyMessage }
           />
         </div>
       </>
@@ -276,6 +306,13 @@ const ChatContent = () => {
             setMessage={ setMessage }
             setButtonAction={ setButtonAction }
             handleDeleteMessage={ handleDeleteMessage }
+            setReplyEdit={ setReplyEditId }
+            replyTo={ m.replyTo ?
+              {
+                content: (currentChatFull.messages.find(msg => msg.messageID === m.replyTo)?.content || "*This message was deleted*"),
+                replyOwner: (currentChatFull.messages.find(msg => msg.messageID === m.replyTo)?.ownerID === currentUser.uid ? "You: " : "Friend: ")
+              }
+              : null }
           />
         )) }
       </div>

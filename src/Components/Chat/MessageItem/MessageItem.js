@@ -25,7 +25,9 @@ const MessageItem = ({
   onVisibleSeen,
   setMessage,
   setButtonAction,
-  handleDeleteMessage
+  handleDeleteMessage,
+  setReplyEdit,
+  replyTo
 }) => {
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [renderUpwards, setRenderUpwards] = useState(false);
@@ -36,10 +38,8 @@ const MessageItem = ({
   const messageType = `${styles.message} ${isOwnMessage ? styles.ownMessage : styles.otherMessage}`;
 
   const toggleMenu = (event) => {
-    if (isOwnMessage) {
-      event.preventDefault();
-      setShowMessageMenu((prev) => !prev);
-    }
+    event.preventDefault();
+    setShowMessageMenu((prev) => !prev);
   };
 
   const closeMenu = (event) => {
@@ -126,6 +126,7 @@ const MessageItem = ({
     setShowMessageMenu(false);
     setButtonAction("Edit");
     setMessage({ content: text, messageID: messageID });
+    setReplyEdit(messageID);
   };
 
   const handleDeleteClick = () => {
@@ -133,13 +134,18 @@ const MessageItem = ({
     handleDeleteMessage(messageID);
   };
 
+  const handleReplyClick = () => {
+    setShowMessageMenu(false);
+    setButtonAction("Reply");
+    setReplyEdit(messageID);
+  };
+
   return (
     <div ref={ messageRef } className={ messageType } onContextMenu={ toggleMenu }>
-      <div>
-        <div className={ styles.messageContent }>
-          { text ? text : <em>*This message was deleted*</em> }
+      <div className={ styles.messageHeader }>
+        <div className={ styles.messageSender } >
+          { isOwnMessage ? "You" : "Friend" }
         </div>
-
         <div className={ styles.messageTimestamp }>
           { timeText }
 
@@ -148,28 +154,49 @@ const MessageItem = ({
               { deliveryStatus === MESSAGE_STATUS.SENT && <img src={ sentIcon } alt="Delivery Status: Sent" /> }
               { deliveryStatus === MESSAGE_STATUS.DELIVERED && <img src={ delivered } alt="Delivery Status: Delivered" /> }
               { deliveryStatus === MESSAGE_STATUS.SEEN && <img src={ seen } alt="Delivery Status: Seen" /> }
-              {}
+            </div>
+          ) }
+        </div>
+        <div className={ styles.messageActions }>
+          {
+            <div className={ styles.dotMenu } onClick={ toggleMenu } aria-haspopup="menu" aria-expanded={ showMessageMenu }>
+              &#8942;
+            </div>
+          }
+          { showMessageMenu && (
+            <div
+              ref={ menuRef }
+              className={ `${styles.customMenu} ${renderUpwards ? styles.upwards : ""}` }
+              role="menu"
+            >
+              { isOwnMessage && (
+                <>
+                  <div className={ styles.menuItem } role="menuitem" onClick={ handleEditClick }>Edit</div>
+                  <div className={ styles.menuItem } role="menuitem" onClick={ handleDeleteClick }>Delete</div>
+                </>
+              ) }
+              <div className={ styles.menuItem } role="menuitem" onClick={ handleReplyClick }>Reply</div>
             </div>
           ) }
         </div>
       </div>
 
-      { isOwnMessage && (
-        <div className={ styles.dotMenu } onClick={ toggleMenu } aria-haspopup="menu" aria-expanded={ showMessageMenu }>
-          &#8942;
+      { replyTo &&
+        <div className={ styles.replyContainer }>
+          <div className={ styles.replyOwner }>
+            { replyTo.replyOwner }
+          </div>
+          <div className={ styles.replyContent }>
+            { replyTo.content }
+          </div>
         </div>
-      ) }
+      }
 
-      { showMessageMenu && (
-        <div
-          ref={ menuRef }
-          className={ `${styles.customMenu} ${renderUpwards ? styles.upwards : ""}` }
-          role="menu"
-        >
-          <div className={ styles.menuItem } role="menuitem" onClick={ handleEditClick }>Edit</div>
-          <div className={ styles.menuItem } role="menuitem" onClick={ handleDeleteClick }>Delete</div>
-        </div>
-      ) }
+      <div className={ styles.messageContent }>
+        { text ? text : <em>*This message was deleted*</em> }
+      </div>
+
+
     </div>
   );
 };

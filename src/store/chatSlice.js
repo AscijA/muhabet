@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { MESSAGE_STATUS } from 'src/Helpers/Constants';
 
 const initialState = {
   uid: "",

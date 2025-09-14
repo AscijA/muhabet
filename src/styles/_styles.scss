@@ -8,6 +8,7 @@ $timestamp-color: #93a1a1;
 $highlight-color: #268bd2;
 $menu-bg-color: #073642;
 $menu-hover-bg: #19414b;
+$sender-color: #b58900;
 
 @mixin profilePics {
   @include dimensionsMaxDimensions(32px);

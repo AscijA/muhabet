@@ -8,6 +8,21 @@
   margin: 0.3125rem;
   max-width: 60%;
   position: relative;
+  flex-direction: column;
+
+  .messageSender {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: $sender-color;
+  }
+
+  .messageHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-direction: row;
+  }
 
   .dotMenu {
     cursor: pointer;
@@ -24,8 +39,10 @@
   .messageTimestamp {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    width: 100%;
     font-size: 0.75rem;
-    margin-top: 0.3125rem;
+    margin-left: 8px; 
     color: $timestamp-color;
 
     .icons {
@@ -83,5 +100,31 @@
   .upwards {
     top: auto;
     bottom: 40px;
+  }
+
+  .replyContainer {
+    border-left: 4px solid $primary-color;
+    padding-left: 8px;
+    margin-bottom: 4px;
+    color: $text-color;
+    font-size: 0.875rem;
+    background-color: lighten($other-message-bg, 5%);
+    border-radius: 5px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+
+    .replyOwner {
+      font-weight: bold;
+      margin-right: 8px;
+      color: darken($text-color, 10%);
+    }
+
+    .replyContent {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: darken($text-color, 20%);
+    }
   }
 }
