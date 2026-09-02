@@ -13,30 +13,21 @@
   }
 
   input {
-    border: 1px solid $primary-color;
-    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    background-color: var(--secondary-color);
+    border-radius: 8px;
     margin: 0.5rem 0px;
-    height: 3.5vh;
+    height: 40px;
     box-sizing: border-box;
     font-size: 1.125rem;
-    color: $primary-color;
+    color: var(--primary-color);
     padding: 0.75rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &:focus {
-      margin: 0.5rem 0px;
-      box-sizing: border-box;
-      outline: 0.125rem solid $secondary-color;
-      outline-offset: 0;
-      border: 0.125rem solid $primary-color;
-      animation-name: blinking;
-      animation-duration: 1.5s;
-      animation-iteration-count: infinite;
+      outline: none;
+      border-color: var(--highlight-color);
+      box-shadow: 0 0 0 3px rgba(38, 139, 210, 0.3); // Solarized blue shadow
     }
-  }
-}
-
-@keyframes blinking {
-  50% {
-    outline-color: $primary-color;
   }
 }

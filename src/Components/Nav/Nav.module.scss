@@ -37,7 +37,7 @@
 
     &:hover {
       cursor: pointer;
-      background-color: rgba(#fff, 0.1);
+      background-color: var(--menu-hover-bg);
       border-radius: 4px;
     }
   }
@@ -68,7 +68,7 @@
 
   &:hover {
     cursor: pointer;
-    background-color: rgba(#fff, 0.1);
+    background-color: var(--menu-hover-bg);
     border-radius: 4px;
   }
 }

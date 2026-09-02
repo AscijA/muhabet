@@ -3,9 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import styles from "./ChatContent.module.scss";
 
-import { setCurrentChat, updateChatByID } from "../../../store/chatSlice";
+import { setCurrentChat } from "../../../store/chatSlice";
 import { MESSAGE_STATUS } from "../../../Helpers/Constants";
-import { updateChat, updateChatNoModify } from 'src/Helpers/ChatUtils';
 import { handleChatStatus } from 'src/Helpers/ChatUtils';
 
 import CustomButton from '../../Common/Buttons/CustomButton';
@@ -34,7 +33,7 @@ const ChatContent = () => {
     [allChats, currentChatMeta.chatId]
   );
 
-  const currentMessages = currentChatFull?.messages;
+  const currentMessages = useMemo(() => currentChatFull?.messages || [], [currentChatFull?.messages]);
 
   const [message, setMessage] = useState(initialMessage);
   const [buttonAction, setButtonAction] = useState("Send");
@@ -71,30 +70,20 @@ const ChatContent = () => {
     seenQueueRef.current.clear();
     if (ids.length === 0) return;
 
-    const msgs = messagesRef.current;
-    const updated = msgs.map(m =>
-      (ids.includes(m.messageID) &&
-        m.ownerID !== userRef.current.uid &&
-        m.messageStatus !== MESSAGE_STATUS.SEEN)
-        ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
-        : m
-    );
-
-    let changed = false;
-    for (let i = 0; i < msgs.length; i++) { if (msgs[i] !== updated[i]) { changed = true; break; } }
-    if (!changed) return;
-
     const cf = chatFullRef.current;
-    const cm = chatMetaRef.current;
-    if (!cf) return;
+    const msgs = messagesRef.current;
+    if (!cf || !msgs) return;
 
-    const newChat = { ...cf, messages: updated };
-    dispatch(updateChatByID(newChat));
-    dispatch(setCurrentChat({ ...cm, messages: updated }));
-
-    updateChat("messages", updated, cm.chatId)
-      .catch(err => console.error("Error marking messages as seen:", err));
-  }, [dispatch]);
+    import('src/Helpers/ChatUtils').then(({ updateMessageInSubcollection }) => {
+      ids.forEach(messageID => {
+        const m = msgs.find(msg => msg.messageID === messageID);
+        if (m && m.ownerID !== userRef.current.uid && m.messageStatus !== MESSAGE_STATUS.SEEN) {
+          updateMessageInSubcollection(cf.id, messageID, { messageStatus: MESSAGE_STATUS.SEEN })
+            .catch(err => console.error("Error marking messages as seen:", err));
+        }
+      });
+    });
+  }, []);
 
   const onVisibleSeen = useCallback((messageID) => {
     seenQueueRef.current.add(messageID);
@@ -131,17 +120,10 @@ const ChatContent = () => {
 
     setMessage(initialMessage);
 
-    if (currentChatFull) {
-      const updatedChat = {
-        ...currentChatFull,
-        messages: [...currentMessages, newMessage],
-      };
-      dispatch(updateChatByID(updatedChat));
-      dispatch(setCurrentChat({ ...currentChatMeta, messages: updatedChat.messages }));
-    }
-
-    updateChat("messages", [...currentMessages, newMessage], currentChatMeta.chatId)
-      .catch((err) => console.error("Error updating messages:", err));
+    import('src/Helpers/ChatUtils').then(({ addMessageToSubcollection }) => {
+      addMessageToSubcollection(currentChatMeta.chatId, newMessage)
+        .catch((err) => { console.error("Error updating messages:", err); alert("Failed to update message. Check your connection."); });
+    });
   };
 
   const handleEditMessage = () => {
@@ -150,32 +132,20 @@ const ChatContent = () => {
     const newMessage = { ...message };
     setMessage(initialMessage);
 
-    const updated = currentMessages.map(msg =>
-      msg.messageID === newMessage.messageID ? { ...msg, ...newMessage } : msg
-    );
-
-    if (currentChatFull) {
-      dispatch(updateChatByID({ ...currentChatFull, messages: updated }));
-      dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
-      updateChatNoModify("messages", updated, currentChatMeta.chatId)
-        .catch((err) => console.error("Error updating messages:", err));
-    }
+    import('src/Helpers/ChatUtils').then(({ updateMessageInSubcollection }) => {
+      updateMessageInSubcollection(currentChatMeta.chatId, newMessage.messageID, newMessage)
+        .catch((err) => { console.error("Error updating messages:", err); alert("Failed to update message. Check your connection."); });
+    });
     setButtonAction("Send");
   };
 
   const handleDeleteMessage = (messageID) => {
     if (!messageID) return;
 
-    const updated = currentMessages.map(msg =>
-      msg.messageID === messageID ? { ...msg, content: "" } : msg
-    );
-
-    if (currentChatFull) {
-      dispatch(updateChatByID({ ...currentChatFull, messages: updated }));
-      dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
-      updateChatNoModify("messages", updated, currentChatMeta.chatId)
-        .catch((err) => console.error("Error updating messages:", err));
-    }
+    import('src/Helpers/ChatUtils').then(({ updateMessageInSubcollection }) => {
+      updateMessageInSubcollection(currentChatMeta.chatId, messageID, { content: "" })
+        .catch((err) => { console.error("Error updating messages:", err); alert("Failed to update message. Check your connection."); });
+    });
   };
 
   const handleReplyMessage = (messageID) => {
@@ -263,27 +233,19 @@ const ChatContent = () => {
     if (!currentChatFull) return;
 
     const msgs = currentChatFull.messages || [];
-    const incomingUnseen = msgs.some(
+    const incomingUnseen = msgs.filter(
       m => m.ownerID !== currentUser.uid && m.messageStatus !== MESSAGE_STATUS.SEEN
     );
-    if (!incomingUnseen) return;
+    
+    if (incomingUnseen.length === 0) return;
 
-    const updated = msgs.map(m =>
-      (m.ownerID !== currentUser.uid && m.messageStatus !== MESSAGE_STATUS.SEEN)
-        ? { ...m, messageStatus: MESSAGE_STATUS.SEEN }
-        : m
-    );
-
-    let changed = false;
-    for (let i = 0; i < msgs.length; i++) if (msgs[i] !== updated[i]) { changed = true; break; }
-    if (!changed) return;
-
-    const newChat = { ...currentChatFull, messages: updated };
-    dispatch(updateChatByID(newChat));
-    dispatch(setCurrentChat({ ...currentChatMeta, messages: updated }));
-    updateChat("messages", updated, currentChatMeta.chatId)
-      .catch(err => console.error("Error marking messages as seen:", err));
-  }, [currentChatFull, currentUser.uid, currentChatMeta, dispatch]);
+    import('src/Helpers/ChatUtils').then(({ updateMessageInSubcollection }) => {
+      incomingUnseen.forEach(m => {
+        updateMessageInSubcollection(currentChatMeta.chatId, m.messageID, { messageStatus: MESSAGE_STATUS.SEEN })
+          .catch(err => console.error("Error marking messages as seen:", err));
+      });
+    });
+  }, [currentChatFull, currentUser.uid, currentChatMeta.chatId]);
 
   useEffect(() => {
     const el = chatContentRef.current;

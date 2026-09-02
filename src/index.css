@@ -5,8 +5,41 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* height: 100vw; */
-  color: #fff;
-
+  color: var(--text-color);
+  background-color: var(--primary-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+:root, [data-theme='dark'] {
+  --primary-color: #002b36;
+  --secondary-color: #fff;
+  --other-message-bg: #02487a;
+  --text-color: #839496;
+  --border-color: #586e75;
+  --timestamp-color: #586e75;
+  --highlight-color: #268bd2;
+  --menu-bg-color: #073642;
+  --menu-hover-bg: #19414b;
+  --sender-color: #b58900;
+  --button-text-color: #fff;
+  --hover-bg: #073642;
+}
+
+[data-theme='light'] {
+  --primary-color: #fdf6e3;
+  --secondary-color: #000;
+  --other-message-bg: #eee8d5;
+  --text-color: #657b83;
+  --border-color: #93a1a1;
+  --timestamp-color: #93a1a1;
+  --highlight-color: #268bd2;
+  --menu-bg-color: #eee8d5;
+  --menu-hover-bg: #e5dac1;
+  --sender-color: #b58900;
+  --button-text-color: #fdf6e3;
+  --hover-bg: #eee8d5;
+}
+
+* {
+  box-sizing: border-box;
+}

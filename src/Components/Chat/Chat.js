@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from "./Chat.module.scss";
 
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { subscribeToAuthChangesOnChatLoad } from 'src/Helpers/AuthUtils';
 
@@ -20,10 +21,12 @@ const Chat = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const unsubscribe = subscribeToAuthChangesOnChatLoad(dispatch, setLoading);
+    const unsubscribe = subscribeToAuthChangesOnChatLoad(dispatch, setLoading, navigate);
     return () => unsubscribe();
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   return (
     <div className={ styles.main }>

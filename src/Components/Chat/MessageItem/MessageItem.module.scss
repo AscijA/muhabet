@@ -108,7 +108,7 @@
     margin-bottom: 4px;
     color: $text-color;
     font-size: 0.875rem;
-    background-color: lighten($other-message-bg, 5%);
+    background-color: var(--menu-hover-bg);
     border-radius: 5px;
     padding: 4px 8px;
     display: flex;
@@ -117,14 +117,16 @@
     .replyOwner {
       font-weight: bold;
       margin-right: 8px;
-      color: darken($text-color, 10%);
+      color: var(--text-color);
+      opacity: 0.9;
     }
 
     .replyContent {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: darken($text-color, 20%);
+      color: var(--text-color);
+      opacity: 0.7;
     }
   }
 }

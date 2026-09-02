@@ -56,6 +56,12 @@ const UserSettingsModal = () => {
           { currentUser.email }
         </div>
         <div className={ styles.buttonsContainer }>
+          <SettingsItem title="Toggle Theme (Light/Dark)" onClick={ () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+          } } />
           <SettingsItem title="Log Out" onClick={ () => setDisplayConfirmLogOut(true) } />
           <SettingsItem title="Remove Profile Image" onClick={ () => setDisplayConfirmDeleteImage(true) } />
           <SettingsItem title="Delete Account" onClick={ () => setDisplayConfirmDeleteAcc(true) } color="red" />

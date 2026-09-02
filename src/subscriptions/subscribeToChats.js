@@ -1,8 +1,7 @@
 // subscribeToChats.js
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "src/Firebase/firebase";
-import { upsertChatSorted, removeChatByID } from "src/store/chatSlice";
-import { updateChatNoModify } from "src/Helpers/ChatUtils";
+import { upsertChatSorted, removeChatByID, updateChatByID } from "src/store/chatSlice";
 import { MESSAGE_STATUS } from "src/Helpers/Constants";
 
 const toMillis = (v) => {
@@ -33,11 +32,18 @@ const normalizeChat = (docSnap) => {
   };
 };
 
-/**
- * Realtime subscription for all chats where the user participates.
- * - Keeps Redux state incrementally updated and sorted by lastModified.
- * - Promotes incoming messages from SENT -> DELIVERED once they reach this device.
- */
+const normalizeMessageDoc = (docSnap) => {
+  const m = docSnap.data();
+  return {
+    ...m,
+    timestamp: toMillis(m?.timestamp),
+    messageStatus: m?.messageStatus ?? MESSAGE_STATUS.SENT,
+    messageID: docSnap.id,
+  };
+};
+
+let messageListeners = {};
+
 export const subscribeToChats = (userID, dispatch, onReady) => {
   const chatsRef = collection(db, "chats");
   const q = query(
@@ -51,42 +57,47 @@ export const subscribeToChats = (userID, dispatch, onReady) => {
   const unsubscribe = onSnapshot(
     q,
     async (snapshot) => {
-      const pendingDeliveries = [];
-
       snapshot.docChanges().forEach((change) => {
         if (change.type === "removed") {
           dispatch(removeChatByID(change.doc.id));
+          if (messageListeners[change.doc.id]) {
+            messageListeners[change.doc.id]();
+            delete messageListeners[change.doc.id];
+          }
           return;
         }
 
         const chat = normalizeChat(change.doc);
+        
+        // Remove the messages array normalization from the chat document itself
+        delete chat.messages;
 
-        const updatedMsgs = chat.messages.map(m => {
-          if (m.ownerID !== userID && m.messageStatus === MESSAGE_STATUS.SENT) {
-            return { ...m, messageStatus: MESSAGE_STATUS.DELIVERED };
-          }
-          return m; 
-        });
-
-        let changed = false;
-        for (let i = 0; i < chat.messages.length; i++) {
-          if (chat.messages[i] !== updatedMsgs[i]) { changed = true; break; }
-        }
-        if (changed) {
-          pendingDeliveries.push({ chatId: chat.id, messages: updatedMsgs });
-          chat.messages = updatedMsgs;
-        }
-
+        // Dispatch the chat metadata
         dispatch(upsertChatSorted(chat));
-      });
 
-      for (const { chatId, messages } of pendingDeliveries) {
-        try {
-          await updateChatNoModify("messages", messages, chatId);
-        } catch (e) {
-          console.error("Failed promoting SENT->DELIVERED:", chatId, e);
+        // Setup message subcollection listener if not exists
+        if (!messageListeners[chat.id]) {
+          const msgsQ = query(
+            collection(db, "chats", chat.id, "messages"),
+            orderBy("timestamp", "asc")
+          );
+          
+          messageListeners[chat.id] = onSnapshot(msgsQ, (msgSnap) => {
+            const msgs = msgSnap.docs.map(normalizeMessageDoc);
+            dispatch(updateChatByID({ id: chat.id, messages: msgs }));
+            
+            // Promote SENT -> DELIVERED
+            msgs.forEach(m => {
+              if (m.ownerID !== userID && m.messageStatus === MESSAGE_STATUS.SENT) {
+                import("src/Helpers/ChatUtils").then(({ updateMessageInSubcollection }) => {
+                   updateMessageInSubcollection(chat.id, m.messageID, { messageStatus: MESSAGE_STATUS.DELIVERED })
+                     .catch(e => console.error("Failed promoting SENT->DELIVERED:", chat.id, m.messageID, e));
+                });
+              }
+            });
+          });
         }
-      }
+      });
 
       if (first) {
         first = false;
@@ -102,5 +113,9 @@ export const subscribeToChats = (userID, dispatch, onReady) => {
     }
   );
 
-  return unsubscribe;
+  return () => {
+    unsubscribe();
+    Object.values(messageListeners).forEach(unsub => unsub());
+    messageListeners = {};
+  };
 };

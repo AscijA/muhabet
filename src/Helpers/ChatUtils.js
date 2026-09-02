@@ -154,4 +154,15 @@ const updateChatNoModify = async (key, value, chatID) => {
 };
 
 
+export const addMessageToSubcollection = async (chatID, message) => {
+  const msgRef = doc(collection(db, "chats", chatID, "messages"), message.messageID);
+  await setDoc(msgRef, message);
+  await updateDoc(doc(db, "chats", chatID), { lastModified: serverTimestamp() });
+};
+
+export const updateMessageInSubcollection = async (chatID, messageID, updates) => {
+  const msgRef = doc(db, "chats", chatID, "messages", messageID);
+  await updateDoc(msgRef, updates);
+};
+
 export { fetchChats, updateChatParticipants, createChat, handleChatStatus, updateChat, updateChatNoModify };

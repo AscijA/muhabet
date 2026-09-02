@@ -208,7 +208,9 @@ function areEqual(prev, next) {
     prev.deliveryStatus === next.deliveryStatus &&
     prev.timestampMs === next.timestampMs &&
     prev.messageID === next.messageID &&
-    prev.rootEl === next.rootEl
+    prev.rootEl === next.rootEl &&
+    prev.replyTo?.content === next.replyTo?.content &&
+    prev.replyTo?.replyOwner === next.replyTo?.replyOwner
   );
 }
 

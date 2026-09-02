@@ -1,14 +1,14 @@
-$primary-color: #002b36;
-$secondary-color: #fff;
+$primary-color: var(--primary-color);
+$secondary-color: var(--secondary-color);
 
-$other-message-bg: #02487a;
-$text-color: #fff;
-$border-color: #586e75;
-$timestamp-color: #93a1a1;
-$highlight-color: #268bd2;
-$menu-bg-color: #073642;
-$menu-hover-bg: #19414b;
-$sender-color: #b58900;
+$other-message-bg: var(--other-message-bg);
+$text-color: var(--text-color);
+$border-color: var(--border-color);
+$timestamp-color: var(--timestamp-color);
+$highlight-color: var(--highlight-color);
+$menu-bg-color: var(--menu-bg-color);
+$menu-hover-bg: var(--menu-hover-bg);
+$sender-color: var(--sender-color);
 
 @mixin profilePics {
   @include dimensionsMaxDimensions(32px);

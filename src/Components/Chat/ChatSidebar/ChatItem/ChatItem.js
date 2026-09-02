@@ -149,25 +149,11 @@ const ChatItem = (props) => {
 };
 
 function areEqual(prev, next) {
-  const prevMsgs = prev.chat.messages || [];
-  const nextMsgs = next.chat.messages || [];
-
-  const prevLast = prevMsgs[prevMsgs.length - 1];
-  const nextLast = nextMsgs[nextMsgs.length - 1];
-
-  const prevUnread = prevMsgs.reduce((n, m) =>
-    n + ((m.ownerID === prev.contactUID && m.messageStatus !== MESSAGE_STATUS.SEEN) ? 1 : 0), 0);
-  const nextUnread = nextMsgs.reduce((n, m) =>
-    n + ((m.ownerID === next.contactUID && m.messageStatus !== MESSAGE_STATUS.SEEN) ? 1 : 0), 0);
-
   return (
     prev.email === next.email &&
     prev.contactUID === next.contactUID &&
     prev.chat.id === next.chat.id &&
-    prevUnread === nextUnread &&
-    prevLast?.messageStatus === nextLast?.messageStatus &&
-    prevLast?.timestamp === nextLast?.timestamp &&
-    prevLast?.content === nextLast?.content &&
+    prev.chat.messages === next.chat.messages &&
     prev.chat.participants === next.chat.participants
   );
 }

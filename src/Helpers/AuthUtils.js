@@ -7,7 +7,7 @@ import {
   browserLocalPersistence,
   AuthErrorCodes
 } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { auth, db, storage } from "../Firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { userSetUp } from "./UserUtils";
@@ -27,7 +27,7 @@ import { subscribeToChats } from "src/subscriptions/subscribeToChats";
  * @param {Function} setLoading
  * @return {Function} unsubscribe
  */
-const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
+const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading, navigate) => {
   let unsubChats = null;
 
   const unsubAuth = onAuthStateChanged(auth, async (user) => {
@@ -73,6 +73,8 @@ const subscribeToAuthChangesOnChatLoad = (dispatch, setLoading) => {
         contact: { profilePic: "", email: "", uid: "" },
         messages: [],
       }));
+      // Redirect to login
+      if (navigate) navigate("/");
     }
   });
 
@@ -122,7 +124,7 @@ const signUpUser = async (email, password, setErrorMessage, setShowError) => {
       uid: userInfo.uid,
     };
 
-    await addDoc(collection(db, "users"), user);
+    await setDoc(doc(db, "users", userInfo.uid), user);
   } catch (error) {
     handleAuthError(error, setErrorMessage, setShowError);
   }
