@@ -27,6 +27,7 @@ const normalizeChat = (docSnap) => {
   return {
     id: docSnap.id,
     ...data,
+    participants: data?.participants || [],
     lastModified: toMillis(data?.lastModified),
     messages: normalizeMessages(data?.messages),
   };

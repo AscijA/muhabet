@@ -14,24 +14,21 @@
   }
 
   &::-webkit-scrollbar {
-    width: 20px;
+    width: 8px;
     background-color: transparent;
   }
 
   &::-webkit-scrollbar-track {
-    background-color: $primary-color;
+    background-color: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: $menu-hover-bg;
-    /* Replace with your color value if not using Sass */
+    background-color: var(--menu-bg-color);
     border-radius: 10px;
-    border: 5px solid $primary-color;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: $timestamp-color;
-    /* Replace with your color value if not using Sass */
+    background-color: var(--highlight-color);
   }
 
   /* Remove arrow buttons on top and bottom */

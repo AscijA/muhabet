@@ -28,7 +28,7 @@
 
   .contactPicBG {
     @include dimensionsMaxDimensions(64px);
-
+    border-radius: 50%;
     margin: 0.75rem 1.5rem;
   }
 
@@ -39,6 +39,8 @@
 
   .contactPicImg {
     @include dimensionsMaxDimensions(64px);
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   .chatItemMostRecentMessageSeen {

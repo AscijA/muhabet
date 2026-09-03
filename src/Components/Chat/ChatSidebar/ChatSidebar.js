@@ -31,10 +31,12 @@ const ChatSidebar = () => {
             let contactUID = "";
             let deliveryStatus = "";
 
-            const other = chat.participants.find(p => p.userID !== currentUser.uid);
+            const other = (chat.participants || []).find(p => p.userID !== currentUser.uid);
 
-            chatOwner = other.email || "";
-            contactUID = other.userID || "";
+            if (other) {
+              chatOwner = other.email || "";
+              contactUID = other.userID || "";
+            }
             deliveryStatus = chat?.lastMessageStatus?.userID === currentUser.uid
               ? chat.lastMessageStatus.status
               : "";

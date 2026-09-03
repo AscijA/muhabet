@@ -34,6 +34,7 @@
   .messageContent {
     font-size: 16px;
     color: $text-color;
+    word-break: break-word;
   }
 
   .messageTimestamp {

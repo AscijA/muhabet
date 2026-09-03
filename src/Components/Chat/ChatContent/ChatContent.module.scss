@@ -15,22 +15,21 @@
     flex-direction: column;
 
     &::-webkit-scrollbar {
-      width: 20px;
+      width: 8px;
       background-color: transparent;
     }
   
     &::-webkit-scrollbar-track {
-      background-color: $secondary-color;
+      background-color: transparent;
     }
   
     &::-webkit-scrollbar-thumb {
-      background-color: $primary-color;
+      background-color: var(--menu-bg-color);
       border-radius: 10px;
-      // border: 5px solid $primary-color;
     }
   
     &::-webkit-scrollbar-thumb:hover {
-      background-color: $menu-bg-color;
+      background-color: var(--highlight-color);
     } 
   
     /* Remove arrow buttons on top and bottom */
@@ -44,23 +43,21 @@
     min-height: 3rem;
     display: flex;
     flex-direction: row;
-    border-top: 1px solid $primary-color;
+    border-top: 1px solid var(--border-color);
     padding-top: 0.125rem;
-    background-color: $primary-color;
+    background-color: var(--primary-color);
 
     textarea::-webkit-scrollbar {
-      width: 12px;
+      width: 8px;
     }
 
     textarea::-webkit-scrollbar-track {
-      background-color: var(--secondary-color);
-      border-radius: 10px;
+      background-color: transparent;
     }
 
     textarea::-webkit-scrollbar-thumb {
-      background-color: $primary-color;
+      background-color: var(--menu-bg-color);
       border-radius: 10px;
-      border: 2px solid var(--menu-bg-color);
     }
 
     textarea::-webkit-scrollbar-thumb:hover {
