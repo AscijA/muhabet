@@ -1,16 +1,20 @@
 //App.js
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import SignComponent from './Components/SignInSignUp/SignComponent';
-import Chat from './Components/Chat/Chat';
+
+const SignComponent = lazy(() => import('./Components/SignInSignUp/SignComponent'));
+const Chat = lazy(() => import('./Components/Chat/Chat'));
 
 function App() {
   return (
     <div className="App">
       <div>
-        <Routes>
-          <Route path='/' element={ <SignComponent /> } />
-          <Route path='/chat' element={ <Chat /> } />
-        </Routes>
+        <Suspense fallback={ <p role="status">Loading Muhabet…</p> }>
+          <Routes>
+            <Route path='/' element={ <SignComponent /> } />
+            <Route path='/chat' element={ <Chat /> } />
+          </Routes>
+        </Suspense>
       </div>
     </div>
   );
