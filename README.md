@@ -1,70 +1,46 @@
-# Getting Started with Create React App
+# Muhabet
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Muhabet is a real-time, private one-to-one messaging application built with React, TypeScript, Redux Toolkit, and Firebase.
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js 20+
+- npm 10+
+- A Firebase project with Authentication, Firestore, and Storage enabled
 
-### `npm start`
+## Local setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Copy `.env.example` to `.env`.
+2. Fill in the Firebase web application configuration.
+3. Run `npm install`.
+4. Run `npm start` and open the Vite URL shown in the terminal (normally `http://localhost:5173`).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The Firebase API key is a public client identifier, but `.env` remains ignored to prevent accidental disclosure of project-specific configuration.
 
-### `npm test`
+## Quality commands
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `npm run typecheck` — validate TypeScript.
+- `npm run lint` — run static analysis.
+- `npm run test:unit` — run domain and application tests with Vitest.
+- `npm run test:rules` — verify Firestore access with the local emulator.
+- `npm run test:e2e` — run deterministic browser journeys.
+- `npm run test:e2e:ui` — open the Playwright test runner.
+- `npm run build` — create a production bundle.
+- `npm run check` — run the complete verification sequence.
 
-### `npm run build`
+E2E tests start the application with an in-memory backend. They never read or modify production Firebase data.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Firebase
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+`firebase.json`, `firestore.rules`, `firestore.indexes.json`, and `storage.rules` define the deployed data boundary. Deploy them only after selecting the intended Firebase project.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The current data model uses `/chats/{conversationId}/messages/{messageId}` for messages and stores participant IDs on the parent chat document.
 
-### `npm run eject`
+User discovery and account deletion run through callable Firebase Functions; browser clients have no Firestore access to `/user-directory`. The Functions module creates a server-owned SHA-256 email index, requires recent authentication for deletion, removes profile and account data, and anonymizes retained conversation membership.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Before deploying Functions, add a Firebase App Check reCAPTCHA Enterprise site key as `VITE_APP_CHECK_SITE_KEY`, install their dependencies with `npm --prefix functions install`, then deploy the selected Firebase project with `npm --prefix functions run deploy`. Callable operations require Firebase Authentication and valid App Check attestation; account deletion also consumes its App Check token to resist replay.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Repository security
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The local `.env` file is ignored and must never be committed. If you cloned before the 2026-09-13 history rewrite, create a fresh clone or reset your local branch to the rewritten `origin/main` before pushing; old commit IDs must not be merged back.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
