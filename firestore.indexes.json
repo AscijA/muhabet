@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "chats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participantIDs", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "lastModified", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
