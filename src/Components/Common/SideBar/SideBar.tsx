@@ -10,7 +10,7 @@ const SideBar: React.FC<SideBarProps> = (props) => {
   let widthStyle = styles.sign + (props.isChat ? " " + styles.chatWidth: "");
   let innerContainerStyle = styles.innerContainer + (props.isChat ? " " + styles.fh : "");
   return (
-    <div className={ styles.container } >
+    <div className={ `${styles.container} ${props.isChat ? styles.chatContainer : ""}` } >
       <div className={ widthStyle }>
         <div className={ innerContainerStyle }>
           { props.children }

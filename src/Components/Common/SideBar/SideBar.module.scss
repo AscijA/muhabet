@@ -1,33 +1,18 @@
-@import "../../../styles/styles";
-
-.container {
-  width: inherit;
-  /* height: 100%; */
-  display: flex;
-}
-
+.container { display: flex; min-width: 0; }
 .sign {
-  width: 30vw;
-  min-width: 500px;
-  height: inherit;
-  box-shadow: 5px 0px 10px $primary-color;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  color: $secondary-color;
-  background-color: $primary-color;
+  width: 42vw; min-width: 360px; height: 100%; padding: clamp(2rem, 5vw, 5.5rem);
+  display: flex; flex-direction: column; justify-content: center;
+  color: var(--text-color); background: var(--primary-color);
 }
-
-.innerContainer {
-  display: flex;
-  flex-direction: column;
-}
-.fh{
-  height: 100%;
-}
-
+.innerContainer { display: flex; flex-direction: column; width: 100%; }
+.fh { height: 100%; }
 .chatWidth {
-  width: 20vw;
-  justify-content: start;
+  width: clamp(280px, 28vw, 390px); min-width: 280px; padding: 0;
+  justify-content: flex-start; border-right: 1px solid var(--border-color);
+}
+@media (max-width: 780px) {
+  .chatContainer { width: 88px; min-width: 88px; flex: 0 0 88px; }
+  .sign { width: 88px; min-width: 88px; }
+  .sign { min-height: 100vh; padding: 2rem 1.5rem; }
+  .chatWidth { width: 88px; min-width: 88px; padding: 0; min-height: 100%; }
 }

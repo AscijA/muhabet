@@ -1,103 +1,19 @@
-@import "../../styles/styles";
-
-
-
-.main {
-  position: absolute;
-  display: flex;
-  height: 60px;
-  background-color: $primary-color;
-  width: 100vw;
-  border-bottom: $secondary-color solid 2px;
-
-}
-
-.side {
-  width: 20vw;
-  min-width: 500px;
-  border-right: $secondary-color solid 2px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.userName {
-  width: 75%;
-  // margin-left: 32px;
-
-}
-
-.settingsButton {
-  // width: 25%;
-  margin-right: 2rem;
-  text-align: end;
-
-  span {
-  padding: 0.5rem;
-
-    &:hover {
-      cursor: pointer;
-      background-color: var(--menu-hover-bg);
-      border-radius: 4px;
-    }
-  }
-}
-
-.contactPic {
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.contactPicBG {
-  background-color: var(--secondary-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.contactPicImg {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 1rem;
-}
-
-.chatContent {
-  // padding: 5px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-
-.contactNav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.25rem;
-  padding-right: 1rem;
-
-  &:hover {
-    cursor: pointer;
-    background-color: var(--menu-hover-bg);
-    border-radius: 4px;
-  }
-}
-
-.contactInfo{
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  
-  div:not(:last-child) {
-    border-bottom: 1px solid $border-color;
-  };
-}
-
-textarea {
-  font-family: 'Roboto', sans-serif;
+.main { display: flex; height: 72px; width: 100%; background: var(--primary-color); border-bottom: 1px solid var(--border-color); z-index: 5; }
+.side { width: clamp(280px, 28vw, 390px); min-width: 280px; border-right: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; }
+.chatContent { display: flex; flex: 1; align-items: center; min-width: 0; padding: 0 1rem; }
+.contactNav { display: flex; min-width: 0; align-items: center; gap: .75rem; padding: .45rem .55rem; border-radius: 10px; cursor: pointer; }
+.contactNav:hover { background: var(--menu-hover-bg); }
+.contactPic, .contactPicBG { width: 42px; height: 42px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface-raised); }
+.contactPicImg { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.userName, .contactNav > div:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; font-weight: 700; }
+.settingsButton { margin-left: .5rem; }
+.settingsButton span { display: block; padding: .55rem .7rem; border-radius: 9px; color: var(--muted-text); cursor: pointer; font-size: .82rem; font-weight: 700; }
+.settingsButton span:hover { color: var(--text-color); background: var(--menu-hover-bg); }
+.contactInfo { width: 100%; display: flex; flex-direction: column; }
+.contactInfo div:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+textarea { font-family: inherit; }
+@media (max-width: 780px) {
+  .side { width: 88px; min-width: 88px; padding: 0; justify-content: center; }
+  .side .userName, .settingsButton { display: none; }
+  .chatContent { padding: 0 .65rem; }
 }
