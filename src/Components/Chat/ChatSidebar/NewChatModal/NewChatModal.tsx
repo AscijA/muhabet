@@ -6,7 +6,7 @@ import SettingsItem from 'src/Components/Common/SettingsItem/SettingsItem';
 import CustomInput from 'src/Components/Common/CustomInput/CustomInput';
 import { getUidFromEmail } from 'src/Helpers/UserUtils';
 import { createChat } from 'src/Helpers/ChatUtils';
-import { setCurrentChat, updateChatByID } from 'src/store/chatSlice';
+import { selectAllChats, setCurrentChat, updateChatByID } from 'src/store/chatSlice';
 import { RootState, AppDispatch } from 'src/store/store';
 import { Chat } from 'src/types';
 
@@ -18,27 +18,32 @@ const NewChatModal: React.FC<NewChatModalProps> = (props) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const currentUser = useSelector((state: RootState) => state.user);
-  const allChats = useSelector((state: RootState) => state.chat.allChats);
+  const allChats = useSelector(selectAllChats);
   const [newEmail, setNewEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const confirmCreateChat = async () => {
+    if (isCreating) return;
     setShowError(false);
     setErrorMessage("");
+    const email = newEmail.trim().toLowerCase();
 
-    if (!newEmail) {
+    if (!email) {
       setErrorMessage("Please enter an email address.");
       setShowError(true);
       return;
     }
-    if (newEmail === currentUser.email) {
+    if (email === currentUser.email.toLowerCase()) {
       setErrorMessage("You cannot create a chat with yourself.");
       setShowError(true);
       return;
     }
 
-    const user2UID = await getUidFromEmail(newEmail);
+    setIsCreating(true);
+    try {
+    const user2UID = await getUidFromEmail(email);
     if (!user2UID) {
       setErrorMessage("No user found with this email address.");
       setShowError(true);
@@ -47,7 +52,7 @@ const NewChatModal: React.FC<NewChatModalProps> = (props) => {
 
     const participants = [
       { userID: currentUser.uid, email: currentUser.email, blockStatus: false, deleteStatus: false },
-      { userID: user2UID, email: newEmail, blockStatus: false, deleteStatus: false },
+      { userID: user2UID, email, blockStatus: false, deleteStatus: false },
     ];
     const participantIDs = participants.map(p => p.userID);
 
@@ -101,6 +106,13 @@ const NewChatModal: React.FC<NewChatModalProps> = (props) => {
 
     props.handleToggleModal();
     setNewEmail("");
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      setErrorMessage("The conversation could not be created. Please try again.");
+      setShowError(true);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const chatToCurrentChat = (chatToCon: Chat) => {
