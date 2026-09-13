@@ -19,10 +19,10 @@ const BasicModal: React.FC<BasicModalProps> = (props) => {
   };
 
   return (
-    <div className={ modalTypeStyles } onClick={ handleBackroundClick }>
-      <div className={ styles.modalContainer }>
+    <div className={ modalTypeStyles } onClick={ handleBackroundClick } role="presentation">
+      <div className={ styles.modalContainer } role="dialog" aria-modal="true">
         <div className={ styles.closeBar }>
-          <div className={ styles.closeButton } onClick={ props.handleToggleModal }></div>
+          <button className={ styles.closeButton } onClick={ props.handleToggleModal } aria-label="Close dialog"></button>
         </div>
         <div className={ styles.childContainer }>
           { props.children }

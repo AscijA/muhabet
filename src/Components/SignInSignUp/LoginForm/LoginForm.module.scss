@@ -1,25 +1,8 @@
-@import "../../../styles/styles";
-
-.helpLinks {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  font-size: 1.1rem;
-  margin-top: 1rem;
-
-  div {
-    transition: color 0.2s ease;
-    
-    &:hover {
-      cursor: pointer;
-      color: var(--highlight-color);
-      text-decoration: underline;
-    }
-  }
-}
-
-.errorMessage {
-  color: #dc322f; // Solarized red
-  font-weight: 500;
-  margin-top: 0.5rem;
-}
+.signForm { width: 100%; max-width: 460px; }
+.intro { margin-bottom: 2rem; }
+.intro h1 { margin: 0 0 .65rem; color: var(--secondary-color); font-size: clamp(2rem, 3.2vw, 3.6rem); line-height: 1; letter-spacing: -.055em; }
+.intro p { margin: 0; color: var(--muted-text); font-size: 1rem; line-height: 1.6; }
+.helpLinks { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; margin-top: 1.25rem; }
+.helpLinks button { padding: .25rem 0; color: var(--muted-text); background: none; border: 0; cursor: pointer; font-size: .9rem; font-weight: 600; }
+.helpLinks button:hover { color: var(--highlight-color); }
+.errorMessage { color: #ff8a80; font-weight: 600; margin: .75rem 0; font-size: .875rem; }

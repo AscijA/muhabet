@@ -1,29 +1,21 @@
-.logoContainer {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  margin-bottom: 1.75rem;
-}
-
-.logo {
-  width: 65%;
-}
-
-.main {
-  display: flex;
-  height: 100vh;
-}
-
-.formContainer {
-  margin: 0 1.5rem;
-}
-
+.main { display: grid; grid-template-columns: minmax(360px, 42%) 1fr; min-height: 100vh; background: #091120; }
+.logoContainer { width: 100%; display: flex; justify-content: flex-start; margin-bottom: 3.5rem; }
+.logo { width: min(220px, 65%); }
+.formContainer { width: 100%; }
 .imageContainer {
-  width: 70vw;
-  height: 100vh;
-  // background-color: aqua;
-  background-image: url("../../assets/temp.png");
-  background-position: center;
+  position: relative; min-height: 100vh; overflow: hidden;
+  background-image: linear-gradient(120deg, rgba(8, 17, 32, .18), rgba(8, 17, 32, .58)), url("../../assets/chat-background.webp");
+  background-size: cover; background-position: center;
+}
+.imageContainer::after {
+  content: "Conversations worth coming back to."; position: absolute;
+  left: clamp(2rem, 5vw, 5rem); bottom: clamp(2rem, 7vw, 5rem);
+  max-width: 10ch; color: white; font-size: clamp(2.8rem, 5.4vw, 6rem);
+  font-weight: 800; line-height: .94; letter-spacing: -.065em; text-wrap: balance;
+  text-shadow: 0 12px 36px rgba(0,0,0,.35);
+}
+@media (max-width: 780px) {
+  .main { display: block; }
+  .imageContainer { display: none; }
+  .logoContainer { margin-bottom: 2.5rem; }
 }

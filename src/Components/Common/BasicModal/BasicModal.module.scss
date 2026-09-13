@@ -1,4 +1,4 @@
-@import '../../../styles/styles';
+@use '../../../styles/styles' as *;
 
 .baseContainer {
   display: flex;
@@ -45,6 +45,9 @@
 .closeButton {
   color: $secondary-color;
   font-size: 3.25rem;
+  border: 0;
+  padding: 0;
+  background: transparent;
 
   &:before {
     display: block;

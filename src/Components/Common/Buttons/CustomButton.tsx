@@ -15,6 +15,7 @@ const CustomButton: React.FC<CustomButtonProps> = (props) => {
   return (
     <div className={ styles.buttonContainer }>
       <button
+        type="button"
         className={ buttonStyle }
         onClick={ props.handleSubmit }>
         { props.buttonText }

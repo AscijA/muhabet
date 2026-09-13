@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import styles from "./CustomInput.module.scss";
 
 interface CustomInputProps {
@@ -9,10 +9,11 @@ interface CustomInputProps {
 }
 
 const CustomInput: React.FC<CustomInputProps> = (props) => {
+  const inputId = useId();
   return (
     <div className={ styles.formInput }>
-      <label>{ props.label }</label>
-      <input type={ props.inputType }
+      <label htmlFor={ inputId }>{ props.label }</label>
+      <input id={ inputId } type={ props.inputType }
         value={ props.stateElement }
         onChange={ props.stateElementChangeHandler } />
     </div>

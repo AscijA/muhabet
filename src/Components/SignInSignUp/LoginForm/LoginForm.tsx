@@ -20,6 +20,10 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = (props) => {
   return (
     <form className={ styles.signForm }>
+      <div className={ styles.intro }>
+        <h1>{ props.buttonText === "Sign in" ? "Welcome back." : "Start a conversation." }</h1>
+        <p>{ props.buttonText === "Sign in" ? "Sign in to pick up where you left off." : "Create your account and say hello." }</p>
+      </div>
       <CustomInput
         label="Email address"
         inputType="email"
@@ -39,8 +43,8 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
         handleSubmit={ () => props.handleSubmit({ preventDefault: () => {} } as React.FormEvent) }
       />
       <div className={ styles.helpLinks }>
-        <div onClick={ props.handleChangeFormType }>{ props.formType }</div>
-        <div onClick={ props.handleResetPasswordToggle }>Reset password</div>
+        <button type="button" onClick={ props.handleChangeFormType }>{ props.formType }</button>
+        <button type="button" onClick={ props.handleResetPasswordToggle }>Reset password</button>
       </div>
     </form>
   );

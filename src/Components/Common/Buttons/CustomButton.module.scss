@@ -1,49 +1,12 @@
-@import "../../../styles/_styles.scss";
-
-
-.buttonContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: end;
-  margin: 0.5rem 0;
-
-  button {
-    font-weight: 600;
-    font-size: 1.25rem;
-    border-radius: 6px;
-    padding: 0.6rem 1.2rem;
-    min-width: 100px;
-    transition: all 0.2s ease-in-out;
-    border: none;
-    cursor: pointer;
-  }
-
-  .filled {
-    background-color: var(--highlight-color);
-    color: var(--button-text-color);
-    border: 2px solid transparent;
-
-    &:hover {
-      background-color: var(--primary-color);
-      border: 2px solid var(--highlight-color);
-      color: var(--highlight-color);
-    }
-  }
-
-  .outlined {
-    background-color: transparent;
-    border: 2px solid var(--highlight-color);
-    color: var(--highlight-color);
-
-    &:hover {
-      background-color: var(--highlight-color);
-      color: var(--button-text-color);
-    }
-  }
-
-  .smallButton {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-    min-width: 80px;
-  }
+.buttonContainer { display: flex; justify-content: flex-end; margin: .6rem 0; }
+.buttonContainer button {
+  min-width: 112px; padding: .78rem 1.25rem; border-radius: 11px;
+  border: 1px solid transparent; font-size: .95rem; font-weight: 800; cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
 }
+.buttonContainer button:active { transform: translateY(1px); }
+.filled { background: var(--highlight-color); color: var(--button-text-color); }
+.filled:hover { background: var(--highlight-hover); }
+.outlined { background: transparent; border-color: var(--border-color) !important; color: var(--text-color); }
+.outlined:hover { background: var(--menu-hover-bg); border-color: var(--highlight-color) !important; }
+.buttonContainer .smallButton { min-width: 82px; padding: .62rem 1rem; font-size: .86rem; }
