@@ -6,10 +6,10 @@ import sentIcon from "../../../../assets/checkmark.svg";
 import delivered from "../../../../assets/delivered.svg";
 import seen from "../../../../assets/seen.svg";
 import { fetchProfilePicture, fetchAndUpdateContactProfile } from "../../../../Helpers/ContactUtils";
-import { updateContact, setCurrentChat } from "../../../../store/chatSlice";
+import { updateContact, setCurrentChat, selectCurrentChat } from "../../../../store/chatSlice";
 import { subscribeToAuthChangesBasic } from "src/Helpers/AuthUtils";
 import { MESSAGE_STATUS } from "../../../../Helpers/Constants";
-import { RootState, AppDispatch } from 'src/store/store';
+import { AppDispatch } from 'src/store/store';
 import { Chat } from 'src/types';
 
 interface ChatItemProps {
@@ -23,8 +23,8 @@ interface ChatItemProps {
 const ChatItem: React.FC<ChatItemProps> = (props) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const chatState = useSelector((state: RootState) => state.chat);
-  const currentChatEmail = chatState.currentChat?.contact?.email;
+  const currentChat = useSelector(selectCurrentChat);
+  const currentChatEmail = currentChat.contact.email;
   const containerStyle =
     styles.chatItemContainer + " " + (currentChatEmail === props.email ? styles.currentChat : "");
 
@@ -78,12 +78,12 @@ const ChatItem: React.FC<ChatItemProps> = (props) => {
 
   useEffect(() => {
     fetchAndUpdateContactProfile(
-      chatState.currentChat?.contact?.uid,
-      chatState.currentChat?.contact?.profilePic,
+      currentChat.contact.uid,
+      currentChat.contact.profilePic,
       updateContact,
       dispatch
     );
-  }, [chatState.currentChat?.contact?.profilePic, chatState.currentChat?.contact?.uid, dispatch]);
+  }, [currentChat.contact.profilePic, currentChat.contact.uid, dispatch]);
 
   const handleChatItemOnClick = () => {
     const messages = props.chat.messages || [];
@@ -117,7 +117,9 @@ const ChatItem: React.FC<ChatItemProps> = (props) => {
   if (chatDeletedByOther) return null;
 
   return (
-    <div className={ containerStyle } onClick={ handleChatItemOnClick }>
+    <div className={ containerStyle } onClick={ handleChatItemOnClick } role="button" tabIndex={ 0 }
+      aria-label={ `Open chat with ${props.email}` }
+      onKeyDown={ event => { if (event.key === "Enter" || event.key === " ") handleChatItemOnClick(); } }>
       <div className={ showUser ? styles.contactPicBG : styles.contactPic }>
         <img className={ styles.contactPicImg } src={ showUser ? profilePic : userIcon } alt="Profile" />
       </div>

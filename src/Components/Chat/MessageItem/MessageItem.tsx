@@ -19,11 +19,12 @@ interface MessageItemProps {
   messageID: string;
   rootEl: HTMLElement | null;
   onVisibleSeen?: (id: string) => void;
-  setMessage: (msg: { content: string; messageID: string }) => void;
-  setButtonAction: (action: string) => void;
+  onEdit: (msg: { content: string; messageID: string }) => void;
   handleDeleteMessage: (id: string) => void;
-  setReplyEdit: (id: string) => void;
+  onReply: (id: string) => void;
   replyTo?: ReplyToInfo | null;
+  clientState?: "pending" | "failed";
+  onRetry?: () => void;
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({
@@ -34,11 +35,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
   messageID,
   rootEl,
   onVisibleSeen,
-  setMessage,
-  setButtonAction,
+  onEdit,
   handleDeleteMessage,
-  setReplyEdit,
-  replyTo
+  onReply,
+  replyTo,
+  clientState,
+  onRetry,
 }) => {
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [renderUpwards, setRenderUpwards] = useState(false);
@@ -135,9 +137,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   const handleEditClick = () => {
     setShowMessageMenu(false);
-    setButtonAction("Edit");
-    setMessage({ content: text, messageID: messageID });
-    setReplyEdit(messageID);
+    onEdit({ content: text, messageID });
   };
 
   const handleDeleteClick = () => {
@@ -147,8 +147,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   const handleReplyClick = () => {
     setShowMessageMenu(false);
-    setButtonAction("Reply");
-    setReplyEdit(messageID);
+    onReply(messageID);
   };
 
   return (
@@ -170,9 +169,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
         <div className={ styles.messageActions }>
           {
-            <div className={ styles.dotMenu } onClick={ toggleMenu } aria-haspopup="menu" aria-expanded={ showMessageMenu }>
+            <button className={ styles.dotMenu } onClick={ toggleMenu } aria-label="Message actions" aria-haspopup="menu" aria-expanded={ showMessageMenu }>
               &#8942;
-            </div>
+            </button>
           }
           { showMessageMenu && (
             <div
@@ -206,6 +205,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
       <div className={ styles.messageContent }>
         { text ? text : <em>*This message was deleted*</em> }
       </div>
+      { clientState && <div className={ styles.clientState }>
+        { clientState === "pending" ? "Sending…" : <button onClick={ onRetry }>Retry sending</button> }
+      </div> }
 
 
     </div>
@@ -219,6 +221,7 @@ function areEqual(prev: MessageItemProps, next: MessageItemProps) {
     prev.deliveryStatus === next.deliveryStatus &&
     prev.timestampMs === next.timestampMs &&
     prev.messageID === next.messageID &&
+    prev.clientState === next.clientState &&
     prev.rootEl === next.rootEl &&
     prev.replyTo?.content === next.replyTo?.content &&
     prev.replyTo?.replyOwner === next.replyTo?.replyOwner

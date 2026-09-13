@@ -5,14 +5,14 @@ import { useSelector } from 'react-redux';
 
 import ChatItem from './ChatItem/ChatItem';
 import BasicModal from 'src/Components/Common/BasicModal/BasicModal';
-import { setShowNewChatModal } from 'src/store/chatSlice';
+import { selectAllChats, setShowNewChatModal } from 'src/store/chatSlice';
 import { useDispatch } from 'react-redux';
 import NewChatModal from './NewChatModal/NewChatModal';
 import { RootState } from 'src/store/store';
 import { Chat } from 'src/types';
 
 const ChatSidebar: React.FC = () => {
-  const allChats = useSelector((state: RootState) => state.chat.allChats);
+  const allChats = useSelector(selectAllChats);
   let currentUser = useSelector((state: RootState) => state.user);
   let showNewChatModal = useSelector((state: RootState) => state.chat.showNewChatModal);
   let dispatch = useDispatch();
