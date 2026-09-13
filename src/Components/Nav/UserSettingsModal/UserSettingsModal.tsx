@@ -20,17 +20,19 @@ const UserSettingsModal: React.FC = () => {
   const [showConfirmWindowLogOut, setDisplayConfirmLogOut] = useState(false);
   const [showConfirmWindowDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
   const [showConfirmWindowDeleteAcc, setDisplayConfirmDeleteAcc] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getUserProfileImage(dispatch, updateUser, setShowDefaultImage);
-  }, [dispatch]);
+    getUserProfileImage(currentUser.uid, dispatch, updateUser, setShowDefaultImage);
+  }, [currentUser.uid, dispatch]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      uploadProfileImage(file, dispatch, updateUser, setShowDefaultImage);
+      uploadProfileImage(currentUser.uid, file, dispatch, updateUser, setShowDefaultImage)
+        .then(error => setProfileError(error || ""));
     }
   };
 
@@ -50,6 +52,7 @@ const UserSettingsModal: React.FC = () => {
         <div className={ styles.email }>
           { currentUser.email }
         </div>
+        { profileError && <div role="alert">{ profileError }</div> }
         <div className={ styles.buttonsContainer }>
           <SettingsItem title="Toggle Theme (Light/Dark)" onClick={ () => {
             const current = document.documentElement.getAttribute('data-theme');
@@ -77,7 +80,7 @@ const UserSettingsModal: React.FC = () => {
         (<ConfirmationWindow
           text="Are you sure you want to remove Your profile picture?"
           buttons={ [
-            { text: "Yes", onClick: () => removeUserProfileImage(dispatch, updateUser, setShowDefaultImage) },
+            { text: "Yes", onClick: () => removeUserProfileImage(currentUser.uid, dispatch, updateUser, setShowDefaultImage) },
             { text: "No", onClick: () => setDisplayConfirmDeleteImage(false) }
           ] }
           handleToggleModal={ () => setDisplayConfirmDeleteImage(false) }
@@ -87,7 +90,7 @@ const UserSettingsModal: React.FC = () => {
         (<ConfirmationWindow
           text="Are you sure you want to Delete Your Account? This action cannot be undone."
           buttons={ [
-            { text: "Yes", onClick: () => deleteUserAccount(dispatch, resetUser, navigate) },
+            { text: "Yes", onClick: () => deleteUserAccount(dispatch, resetUser, resetChatState, navigate) },
             { text: "No", onClick: () => setDisplayConfirmDeleteAcc(false) }
           ] }
           handleToggleModal={ () => setDisplayConfirmDeleteAcc(false) }

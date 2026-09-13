@@ -5,6 +5,7 @@ import ConfirmationWindow from '../../Common/ConfirmationWindow/ConfirmationWind
 import SettingsItem from '../../Common/SettingsItem/SettingsItem';
 import userIcon from "../../../assets/user.svg";
 import { RootState } from 'src/store/store';
+import { selectAllChats, selectCurrentChat } from 'src/store/chatSlice';
 
 interface ContactInfoModalProps {
   handleDeleteChat?: () => void;
@@ -14,7 +15,9 @@ interface ContactInfoModalProps {
 
 const ContactInfoModal: React.FC<ContactInfoModalProps> = (props) => {
   const currentUser = useSelector((state: RootState) => state.user);
-  const { currentChat, allChats, showContactDefaultImage: showContact } = useSelector((state: RootState) => state.chat);
+  const { showContactDefaultImage: showContact } = useSelector((state: RootState) => state.chat);
+  const currentChat = useSelector(selectCurrentChat);
+  const allChats = useSelector(selectAllChats);
 
   const [showConfirmWindowDeleteChat, setDisplayConfirmDeleteChat] = useState(false);
   const [showConfirmWindowBlockUser, setDisplayConfirmBlockUser] = useState(false);

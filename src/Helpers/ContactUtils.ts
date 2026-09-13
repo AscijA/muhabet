@@ -1,75 +1,23 @@
-import { storage } from "../Firebase/firebase";
-import { ref, getDownloadURL } from "firebase/storage";
-import { getContactImage, getImageFromFirebaseAndSaveToIDB } from "src/Helpers/idb";
+import { chatServices } from "src/app/chatServices";
+import { updateContact as updateContactAction, setShowContactDefaultImage as setDefaultAction } from "src/store/chatSlice";
 import { AppDispatch } from "src/store/store";
-import { ChatContact } from "src/types";
 
-export const fetchProfilePicture = async (
-  contactUID: string | undefined | null,
-  setProfilePic: (url: string) => void,
-  setShowUser: (show: boolean) => void
-) => {
-  try {
-    if (!contactUID) return;
-
-    const image = await getContactImage(contactUID);
-    if (image) {
-      setProfilePic(URL.createObjectURL(image));
-      setShowUser(true);
-    }
-
-    const contactRef = ref(storage, `profile-pics/${contactUID}`);
-    const url = await getDownloadURL(contactRef);
-    setProfilePic(url);
-    setShowUser(true);
-  } catch (error) {
-    console.error("Error fetching profile picture:", error);
-  }
+export const fetchProfilePicture = async (contactId: string | undefined | null, setPicture: (url: string) => void, setAvailable: (show: boolean) => void) => {
+  if (!contactId) return;
+  const image = await chatServices.profiles.getImage(contactId);
+  if (!image) { setAvailable(false); return; }
+  setPicture(image.url); setAvailable(true);
 };
 
-export const fetchAndUpdateContactProfile = async (
-  contactUID: string | undefined | null,
-  currentProfilePic: string,
-  updateContact: any,
-  dispatch: AppDispatch
-) => {
-  try {
-    if (!contactUID || currentProfilePic) return;
-
-    const contactRef = ref(storage, `profile-pics/${contactUID}`);
-    const url = await getDownloadURL(contactRef);
-
-    if (currentProfilePic !== url) {
-      dispatch(updateContact({ profilePic: url }));
-    }
-  } catch (error) {
-    console.error("Error fetching contact profile pic:", error);
-  }
+export const fetchAndUpdateContactProfile = async (contactId: string | undefined | null, currentPicture: string, updateContact: typeof updateContactAction, dispatch: AppDispatch) => {
+  if (!contactId || currentPicture) return;
+  const image = await chatServices.profiles.getImage(contactId);
+  if (image) dispatch(updateContact({ profilePic: image.url }));
 };
 
-export const fetchContactProfile = async (
-  contactUID: string | undefined | null,
-  dispatch: AppDispatch,
-  updateContact: any,
-  setShowContactDefaultImage: any
-) => {
-  try {
-    if (!contactUID) return;
-    
-    const image = await getContactImage(contactUID);
-    if (image) {
-      dispatch(updateContact({ profilePic: URL.createObjectURL(image) }));
-      dispatch(setShowContactDefaultImage(false));
-    }
-    
-    const contactRef = ref(storage, `profile-pics/${contactUID}`);
-    const url = await getDownloadURL(contactRef);
-    dispatch(updateContact({ profilePic: url }));
-    dispatch(setShowContactDefaultImage(false));
-    
-    getImageFromFirebaseAndSaveToIDB(contactUID, url);
-  } catch (error) {
-    dispatch(setShowContactDefaultImage(true));
-    console.error("Error fetching contact profile pic:", error);
-  }
+export const fetchContactProfile = async (contactId: string | undefined | null, dispatch: AppDispatch, updateContact: typeof updateContactAction, setDefault: typeof setDefaultAction) => {
+  if (!contactId) return;
+  const image = await chatServices.profiles.getImage(contactId);
+  dispatch(setDefault(!image));
+  if (image) dispatch(updateContact({ profilePic: image.url }));
 };

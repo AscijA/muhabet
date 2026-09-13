@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './Nav.module.scss';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { toggleShowChatInfo, updateContact, setShowContactDefaultImage, setCurrentChat } from '../../store/chatSlice';
+import { toggleShowChatInfo, updateContact, setShowContactDefaultImage, setCurrentChat, selectCurrentChat } from '../../store/chatSlice';
 import { subscribeToAuthChangesBasic } from 'src/Helpers/AuthUtils';
 import { fetchContactProfile } from 'src/Helpers/ContactUtils';
 import { handleChatStatus } from 'src/Helpers/ChatUtils';
@@ -11,7 +11,7 @@ import UserSettingsModal from './UserSettingsModal/UserSettingsModal';
 import ContactInfo from './ContactInfoModal/ContactInfoModal';
 import BasicModal from '../Common/BasicModal/BasicModal';
 import { RootState, AppDispatch } from 'src/store/store';
-import { User as FirebaseUser } from 'firebase/auth';
+import { AuthenticatedUser } from 'src/domain/identity/User';
 
 const Nav: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,13 +19,14 @@ const Nav: React.FC = () => {
 
   let user = useSelector((state: RootState) => state.user);
   let chat = useSelector((state: RootState) => state.chat);
+  const currentChat = useSelector(selectCurrentChat);
   const showDefaultImage = useSelector((state: RootState) => state.chat.showDefaultImage);
   const showContact = useSelector((state: RootState) => state.chat.showContactDefaultImage);
 
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = subscribeToAuthChangesBasic((u: FirebaseUser | null) => {
+    const unsubscribe = subscribeToAuthChangesBasic((u: AuthenticatedUser | null) => {
       if (!u) {
         navigate("/");
       }
@@ -34,8 +35,8 @@ const Nav: React.FC = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetchContactProfile(chat.currentChat?.contact?.uid, dispatch, updateContact, setShowContactDefaultImage);
-  }, [chat.currentChat?.contact?.uid, dispatch]);
+    fetchContactProfile(currentChat.contact.uid, dispatch, updateContact, setShowContactDefaultImage);
+  }, [currentChat.contact.uid, dispatch]);
 
   const handleShowSettingsToggle = () => {
     setShowSettings(prev => !prev);
@@ -60,7 +61,8 @@ const Nav: React.FC = () => {
   return (
     <div className={ styles.main }>
       <div className={ styles.side }>
-        <div className={ styles.contactNav } onClick={ handleShowSettingsToggle }>
+        <div className={ styles.contactNav } onClick={ handleShowSettingsToggle } role="button" tabIndex={ 0 } aria-label="Open settings"
+          onKeyDown={ event => { if (event.key === "Enter" || event.key === " ") handleShowSettingsToggle(); } }>
           <div className={ showDefaultImage ? styles.contactPicBG : styles.contactPic }>
             <img className={ styles.contactPicImg } src={ showDefaultImage ? userIcon : user.profilePic } alt="Profile" />
           </div>
@@ -69,12 +71,13 @@ const Nav: React.FC = () => {
         <div className={ styles.settingsButton } onClick={ handleShowSettingsToggle }><span>Settings</span></div>
       </div>
       <div className={ styles.chatContent }>
-        { chat.currentChat.contact.uid && (
-          <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } >
+        { currentChat.contact.uid && (
+          <div className={ styles.contactNav } onClick={ handleShowContactInfoToggle } role="button" tabIndex={ 0 } aria-label="Open contact details"
+            onKeyDown={ event => { if (event.key === "Enter" || event.key === " ") handleShowContactInfoToggle(); } }>
             <div className={ showContact ? styles.contactPicBG : styles.contactPic }>
-              <img className={ styles.contactPicImg } src={ showContact ? userIcon : chat.currentChat.contact.profilePic } alt="Profile" />
+              <img className={ styles.contactPicImg } src={ showContact ? userIcon : currentChat.contact.profilePic } alt="Profile" />
             </div>
-            <div>{ chat.currentChat.contact.email }</div>
+            <div>{ currentChat.contact.email }</div>
           </div>
         ) }
       </div>

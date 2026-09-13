@@ -1,71 +1,56 @@
-import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage';
-import { auth, storage } from '../Firebase/firebase';
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { setUser, UserState } from "src/store/userSlice";
-import { db } from "src/Firebase/firebase";
-import { deleteUser, User as FirebaseUser } from 'firebase/auth';
+import { UserState } from "src/store/userSlice";
 import { AppDispatch } from "src/store/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import { createDeleteAccountUseCase } from "src/application/identity/deleteAccountUseCase";
+import { authServices } from "src/app/authServices";
+import { chatServices } from "src/app/chatServices";
+import { validateProfileImage } from "src/domain/profiles/profileImagePolicy";
 
-export const userSetUp = async (authUser: FirebaseUser, dispatch: AppDispatch) => {
-  const user: UserState = {
-    email: authUser.email || "",
-    displayName: authUser.displayName || "",
-    emailVerified: authUser.emailVerified,
-    createdAt: authUser.metadata.creationTime || "",
-    uid: authUser.uid,
-    contacts: [],
-    profilePic: "",
-    settings: null
-  };
-  dispatch(setUser(user));
-};
+const deleteAccount = createDeleteAccountUseCase({ auth: authServices.auth, profiles: chatServices.profiles });
 
 export const getUserProfileImage = async (
+  userId: string,
   dispatch: AppDispatch,
   updateUserAction: ActionCreatorWithPayload<Partial<UserState>>,
   setShowDefaultImageAction: ActionCreatorWithPayload<boolean>
 ) => {
-  try {
-    if (auth.currentUser) {
-      const gsRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-      const url = await getDownloadURL(gsRef);
-      dispatch(updateUserAction({ profilePic: url }));
-      dispatch(setShowDefaultImageAction(false));
-    }
-  } catch (error) {
-    dispatch(setShowDefaultImageAction(true));
-  }
+  if (!userId) { dispatch(setShowDefaultImageAction(true)); return; }
+  const image = await chatServices.profiles.getImage(userId);
+  dispatch(setShowDefaultImageAction(!image));
+  if (image) dispatch(updateUserAction({ profilePic: image.url }));
 };
 
 export const uploadProfileImage = async (
+  userId: string,
   file: File,
   dispatch: AppDispatch,
   updateUserAction: ActionCreatorWithPayload<Partial<UserState>>,
   setShowDefaultImageAction: ActionCreatorWithPayload<boolean>
 ) => {
+  const validation = validateProfileImage(file);
+  if (!validation.ok) return validation.message;
   try {
-    if (auth.currentUser) {
-      const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      dispatch(updateUserAction({ profilePic: url }));
+    if (userId) {
+      const image = await chatServices.profiles.uploadImage(userId, file);
+      dispatch(updateUserAction({ profilePic: image.url }));
       dispatch(setShowDefaultImageAction(false));
     }
+    return null;
   } catch (error) {
     console.error("Error uploading profile image:", error);
+    return "The profile image could not be uploaded. Please try again.";
   }
 };
 
 export const removeUserProfileImage = async (
+  userId: string,
   dispatch: AppDispatch,
   updateUserAction: ActionCreatorWithPayload<Partial<UserState>>,
   setShowDefaultImageAction: ActionCreatorWithPayload<boolean>
 ) => {
   try {
-    if (auth.currentUser) {
-      const storageRef = ref(storage, `profile-pics/${auth.currentUser.uid}`);
-      await deleteObject(storageRef);
+    if (userId) {
+      await chatServices.profiles.removeImage(userId);
       dispatch(updateUserAction({ profilePic: "" }));
       dispatch(setShowDefaultImageAction(true));
     }
@@ -81,7 +66,8 @@ export const signOutUser = async (
   navigate: (path: string) => void
 ) => {
   try {
-    await auth.signOut();
+    const result = await authServices.auth.signOut();
+    if (!result.ok) throw new Error(result.reason);
     dispatch(resetUserAction());
     dispatch(resetChatStateAction());
     navigate("/");
@@ -93,22 +79,20 @@ export const signOutUser = async (
 export const deleteUserAccount = async (
   dispatch: AppDispatch,
   resetUserAction: any,
+  resetChatStateAction: any,
   navigate: (path: string) => void
 ) => {
   try {
-    if (auth.currentUser) {
-      await deleteUser(auth.currentUser);
-      dispatch(resetUserAction());
-      navigate("/");
-    }
+    const result = await deleteAccount();
+    if (!result.ok) throw new Error(result.reason);
+    dispatch(resetUserAction());
+    dispatch(resetChatStateAction());
+    navigate("/");
   } catch (error) {
     console.error("Error deleting user:", error);
   }
 };
 
 export const getUidFromEmail = async (email: string): Promise<string | null> => {
-  const q = query(collection(db, "users"), where("email", "==", email));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  return snapshot.docs[0].data().uid;
+  return chatServices.userDirectory.findByEmail(email);
 };
